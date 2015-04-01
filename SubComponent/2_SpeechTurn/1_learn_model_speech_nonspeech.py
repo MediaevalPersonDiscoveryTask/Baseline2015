@@ -15,25 +15,19 @@ import pickle
 
 if __name__ == '__main__':
     # read arguments
-    arguments = docopt(__doc__)
-    path_to_wave = arguments['<path_to_wave>']
-    video_list = arguments['<video_list>']
-    reference = arguments['<reference>']
-    model_output = arguments['<model_output>']
-    uem_file = arguments['<uem_file>']
-
+    args = docopt(__doc__)
     # read ref
-    refs = MDTMParser().read(reference)
+    refs = MDTMParser().read(args['<reference>'])
     # segment manually annotated in the reference
-    uems = UEMParser().read(uem_file)
+    uems = UEMParser().read(args['<uem_file>'])
     # extractor Yaafe
     extractor = YaafeCompound([YaafeZCR(), YaafeMFCC(e=False, De=False, DDe=False, D=True, DD = True)])
 
     audio_features = []
     ref_speech_nonspeech = []
-    for video in open(video_list).read().splitlines():
+    for video in open(args['<video_list>']).read().splitlines():
         # extract features
-        audio_features = extractor(path_to_wave+'/'+video+'.wav')
+        audio_features = extractor(args['<path_to_wave>']+'/'+video+'.wav')
         audio_features.append(audio_features)
 
         ref = refs(uri=video, modality="speaker")
@@ -52,4 +46,4 @@ if __name__ == '__main__':
     segmenter.fit(audio_features, ref_speech_nonspeech)
  
     # save segmenter model
-    pickle.dump(segmenter, open(model_output, "wb" ) )
+    pickle.dump(segmenter, open(args['<model_output>'], "wb" ) )
