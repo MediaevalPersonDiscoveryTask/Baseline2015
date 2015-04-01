@@ -28,8 +28,8 @@ if __name__ == '__main__':
     # segment audio signal and write in output_path
     with open(args['<output_path>']+'/'+args['<video_name>']+'.mdtm', 'w') as f:
         MDTMParser().write(segmenter.predict(audio_features, 
-                                             min_duration={'speech':float(args['<min_dur_speech>']), 
-                                                           'non_speech':float(args['<min_dur_non_speech>'])
+                                             min_duration={'speech':float(args['--min_dur_speech']), 
+                                                           'non_speech':float(args['--min_dur_non_speech'])
                                                           }
                                             ), 
                            f=f, 
