@@ -89,15 +89,18 @@ if __name__ == '__main__':
     # read the first frame, take only the ROI and copy as the previous frame
     ret, frame = capture.read()
     frame_previous = frame[y:y+h, x:x+w].copy()
+    nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT))
+    c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
 
     # save desc into a file
     fout = open(args['<output_file>'], 'w')
-    while (capture.isOpened()):
+    while (c_frame<nb_frame):
         ret, frame = capture.read()
+        c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
         if ret:
             frame = frame[y:y+h, x:x+w]
             # compute and save descriptor 
-            fout.write(str(int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))))
+            fout.write(str(c_frame))
             fout.write(' '+str(round(cv.CompareHist(calcul_hist(frame), calcul_hist(frame_previous), cv.CV_COMP_CORREL), 3)))
             fout.write(' '+str(round(score_OF(frame_previous, frame, lk_params, feature_params), 3)))
             fout.write('\n')
