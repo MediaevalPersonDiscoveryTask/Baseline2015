@@ -53,6 +53,6 @@ if __name__ == '__main__':
     for i in list(minima)[0]:
         if x[i] < threshold:
             fout.write(str(y[i])+'\n')
-    fout.write(str(y[-1]))
+    fout.write(str(y[-1])+'\n')
 
     
