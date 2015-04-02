@@ -15,9 +15,9 @@ Options:
   --h=<h>    position height of the ROI, (0 > h+y > video_height), default height of the video
 """
 
-import cv2, cv
-import json, sys
 from docopt import docopt
+import cv2, cv
+import numpy as np
 
 def calcul_hist(src_np):  
     height, width, depth = src_np.shape
