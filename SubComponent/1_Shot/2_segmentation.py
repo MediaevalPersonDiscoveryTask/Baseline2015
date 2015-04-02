@@ -1,9 +1,10 @@
 """
-Find shot boundaries based on histogram and optical flow between 2 consecutive frames
+Find shot boundaries with a descriptor (<descriptor>) based on histogram and optical flow between consecutive frames.
+Write frame selected as shot boundarires into <output_file>.
 
 Usage:
-  cut_thr_selection.py <descriptor> <output_file> [--threshold=<t>] [--min_duration=<md>] [--X_sigma=<Xs>] [--mix=<m>]
-  cut_thr_selection.py -h | --help
+  segmentation.py <descriptor> <output_file> [--threshold=<t>] [--min_duration=<md>] [--X_sigma=<Xs>] [--mix=<m>]
+  segmentation.py -h | --help
 Options:
   --min_duration=<md>  minimum duration (in frame) of a shot (>0) [default: 15]  
   --threshold=<t>      threshold value  (0.0 > t > 1.0), default = mean(score) + X_sigma * std(score)
