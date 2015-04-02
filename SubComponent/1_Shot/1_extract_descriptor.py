@@ -1,5 +1,9 @@
 """
-Compute histogram and optical flow between 2 consecutive frames to find shot boundaries
+Take a video file (<video_file>) in avi format and compute:
+ - A score based on the difference of color histogram between 2 consecutive frames
+ - A score based on the proportion of point of interested retrieved between 2 consecutive frame
+Write this 2 scores into an output file <output_file>.
+If x, y, w, h is defined, the score is computed only on a region of interest of the images.
 
 Usage:
   cut_hist_OF_score.py <video_file> <output_file> [--x=<x> --y=<y> --w=<w> --h=<h>]
