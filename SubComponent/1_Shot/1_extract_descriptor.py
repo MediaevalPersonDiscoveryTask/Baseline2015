@@ -60,11 +60,8 @@ def score_OF(img0, img1, lk_params, feature_params):
 if __name__ == '__main__': 
     # read args
     args = docopt(__doc__)
-    x = int(args['--x'])
-    y = int(args['--y'])
-    w = int(args['--w'])
-    h = int(args['--h'])
 
+    # parameters for optical flow
     lk_params = dict(winSize  = (20, 20), 
                      maxLevel = 2, 
                      criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
@@ -73,32 +70,36 @@ if __name__ == '__main__':
                           qualityLevel = 0.01,
                           minDistance = 10,
                           blockSize = 3) 
+
     # open video
     capture = cv2.VideoCapture(args['<video_file>'])
-    # extraction video information
-    nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT)-1)
-    video_width = int(capture.get(cv.CV_CAP_PROP_FRAME_WIDTH))
-    video_height = int(capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
-    # read the first frame
-    ret, frame = capture.read()
-    c_frame = capture.get(cv.CV_CAP_PROP_POS_FRAMES)    
-    # get only the ROI
-    frame = frame[y:y+h, x:x+w]
-    # copy the current frame
-    frame_previous = frame.copy()
 
+    # define ROI position
+    if args['--w']:
+        w = int(args['--w'])
+    else:
+        w = int(capture.get(cv.CV_CAP_PROP_FRAME_WIDTH))
+    if args['--h']:
+        h = int(args['--h'])
+    else:
+        h = int(capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
+    x = int(args['--x'])
+    y = int(args['--y'])
+
+    # read the first frame, take only the ROI and copy as the previous frame
+    ret, frame = capture.read()
+    frame_previous = frame[y:y+h, x:x+w].copy()
+
+    # save desc into a file
     fout = open(args['<output_file>'], 'w')
-    while (c_frame<nb_frame):
+    while (capture.isOpened()):
         ret, frame = capture.read()
-        frame = frame[y:y+h, x:x+w]
-        c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))  
-        if frame.any():
+        if ret:
+            frame = frame[y:y+h, x:x+w]
             # compute and save descriptor 
-            histo_current = calcul_hist(frame)    
-            previous_current =  calcul_hist(frame_previous) 
-            fout.write(c_frame)
-            fout.write(' '+str(round(cv.CompareHist(histo_current, previous_current, cv.CV_COMP_CORREL), 3)))
-            fout.write(' '+str(round(score_OF(tools.ROI(0, 0, w, h), frame, frame_previous, lk_params, feature_params), 3)))
+            fout.write(str(int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))))
+            fout.write(' '+str(round(cv.CompareHist(calcul_hist(frame), calcul_hist(frame_previous), cv.CV_COMP_CORREL), 3)))
+            fout.write(' '+str(round(score_OF(frame_previous, frame, lk_params, feature_params), 3)))
             fout.write('\n')
             # copy the current frame
             frame_previous = frame.copy()
