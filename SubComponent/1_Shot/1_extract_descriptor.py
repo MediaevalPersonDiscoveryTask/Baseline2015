@@ -58,6 +58,13 @@ def score_OF(img0, img1, lk_params, feature_params):
     # return proportion of point retrieved
     return np.mean(st0_1 + st1_0)
 
+def define_roi(x, y, w, h, capture):
+    # define ROI position
+    x = x and int(x) or 0.0
+    y = y and int(y) or 0.0
+    w = w and int(w) or int(capture.get(cv.CV_CAP_PROP_FRAME_WIDTH))-x
+    h = h and int(h) or int(capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT))-y
+    return x, y, w, h
 
 if __name__ == '__main__': 
     # read args
@@ -76,17 +83,8 @@ if __name__ == '__main__':
     # open video
     capture = cv2.VideoCapture(args['<video_file>'])
 
-    # define ROI position
-    if args['--w']:
-        w = int(args['--w'])
-    else:
-        w = int(capture.get(cv.CV_CAP_PROP_FRAME_WIDTH))
-    if args['--h']:
-        h = int(args['--h'])
-    else:
-        h = int(capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
-    x = int(args['--x'])
-    y = int(args['--y'])
+    # find_ROI position
+    x, y, w, h = define_roi(args['--x'], args['--y'], args['--w'], args['--h'], capture)
 
     # read the first frame, take only the ROI and copy as the previous frame
     ret, frame = capture.read()
