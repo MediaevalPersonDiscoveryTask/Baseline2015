@@ -92,15 +92,39 @@ if __name__ == '__main__':
     nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT))
     c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
 
+
+    def createGetT(idxPath):
+
+        # charge idx
+        parser = IDXParser().read(idxPath)
+
+        def getT(opencvFrame, opencvTime):
+            return parser(opencvFrame)
+
+        return getT
+
+
+    if args['--idx']:
+        from mediaeval_util import createGetT
+        getT = createGetT(args['--idx'])
+    else:
+        def getT(opencvFrame, opencvTime):
+            return opencvTime
+        
+
+
     # save desc into a file
     fout = open(args['<output_file>'], 'w')
     while (c_frame<nb_frame):
         ret, frame = capture.read()
         c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
+        trueT = getT(c_frame, capture.get(cv.CV_CAP_PROP_POS_MSEC)/1000.0)
+
         if ret:
             frame = frame[y:y+h, x:x+w]
             # compute and save descriptor 
-            fout.write(str(c_frame))
+            fout.write('%06d' %(c_frame))
+            fout.write(' '+str(trueT))
             fout.write(' '+str(round(cv.CompareHist(calcul_hist(frame), calcul_hist(frame_previous), cv.CV_COMP_CORREL), 3)))
             fout.write(' '+str(round(score_OF(frame_previous, frame, lk_params, feature_params), 3)))
             fout.write('\n')
