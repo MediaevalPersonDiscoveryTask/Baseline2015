@@ -22,26 +22,18 @@ def align_ref_st(seg_st, ref, min_cooc):
             if cooc_dur > best_cooc and cooc_dur >= min_cooc:
                 name_st[st] = list(ref.get_labels(seg))[0] 
                 best_cooc = cooc_dur
-
     return name_st
-
 
 if __name__ == '__main__':
     arguments = docopt(__doc__)
-    list_video_file = arguments['<list_video_file>']
-    segmentation = arguments['<segmentation>']
-    matrix_path = arguments['<matrix_path>']
-    output_model_file = arguments['<output_model_file>']
-    
+
+    # read references    
     refs = MDTMParser().read(args['<reference>'])
  
+    # read features
     X = []
-    Y = []      
-    l_video = []
-    for video in open(list_video_file):
-        l_video.append(video[:-1])
-
-    for video in l_video:
+    Y = []
+    for video in open(arguments['<list_video_file>']).read().splitlines():
         ref = refs(uri=video, modality="speaker")
         seg_st = MDTMParser().read(args['<segmentation_path>']+'/'+video+'.mdtm')(uri=video, modality="speaker")
         name_st = align_ref_st(seg_st, ref, float(args['--min_cooc']))
@@ -64,4 +56,4 @@ if __name__ == '__main__':
     clf = LogisticRegression()
     clf.fit(X, Y) 
     # save model
-    joblib.dump(clf, output_model_file) 
+    joblib.dump(clf, arguments['<output_model_file>']) 
