@@ -37,8 +37,6 @@ class IDXHack(object):
             self.xmin = np.min(x)
             self.xmax = np.max(x)
 
-        return self
-
     def __call__(self, opencvFrame, opencvTime):
 
         if self.idx is None:
