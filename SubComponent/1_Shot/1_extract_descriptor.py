@@ -6,13 +6,14 @@ Write this 2 scores into an output file <output_file>.
 If x, y, w, h is defined, the score is computed only on a region of interest of the images.
 
 Usage:
-  cut_hist_OF_score.py <video_file> <output_file> [--x=<x> --y=<y> --w=<w> --h=<h>]
+  cut_hist_OF_score.py <video_file> <output_file> [--x=<x> --y=<y> --w=<w> --h=<h>] [--idx=<idx>]
   cut_hist_OF_score.py -h | --help
 Options:
-  --x=<x>    position left of the ROI (0 > x > video_width) [default: 0]
-  --y=<y>    position bottom of the ROI (0 > y > video_height) [default: 0]
-  --w=<w>    position width of the ROI, (0 > w+x > video_width), default width of the video
-  --h=<h>    position height of the ROI, (0 > h+y > video_height), default height of the video
+  --x=<x>      position left of the ROI (0 > x > video_width) [default: 0]
+  --y=<y>      position bottom of the ROI (0 > y > video_height) [default: 0]
+  --w=<w>      position width of the ROI, (0 > w+x > video_width), default width of the video
+  --h=<h>      position height of the ROI, (0 > h+y > video_height), default height of the video
+  --idx=<idx>  mapping between frame number to timestamp
 """
 
 from docopt import docopt
