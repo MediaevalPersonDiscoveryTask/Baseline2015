@@ -2,7 +2,7 @@
 learn segmenter model for speech nonspeech segmentation
 
 Usage:
-  learn_model_speech_nonspeech.py <path_to_wave> <video_list> <reference> <model_output> <uem_file>
+  learn_model_speech_nonspeech.py <path_to_wave> <video_list> <reference> <uem_file> <model_output>
   learn_model_speech_nonspeech.py -h | --help
 """
 
