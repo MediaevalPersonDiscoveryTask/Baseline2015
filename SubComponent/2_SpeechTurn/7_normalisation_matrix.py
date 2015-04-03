@@ -2,8 +2,8 @@
 Compute speaker versus speaker distance
 
 Usage:
-  compute_svs_matrix_perceptron_model.py <videoId> <segmentation_path> <matrix_path> <model_file> <output_path>
-  compute_svs_matrix_perceptron_model.py -h | --help
+  normalisation_matrix.py <videoId> <segmentation_path> <matrix_path> <model_file> <output_path>
+  normalisation_matrix.py -h | --help
 """
 
 from docopt import docopt
