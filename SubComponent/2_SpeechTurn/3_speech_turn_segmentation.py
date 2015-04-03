@@ -2,9 +2,10 @@
 speech turn segmentation
 
 Usage:
-  speech_turn_segmentation.py <video_name> <path_to_wave> <seg_speech_nonspeech> <output_path> <penalty_coef> [--min_duration=<md>] 
+  speech_turn_segmentation.py <video_name> <path_to_wave> <seg_speech_nonspeech> <output_path> [--penalty_coef=<pc>] [--min_duration=<md>] 
   speech_turn_segmentation.py -h | --help
 Options:
+  --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 1.0]
   --min_duration=<md>   minimum duration of a speech turn (>0.0) [default: 1.0]
 """
 
@@ -41,10 +42,3 @@ if __name__ == '__main__':
     # save the segmentation
     with open(args['<output_path>']+'/'+args['<video_name>']+'.mdtm', 'w') as f:
         MDTMParser().write(anno, f=f, uri=args['<video_name>'], modality='speaker')
-
-
-
-
-
-
-
