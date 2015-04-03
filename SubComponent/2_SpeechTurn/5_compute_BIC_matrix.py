@@ -2,8 +2,8 @@
 Compute BIC distance between speech turns and save it into a matrix file
 
 Usage:
-  compute_svs_matrix.py <video_name> <wave> <segmentation> <output_matrix_file>
-  compute_svs_matrix.py -h | --help
+  compute_BIC_matrix.py <video_name> <wave> <segmentation> <output_matrix_file>
+  compute_BIC_matrix.py -h | --help
 """
 
 from docopt import docopt
