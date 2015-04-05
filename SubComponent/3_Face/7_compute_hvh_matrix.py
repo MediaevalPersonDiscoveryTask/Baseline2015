@@ -2,7 +2,7 @@
 Compute head versus head distance
 
 Usage:
-  compute_hvh_matrix.py <file_desc_in> <file_hvh_out>
+  compute_hvh_matrix.py <facetracks_descriptor> <matrix_output>
   compute_hvh_matrix.py -h | --help
 """
 
@@ -17,16 +17,17 @@ def sqdist(desc1, desc2):
 	return dist
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__)
-    file_desc_in = arguments['<file_desc_in>']
-    file_hvh_out = arguments['<file_hvh_out>']
+    # read arguments
+    args = docopt(__doc__)
 
+    # read face track descriptors
     dic = {}
-    for line in open(file_desc_in):
-        l = line[:-1].split(' ')
+    for line in open(args['<facetracks_descriptor>']).read().splitlines()::
+        l = line.split(' ')
         dic[int(l[0])] = np.array(l[2:], dtype='|S20').astype(np.float)
 
-    fout = open(file_hvh_out, 'w')
+    # compute and save distance between face tracks
+    fout = open(args['<matrix_output>'], 'w')
     for h1 in sorted(dic):
         for h2 in sorted(dic):
             if h1 < h2:

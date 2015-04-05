@@ -2,14 +2,12 @@
 Select central face descriptor projected by LDML of a face track
 
 Usage:
-  select_central_desc_hog_LDML.py <video> <output_path> <hog_path> <file_ldml>
+  select_central_desc_hog_LDML.py <hog> <ldml_matrix> <output_file> 
   select_central_desc_hog_LDML.py -h | --help
 """
 
 from docopt import docopt
-import sys, os, glob
 import numpy as np
-import math 
 
 def sqdist(desc1, desc2):
     dim = min(desc1.shape[0], desc2.shape[0])
@@ -20,37 +18,32 @@ def sqdist(desc1, desc2):
     return dist
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__)
-    video = arguments['<video>']
-    path_out = arguments['<output_path>']
-    hog_path = arguments['<hog_path>']
-    file_ldml = arguments['<file_ldml>']
+    # read arguments
+    args = docopt(__doc__)
 
-    K = 100
+    # size of the descriptor before projection
     N = 7
     nbins = 8
     cell_sz = 7
     block_sz = 7
     HOG_DIM = N*nbins*cell_sz*block_sz
+    # size of the descriptor after projection
+    K = 100 
 
-    file_hog = hog_path+'/'+video.split('/')[-1]+'.face_descriptor'
-    fout = open(path_out+'/'+video.split('/')[-1]+'.central_HoG_LDML', 'w')
-
-    L = np.fromfile(file_ldml, sep=' ')
+    # load projection matrix
+    L = np.fromfile(args['<ldml_matrix>'], sep=' ')
     L = np.array(L)
     L = L.reshape(K, HOG_DIM)  
 
+    # read and project descriptor
     desc_face = {}
-    for line in open(file_hog):
-        l = line[:-1].split(' ')
-        i_face = int(float(l[1]))
-        desc = map(float, l[2:2+HOG_DIM])
-        set_desc = set(desc)
+    for line in open(args['<hog>']).read().splitlines():
+        l = line.split(' ')
+        desc_ldml = np.dot(np.array(map(float, l[2:2+HOG_DIM]), dtype='|S20').astype(np.float), L.T)
+        desc_face.setdefault(int(l[1]), []).append(np.array(desc_ldml))
 
-        if set_desc != set(['-1']) and desc != [''] and desc != []:
-            desc_ldml = np.dot(np.array(desc, dtype='|S20').astype(np.float), L.T)
-            desc_face.setdefault(i_face, []).append(np.array(desc_ldml))
-    
+    # find central descriptor for each face track and save it
+    fout = open(args['<output_file>'], 'w')    
     for i_face, l_desc in sorted(desc_face.items()):
         min_dist = 10000.0
         best_desc = []
