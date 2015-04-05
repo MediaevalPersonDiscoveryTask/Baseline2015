@@ -2,7 +2,7 @@
 Compute HoG descriptor for each images of a face track
 
 Usage:
-  face_HoG_descriptor <video> <output_path> <flandmark_path> <features_model_path>
+  face_HoG_descriptor <video> <flandmark> <features_model> <output_file> 
   face_HoG_descriptor -h | --help
 """
 
@@ -34,49 +34,30 @@ class CvRect:
         self.width = width
         self.height = height
 
-
 def int_round_tab(t):    
     new_t = []
     for e in t:
         new_t.append(int(round(e)))
     return new_t
 
-
-def read_face_landmarks_file(flandmark_path, video):
+def read_face_landmarks_file(flandmark):
     dic_flm = {}
-    for line in open(flandmark_path+"/"+video+'.flandmark'):
-        l = line[:-1].split(' ')
+    for line in open(flandmark).read().splitlines():
+        l = line.split(' ')
         frame = int(l[0])
         i_face =int(l[1])
         dic_flm.setdefault(frame, {})
         dic_flm[frame][i_face] = []
-
         #re-order the landmarks [eyes - nose - mouth]
-        dic_flm[frame][i_face].append(float(l[16]))
-        dic_flm[frame][i_face].append(float(l[17]))
-        dic_flm[frame][i_face].append(float(l[8]))
-        dic_flm[frame][i_face].append(float(l[9]))
-        dic_flm[frame][i_face].append(float(l[10]))
-        dic_flm[frame][i_face].append(float(l[11]))
-        dic_flm[frame][i_face].append(float(l[18]))
-        dic_flm[frame][i_face].append(float(l[19]))
-        
-        dic_flm[frame][i_face].append(float(l[20]))
-        dic_flm[frame][i_face].append(float(l[21]))
-        
-        dic_flm[frame][i_face].append(float(l[12]))
-        dic_flm[frame][i_face].append(float(l[13]))
-        dic_flm[frame][i_face].append(float(l[14]))
-        dic_flm[frame][i_face].append(float(l[15]))
+        for i in [16, 17, 8, 9, 10, 11, 18, 19, 20, 21, 12, 13, 14, 15]:
+            dic_flm[frame][i_face].append(float(l[i]))
     return dic_flm
-
 
 def load_feature_model(filepath):
     model = []
     for line in open(filepath):
         model = map(float, line[:-1].split(' '))[2:]
     return model
-
 
 def compute_center(pts):     # ok
     center = Point2D32f(0.0,0.0)
@@ -86,7 +67,6 @@ def compute_center(pts):     # ok
     center.x /= N
     center.y /= N
     return center
-
 
 def compute_affine_transformation(src, dst):
     src_center = compute_center(src)
@@ -146,7 +126,6 @@ def compute_affine_transformation(src, dst):
 
     return warp_matrix;
 
-
 def compute_integral_hog(img):
     img_xsobel = cv.CreateImage(cv.GetSize(img), cv.IPL_DEPTH_32F, 1)
     img_ysobel = cv.CreateImage(cv.GetSize(img), cv.IPL_DEPTH_32F, 1)
@@ -189,7 +168,6 @@ def compute_integral_hog(img):
 
     return img_integrals
 
-
 def compute_hog_cell(hog, img_integrals, cell):
     hog_cell = []
     if( cell.x<0 or cell.y<0 or cell.x + cell.width>= img_integrals[0].width or cell.y + cell.height>=img_integrals[0].height) :    #case we are out of the image size
@@ -203,7 +181,6 @@ def compute_hog_cell(hog, img_integrals, cell):
             h3 = cv.Get2D(img_integrals[i],cell.y + cell.height, cell.x)[0]
             hog_cell.append(float(h2 - h3 - h1 + h0))
     return hog_cell, hog
-
 
 def compute_hog_block(hog,  img_integrals, block):
     nb = 0;
@@ -228,13 +205,11 @@ def compute_hog_block(hog,  img_integrals, block):
         hog[i] /= math.sqrt(sum + eps*eps);    
     return hog
 
-
 def compute_hog_desc(hog, img_integrals, point):
     shift = block_sz * cell_sz / 2
     block = CvRect(point.x - shift, point.y - shift, block_sz*cell_sz, block_sz*cell_sz)
     hog = compute_hog_block(hog, img_integrals, block);
     return hog
-
 
 def compute_aligned_face_descriptor(src, features, features_model):
     desc = []
@@ -264,36 +239,29 @@ def compute_aligned_face_descriptor(src, features, features_model):
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__)
-    video = arguments['<video>']
-    path_out = arguments['<output_path>']
-    flandmark_path = arguments['<flandmark_path>']
-    features_model_path = arguments['<features_model_path>']
-
-    capture = cv2.VideoCapture(video)
+    # read arguments
+    args = docopt(__doc__)
+    # open video
+    capture = cv2.VideoCapture(args['<video>'])
     nb_frame = capture.get(cv.CV_CAP_PROP_FRAME_COUNT)    
-    print 'nb_frame', nb_frame
-
-    features_model = load_feature_model(features_model_path); 
-    dic_flm = read_face_landmarks_file(flandmark_path, video.split('/')[-1])
-    fout = open(path_out+'/'+video.split('/')[-1]+'.face_descriptor', 'w')
-    c_frame = 0                                                 # number of the current frame read in the video
+    # load features model
+    features_model = load_feature_model(args['<features_model>']); 
+    # read position of facial landmark
+    dic_flm = read_face_landmarks_file(args['<flandmark>'])
+    # compute and save desriptor
+    c_frame = 0
+    fout = open(args['<output_file>'], 'w')
     while (c_frame<nb_frame):   
-        ret, frame_tmp = capture.read()                         # read the video
+        ret, frame_tmp = capture.read()
         c_frame = capture.get(cv.CV_CAP_PROP_POS_FRAMES)  
-        if frame_tmp.any() : 
+        if ret and c_frame in dic_flm: 
             frame = cv.CreateImageHeader((frame_tmp.shape[1], frame_tmp.shape[0]), cv.IPL_DEPTH_8U, 3)
             cv.SetData(frame, frame_tmp.tostring(), frame_tmp.dtype.itemsize * 3 * frame_tmp.shape[1])            
-            if c_frame in dic_flm:
-                for i_face, flandmark in dic_flm[c_frame].items():
-                    if flandmark[0] != -1:
-                        fout.write(str(c_frame)+' '+str(i_face))
-                        for e in compute_aligned_face_descriptor(frame, flandmark, features_model):
-                            fout.write(' '+str(e))
-                        fout.write('\n')
-
-            if c_frame%100 == 0:                
-                print c_frame
-
-    capture.release() 
+            for i_face, flandmark in dic_flm[c_frame].items():
+                if flandmark[0] != -1:
+                    fout.write(str(c_frame)+' '+str(i_face))
+                    for e in compute_aligned_face_descriptor(frame, flandmark, features_model):
+                        fout.write(' '+str(e))
+                    fout.write('\n')
     fout.close()
+    capture.release() 
