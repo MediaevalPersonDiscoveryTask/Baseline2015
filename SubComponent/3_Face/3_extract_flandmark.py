@@ -1,17 +1,16 @@
 """
-Find face landmark after face tracking
+Find facial landmark on face tracks
+
+Usage:
+  extract_flandmark.py <video> <face_tracking> <bin_flandmark> <output_file>
+  extract_flandmark.py -h | --help
 """
-import glob, os
 
-for f in sorted(glob.glob("/Users/poignant/Documents/mount/video_REPERE/ns382665.ovh.net/qcompere/phase*/*/*.avi")):
-    video = f.split('/')[-1].split('.')[0]
-    print video
+import os
+from docopt import docopt
 
-    path_bin = "./face_landmarks_detection_macos"
-    f_facetrack = "/Users/poignant/Documents/mount/work1_poignant/facetracks/"+video+".avi.facetrack"
-    fout = "/Users/poignant/Documents/mount/work1_poignant/flandmark/"+video+".avi.flandmark"
-
-    if not os.path.isfile(fout) and os.path.isfile(f_facetrack):
-        os.popen(path_bin+" "+f+" "+f_facetrack+" "+fout)
-
-
+if __name__ == '__main__':
+    # read args
+    args = docopt(__doc__)
+    # Run extract facial landmark
+    os.popen(args['<bin_flandmark>']+" "+args['<video>']+" "+args['<face_tracking>']+" "+args['<output_file>'])
