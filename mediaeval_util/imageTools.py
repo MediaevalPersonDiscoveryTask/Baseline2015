@@ -36,3 +36,41 @@ def prop_pts_find_by_optical_flow(img0, img1, lk_params, feature_params):
 
     # return proportion of point retrieved
     return np.mean(st0_1 + st1_0)
+
+
+def OpticalFlow(img0, img1, lk_params, feature_params):
+    img0 = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
+    img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+
+    p0 = cv2.goodFeaturesToTrack(img0, mask = None, **feature_params)    
+    p1 = cv2.goodFeaturesToTrack(img1, mask = None, **feature_params)    
+    if p0 is None or  p1 is None:
+        return -1.0, [], []
+    
+    st1_0, st0_1 = [], []
+    if p0 is not None:
+        p0_1, st0_1, err0_1 = cv2.calcOpticalFlowPyrLK(img0_tmp, img1_tmp, p0, None, **lk_params)
+        st0_1 = list(np.array(st0_1).T[0])
+    if p1 is not None:
+        p1_0, st1_0, err1_0 = cv2.calcOpticalFlowPyrLK(img1_tmp, img0_tmp, p1, None, **lk_params)
+        st1_0 = list(np.array(st1_0).T[0])
+
+    l_move_x = []
+    l_move_y = []
+    for pts0, pts1, s in itertools.izip(p0, p1_0, st1_0):
+        if s[0] == 1:
+            l_move_x.append(pts1[0][0]-pts0[0][0])
+            l_move_y.append(pts1[0][1]-pts0[0][1])
+
+    return np.mean(st0_1 + st1_0), l_move_x, l_move_y
+
+def score_coverage_ROI(ROI1, ROI2):
+    width_inter = min(ROI1[2], ROI2[2])-max(ROI1[0], ROI2[0])
+    height_inter = min(ROI1[3], ROI2[3])-max(ROI1[1], ROI2[1])
+    area_ROI1 = (ROI1[3]-ROI1[1]) * (ROI1[2]-ROI1[0])
+    area_ROI2 = (ROI2[3]-ROI2[1]) * (ROI2[2]-ROI2[0])
+    if width_inter < 0 or height_inter < 0:
+        return 0.0
+    area_intersection = width_inter * height_inter
+    area_union = area_ROI1 + area_ROI2 - area_intersection
+    return float(area_intersection) / area_union
