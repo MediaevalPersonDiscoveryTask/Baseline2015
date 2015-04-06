@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     # read face track descriptors
     dic = {}
-    for line in open(args['<facetracks_descriptor>']).read().splitlines()::
+    for line in open(args['<facetracks_descriptor>']).read().splitlines():
         l = line.split(' ')
         dic[int(l[0])] = np.array(l[2:], dtype='|S20').astype(np.float)
 
