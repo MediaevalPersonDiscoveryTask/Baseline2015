@@ -1,2 +1,4 @@
 
 *.pyc
+
+SubComponent/3_Face/3_extract_flandmark/build/*
