@@ -54,19 +54,13 @@ int main( int argc, char** argv )
         }
 
         if (n>0){
-            int num_frame = atoi(token[0]);
-            int nb_face = atoi(token[1]);
-            if (nb_face > 0) {
-                for (int i_face=0; i_face<nb_face;i_face ++){
-                    vector<int> fb(5);
-                    fb[0] = atoi(token[2+i_face*5]);
-                    fb[1] = atoi(token[3+i_face*5]);
-                    fb[2] = atoi(token[4+i_face*5]);
-                    fb[3] = fb[1] + atoi(token[5+i_face*5]);
-                    fb[4] = fb[2] + atoi(token[6+i_face*5]);   
-                    map_frame_box[num_frame].push_back(fb);
-                }
-            }          
+            vector<int> fb(5);
+            fb[0] = atoi(token[1]);
+            fb[1] = atoi(token[2]);
+            fb[2] = atoi(token[3]);
+            fb[3] = fb[1] + atoi(token[4]);
+            fb[4] = fb[2] + atoi(token[5]);   
+            map_frame_box[atoi(token[0])].push_back(fb); 
         }
     } 
 
