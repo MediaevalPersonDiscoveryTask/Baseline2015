@@ -16,6 +16,7 @@ import cv2, cv
 if __name__ == '__main__':
     # read args
     args = docopt(__doc__)
+    minsize = (int(args['--minSize']), int(args['--minSize']))
     # storage for face detected  
     storage = cv.CreateMemStorage()
     # load cascade file
@@ -23,21 +24,21 @@ if __name__ == '__main__':
     # read video
     capture = cv.CaptureFromFile(args['<video_file>'])
     nb_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_COUNT)-1)
-    frame = cv.QueryFrame(capture)
-    c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))
-
+    c_frame = 0
     # save face detection
     fout = open(args['<output_file>'], 'w')
     while (c_frame<nb_frame):
         frame = cv.QueryFrame(capture)
-        detected = cv.HaarDetectObjects(frame, 
-                                        cascade, 
-                                        storage, 
-                                        float(args['--scaleFactor']), 
-                                        int(args['--minNeighbors']), 
-                                        cv.CV_HAAR_DO_CANNY_PRUNING, 
-                                        (int(args['--minSize']), int(args['--minSize'])))
-        for (x,y,w,h),n in detected:  
-            fout.write(str(int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))))
-            fout.write(' '+str(x)+' '+str(y)+' '+str(w)+' '+str(h)+' '+str(n)+'\n')
+        c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))
+        if frame:
+            detected = cv.HaarDetectObjects(frame, 
+                                            cascade, 
+                                            storage, 
+                                            float(args['--scaleFactor']), 
+                                            int(args['--minNeighbors']), 
+                                            cv.CV_HAAR_DO_CANNY_PRUNING, 
+                                            minsize)
+            for (x,y,w,h),n in detected:  
+                fout.write(str(int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))))
+                fout.write(' '+str(x)+' '+str(y)+' '+str(w)+' '+str(h)+' '+str(n)+'\n')
     fout.close()

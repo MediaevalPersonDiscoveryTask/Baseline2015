@@ -41,10 +41,10 @@ def find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, back
             for i in range(1, nbFrameTracking):
                 if f_nb+i*step in l_frames_shot and f_nb+i*step-step in l_frames_shot:                # check if the next frame is in the shot     
                     s, l_move_x, l_move_y = OpticalFlow(l_frames_shot[f_nb+i*step-step][ymin:ymax, xmin:xmax], l_frames_shot[f_nb+i*step][ymin:ymax, xmin:xmax], lk_params, feature_params)
-                    xmin = xmin+np.mean(l_move_x)]
-                    xmax = xmax+np.mean(l_move_x)]
-                    ymin = ymin+np.mean(l_move_y)]
-                    ymax = ymax+np.mean(l_move_y)]
+                    xmin = xmin+np.mean(l_move_x)
+                    xmax = xmax+np.mean(l_move_x)
+                    ymin = ymin+np.mean(l_move_y)
+                    ymax = ymax+np.mean(l_move_y)
 
                     if s < threshold_OF:                    
                         break
@@ -53,7 +53,6 @@ def find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, back
                         best_i_face = ''
                         for i_face2, face_next in l_faces[f_nb+i*step].items():  
                             xmin_next, ymin_next, xmax_next, ymax_next = face_next['x'], face_next['y'], face_next['x']+face_next['w'], face_next['y']+face_next['h']
-
                             coverage = score_coverage_ROI([xmin, ymin, xmax, ymax], [xmin_next, ymin_next, xmax_next, ymax_next])  # compute the coverage between the 2 roi
                             if coverage > best_coverage:            
                                 best_coverage = coverage  
@@ -65,8 +64,7 @@ def find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, back
                             for f_nb2, roi in sorted(l_temp.items()):   # add the box to the list of face tracked
                                 new_face_find_by_tracking[f_nb2][i_face] = roi
                             break
-                        l_temp[f_nb+i*step] = [xmin, ymin, xmax, ymax]           # Add face  to the temporary list
-
+                        l_temp[f_nb+i*step] = {'x':xmin, 'y':ymin, 'w':xmax-xmin, 'h':ymax-ymin}          # Add face  to the temporary list
                 else:
                     nb_face_cluster[face_to_cluster[i_face]]+=1
                     for f_nb2, roi in sorted(l_temp.items()):   # add the box to the list of face tracked
@@ -74,8 +72,7 @@ def find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, back
 
     for f_nb in sorted(l_frames_shot):                          # copy the face find by tracking into l_faces
         for i_face, roi in new_face_find_by_tracking[f_nb].items(): 
-            l_faces[f_nb][i_face] = {'roi':roi, 'sqrt_Neighbors':0, 'Neighbors':0}
-
+            l_faces[f_nb][i_face] = {'Neighbors':0, 'sqrt_Neighbors':0, 'x':roi['x'], 'y':roi['y'], 'w':roi['w'], 'h':roi['h']}
     return l_faces, face_to_cluster, nb_face_cluster
 
 
@@ -84,9 +81,14 @@ if __name__ == '__main__':
     args = docopt(__doc__)
     # read file with the list of shot
     shot_boundaries = []                                                  # list of shot boundaries
+    startFirstShot = +np.inf
+    endLastShot = 0
     for line in open(args['<shot_seg_file>']).read().splitlines():
         videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
         shot_boundaries.append(int(endFrame))
+        if int(startFrame)<startFirstShot:
+            startFirstShot = int(startFrame)
+    endLastShot = max(shot_boundaries)
     # open the video
     capture = cv2.VideoCapture(args['<video_file>'])            # read the video
     nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT)-1)   # total number of frame in the video
@@ -103,8 +105,9 @@ if __name__ == '__main__':
         nb_face+=1
         face_to_cluster[nb_face] = nb_face
         nb_face_cluster[nb_face] = 1
+
         l_faces[int(c_frame)][nb_face] = {'Neighbors':int(n), 
-                                          'sqrt_Neighbors':int(math.sqrt(int(n)))), 
+                                          'sqrt_Neighbors':int(round(math.sqrt(int(n)),0)), 
                                           'x':int(x), 
                                           'y':int(y), 
                                           'w':int(w), 
@@ -115,20 +118,18 @@ if __name__ == '__main__':
     data_out = {}
     l_frames_shot = {}                                          # frames of the current shot 
     fout = open(args['<output_file>'], 'w')
-    while (c_frame<nb_frame):
+    while (c_frame<endLastShot):
         ret, frame = capture.read()                             # get the next image
         c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))  
-        if ret :                                                # if there is an image in the frame
+        if ret and c_frame>=startFirstShot:                     # if there is an image in the frame
             if c_frame in shot_boundaries:                      # if the frame is a shot boundaries, proceed the tracking
                 # tracking forward
                 l_faces, face_to_cluster, nb_face_cluster = find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, False, float(args['--threshold_OF']), float(args['--threshold_cov']))
                 # tracking backward
                 l_faces, face_to_cluster, nb_face_cluster = find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, True, float(args['--threshold_OF']), float(args['--threshold_cov']))
                 for f_nb in sorted(l_frames_shot):              # for frame in the current shot
-                    fout.write(str(f_nb)+' '+str(len(l_faces[f_nb])))
                     for i_face, face in l_faces[f_nb].items():
-                        fout.write(' '+str(i_face)+' '+str(face['x'])+' '+str(face['y'])+' '+str(face['w'])+' '+str(face['h']))
-                    fout.write('\n')
+                        fout.write(str(f_nb)+' '+str(face_to_cluster[i_face])+' '+str(int(round(face['x'], 0)))+' '+str(int(round(face['y'], 0)))+' '+str(int(round(face['w'],0)))+' '+str(int(round(face['h'], 0)))+'\n')
                 l_frames_shot.clear()
             l_frames_shot[c_frame] = frame.copy()               # copy the current frame
     capture.release()                                           # relaese the video
