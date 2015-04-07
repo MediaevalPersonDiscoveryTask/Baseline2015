@@ -23,4 +23,4 @@ python /path_to_source_code/SubComponent/3_face/4_face_HoG_descriptor.py path_to
 
 # Compute distance between face track
 
-python /path_to_source_code/SubComponent/3_face/central_HoG_LDML/video.central_HoG_LDML /path_to_source_code/SubComponent/3_face//Face_vs_Face_matrix/video.mat
+python /path_to_source_code/SubComponent/3_face/5_compute_hvh_matrix.py  path_to_metadata/3_Face/facetraks_desc/video.desc /path_to_source_code/SubComponent/3_face/Face_vs_Face_matrix/video.mat
