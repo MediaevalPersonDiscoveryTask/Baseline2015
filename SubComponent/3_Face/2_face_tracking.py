@@ -2,11 +2,13 @@
 Face tracking based on the face detection and optical flow for miss detection
 
 Usage:
-  face_tracker.py <video_file> <shot_seg_file> <detection_face_file> <output_file> [--threshold_OF=<of>] [--threshold_cov=<tc>]
+  face_tracker.py <video_file> <shot_seg_file> <detection_face_file> <output_face_tracking_pos> <output_facetracks_segmentation> [--threshold_OF=<of>] [--threshold_cov=<tc>] [--idx=<idx>]
   face_tracker.py -h | --help
 Options:
   --threshold_OF=<of>       value of the threshold on the optical flow for the tracking [default: 0.3]
   --threshold_cov=<tc>      if the coverage of 2 boxes is higher than threshold_cov, we consider they correspond to the same face track [default: 0.2]
+  --idx=<idx>               mapping between frame number to timestamp
+
 """
 
 from docopt import docopt
@@ -14,6 +16,7 @@ import cv2, cv
 import numpy as np
 import math
 from mediaeval_util.imageTools import OpticalFlow, score_coverage_ROI
+from mediaeval_util.repere import IDXHack
 
 lk_params = dict( winSize  = (20, 20), 
                   maxLevel = 2, 
@@ -90,6 +93,9 @@ if __name__ == '__main__':
     startFirstShot = min(frames_to_process)
     last_frame_to_process = max(frames_to_process)
 
+    # defined function from frame to timestamp
+    frame2time = IDXHack(args['--idx'])
+
     # open the video
     capture = cv2.VideoCapture(args['<video_file>'])            # read the video
     nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT)-1)   # total number of frame in the video
@@ -111,18 +117,38 @@ if __name__ == '__main__':
     ret, frame = capture.read()
     c_frame = capture.get(cv.CV_CAP_PROP_POS_FRAMES)
     l_frames_shot = {}                                          # frames of the current shot 
-    fout = open(args['<output_face_tracking_pos>'], 'w')
+    fout_pos = open(args['<output_face_tracking_pos>'], 'w')
+    fout_seg = open(args['<output_facetracks_segmentation>'], 'w')
+    frame_to_timestamp = {}
     while (c_frame<=last_frame_to_process):
         ret, frame = capture.read()                             # get the next image
         c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))  
         if ret and c_frame in frames_to_process:                # if there is an image in the frame
+            frame_to_timestamp[c_frame] = frame2time(startFrame, capture.get(cv.CV_CAP_PROP_POS_MSEC)/1000.0)
             if c_frame in shot_boundaries:                      # if the frame is a shot boundaries, proceed the tracking
                 l_faces, face_to_cluster, nb_face_cluster = find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, False, float(args['--threshold_OF']), float(args['--threshold_cov']))
                 l_faces, face_to_cluster, nb_face_cluster = find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, True, float(args['--threshold_OF']), float(args['--threshold_cov']))
+                # write face position
                 for f_nb in sorted(l_frames_shot):              # for frame in the current shot
                     for i_face, face in l_faces[f_nb].items():
-                        fout.write(str(f_nb)+' '+str(face_to_cluster[i_face])+' '+str(int(round(face['x'], 0)))+' '+str(int(round(face['y'], 0)))+' '+str(int(round(face['w'],0)))+' '+str(int(round(face['h'], 0)))+'\n')
+                        fout_pos.write(str(f_nb)+' '+str(face_to_cluster[i_face])+' '+str(int(round(face['x'], 0)))+' '+str(int(round(face['y'], 0)))+' '+str(int(round(face['w'],0)))+' '+str(int(round(face['h'], 0)))+'\n')
+                # write face segmentation
+                seg_face = {}
+                for f_nb in sorted(l_frames_shot):              # for frame in the current shot
+                    for i_face in l_faces[f_nb]:
+                        seg_face.setdefault(face_to_cluster[i_face], []).append(f_nb)
+                for i_face in sorted(seg_face):
+                    startFrame = min(seg_face[i_face])
+                    endFrame = max(seg_face[i_face])
+                    startTime = frame_to_timestamp[startFrame]
+                    endTime = frame_to_timestamp[endFrame]
+                    fout_seg.write(str(i_face)+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+'\n')
                 l_frames_shot.clear()
             l_frames_shot[c_frame] = frame.copy()               # copy the current frame
+    fout_pos.close()
+    fout_seg.close()
     capture.release()                                           # relaese the video
+
+
+
 
