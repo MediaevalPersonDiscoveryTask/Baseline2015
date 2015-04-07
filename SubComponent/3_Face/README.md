@@ -5,7 +5,7 @@ python /path_to_source_code/SubComponent/3_face/1_face_detection.py path_to_vide
 
 # face tracking
 
-python /path_to_source_code/SubComponent/3_face/2_face_tracking.py path_to_video/video.avi path_to_metadata/1_Shot/segmentation/video.shot  path_to_metadata/3_Face/detection/video.face path_to_metadata/3_Face/tracking/video.facetrack path_to_metadata/3_Face/facetracks_segmentation/video.seg
+python /path_to_source_code/SubComponent/3_face/2_face_tracking.py path_to_video/video.avi path_to_metadata/1_Shot/segmentation/video.shot  path_to_metadata/3_Face/detection/video.face path_to_metadata/3_Face/tracking/video.facetrack path_to_metadata/3_Face/facetracks_segmentation/video.seg --idx=data_path/idx/video.MPG.idx
 
 # extract flandmark
 
