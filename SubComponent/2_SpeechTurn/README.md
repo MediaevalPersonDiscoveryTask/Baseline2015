@@ -1,4 +1,8 @@
 
+# add path_to_source_code to the PYTHONPATH
+
+export PYTHONPATH=$PYTHONPATH:path_to_source_code
+
 # Learn segmenter model for speech nonspeech segmentation
 
 python 1_learn_model_speech_nonspeech.py path_to_wave/video.wav path_to_video_list/uri.dev.lst path_to_reference/speaker.dev.mdtm data_path/uem/segment.uem data_path/model/model_speech_nonspeech 

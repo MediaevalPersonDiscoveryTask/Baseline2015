@@ -1,4 +1,8 @@
 
+# add path_to_source_code to the PYTHONPATH
+
+export PYTHONPATH=$PYTHONPATH:path_to_source_code
+
 # face detection
 
 python /path_to_source_code/SubComponent/3_face/1_face_detection.py path_to_video/video.avi path_to_metadata/3_Face/detection/video.face path_to_source_code/SubComponent/Model/haarcascade_frontalface_default.xml --shot_segmentation=path_to_metadata/1_Shot/segmentation/video.shot
