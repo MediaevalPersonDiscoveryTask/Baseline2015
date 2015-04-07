@@ -1,9 +1,9 @@
 """
-Compute HoG descriptor for each images of a face track
+Compute HoG descriptor projected by LDML for each facetrack
 
 Usage:
-  face_HoG_descriptor <video> <flandmark> <features_model> <output_file> 
-  face_HoG_descriptor -h | --help
+  facetrack_descriptor <video> <flandmark> <features_model> <ldml_matrix> <output_file> 
+  facetrack_descriptor -h | --help
 """
 
 from docopt import docopt
@@ -12,15 +12,6 @@ import numpy as np
 import cv2, cv
 import os, sys, getopt
 import math
-
-N = 7
-nbins = 8
-cell_sz = 7
-block_sz = 7
-
-HOG_DIM = N*nbins*cell_sz*block_sz
-
-dim = nbins*cell_sz*block_sz
 
 class Point2D32f:
     def __init__(self, x, y):
@@ -33,6 +24,14 @@ class CvRect:
         self.y = y
         self.width = width
         self.height = height
+
+def sqdist(desc1, desc2):
+    dim = min(desc1.shape[0], desc2.shape[0])
+    dist = 0.0
+    for i in range(dim):
+        d = desc1[i] - desc2[i]
+        dist += d*d
+    return dist
 
 def int_round_tab(t):    
     new_t = []
@@ -211,7 +210,7 @@ def compute_hog_desc(hog, img_integrals, point):
     hog = compute_hog_block(hog, img_integrals, block);
     return hog
 
-def compute_aligned_face_descriptor(src, features, features_model):
+def compute_aligned_face_descriptor(src, features, features_model, dim_HoG_pts):
     desc = []
     pts_dst = []
     pts = features[:]
@@ -233,7 +232,7 @@ def compute_aligned_face_descriptor(src, features, features_model):
         pts_dst.append(d * pts[j*2] + e * pts[j*2+1] + f)
         pt = Point2D32f(int(pts_dst[j*2]),int(pts_dst[j*2+1]))        
         hog = compute_hog_desc(hog, img_int, pt);                             
-        for k in range(dim):
+        for k in range(dim_HoG_pts):
             desc.append(hog[k])
     return desc
 
@@ -241,27 +240,57 @@ def compute_aligned_face_descriptor(src, features, features_model):
 if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
+    # size of the descriptor before projection
+    N = 7
+    nbins = 8
+    cell_sz = 7
+    block_sz = 7
+    dim_HoG_pts = nbins*cell_sz*block_sz
+    dim_HoG_total = N*dim_HoG_pts
+    # size of the descriptor after projection
+    K = 100    
+    # load projection matrix
+    L = np.fromfile(args['<ldml_matrix>'], sep=' ')
+    L = np.array(L)
+    L = L.reshape(K, dim_HoG_total)  
     # open video
     capture = cv2.VideoCapture(args['<video>'])
-    nb_frame = capture.get(cv.CV_CAP_PROP_FRAME_COUNT)    
     # load features model
     features_model = load_feature_model(args['<features_model>']); 
     # read position of facial landmark
     dic_flm = read_face_landmarks_file(args['<flandmark>'])
-    # compute and save desriptor
+    last_frame_to_process = max(dic_flm)
+    # compute descriptor
     c_frame = 0
-    fout = open(args['<output_file>'], 'w')
-    while (c_frame<nb_frame):   
+    desc_facetrack = {}
+    while (c_frame<last_frame_to_process):   
         ret, frame_tmp = capture.read()
-        c_frame = capture.get(cv.CV_CAP_PROP_POS_FRAMES)  
+        c_frame = capture.get(cv.CV_CAP_PROP_POS_FRAMES) 
         if ret and c_frame in dic_flm: 
             frame = cv.CreateImageHeader((frame_tmp.shape[1], frame_tmp.shape[0]), cv.IPL_DEPTH_8U, 3)
             cv.SetData(frame, frame_tmp.tostring(), frame_tmp.dtype.itemsize * 3 * frame_tmp.shape[1])            
             for i_face, flandmark in dic_flm[c_frame].items():
                 if flandmark[0] != -1:
-                    fout.write(str(c_frame)+' '+str(i_face))
-                    for e in compute_aligned_face_descriptor(frame, flandmark, features_model):
-                        fout.write(' '+str(e))
-                    fout.write('\n')
+                    HoG_desc = compute_aligned_face_descriptor(frame, flandmark, features_model, dim_HoG_pts)
+                    projected_desc = np.dot(np.array(HoG_desc, dtype='|S20').astype(np.float), L.T)
+                    desc_facetrack.setdefault(i_face, []).append(projected_desc)
+    # save the central projected descriptor for each facetrack
+    fout = open(args['<output_file>'], 'w')
+    for i_face, l_desc in sorted(desc_facetrack.items()):
+        min_dist = +np.inf
+        best_desc = []
+        # find the more central descriptor
+        for desc1 in l_desc:
+            l_d = []
+            for desc2 in l_desc:
+                l_d.append(sqdist(desc1, desc2))
+            d = np.mean(np.array(l_d))
+            if d < min_dist:
+                min_dist = d
+                best_desc = desc1
+        fout.write(str(i_face)+' '+str(min_dist))
+        for e in best_desc:
+            fout.write(' '+str(e))
+        fout.write('\n')
     fout.close()
     capture.release() 
