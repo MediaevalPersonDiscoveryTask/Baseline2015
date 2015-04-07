@@ -81,14 +81,15 @@ if __name__ == '__main__':
     args = docopt(__doc__)
     # read file with the list of shot
     shot_boundaries = []                                                  # list of shot boundaries
-    startFirstShot = +np.inf
-    endLastShot = 0
+    frames_to_process = []
     for line in open(args['<shot_seg_file>']).read().splitlines():
         videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
         shot_boundaries.append(int(endFrame))
-        if int(startFrame)<startFirstShot:
-            startFirstShot = int(startFrame)
-    endLastShot = max(shot_boundaries)
+        for c_frame in range(int(startFrame), int(endFrame)+1):
+            frames_to_process.append(c_frame)        
+    startFirstShot = min(frames_to_process)
+    last_frame_to_process = max(frames_to_process)
+
     # open the video
     capture = cv2.VideoCapture(args['<video_file>'])            # read the video
     nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT)-1)   # total number of frame in the video
@@ -105,27 +106,18 @@ if __name__ == '__main__':
         nb_face+=1
         face_to_cluster[nb_face] = nb_face
         nb_face_cluster[nb_face] = 1
-
-        l_faces[int(c_frame)][nb_face] = {'Neighbors':int(n), 
-                                          'sqrt_Neighbors':int(round(math.sqrt(int(n)),0)), 
-                                          'x':int(x), 
-                                          'y':int(y), 
-                                          'w':int(w), 
-                                          'h':int(h)}
+        l_faces[int(c_frame)][nb_face] = {'Neighbors':int(n), 'sqrt_Neighbors':int(round(math.sqrt(int(n)),0)), 'x':int(x), 'y':int(y), 'w':int(w), 'h':int(h)}
 
     ret, frame = capture.read()
     c_frame = capture.get(cv.CV_CAP_PROP_POS_FRAMES)
-    data_out = {}
     l_frames_shot = {}                                          # frames of the current shot 
-    fout = open(args['<output_file>'], 'w')
-    while (c_frame<endLastShot):
+    fout = open(args['<output_face_tracking_pos>'], 'w')
+    while (c_frame<=last_frame_to_process):
         ret, frame = capture.read()                             # get the next image
         c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))  
-        if ret and c_frame>=startFirstShot:                     # if there is an image in the frame
+        if ret and c_frame in frames_to_process:                # if there is an image in the frame
             if c_frame in shot_boundaries:                      # if the frame is a shot boundaries, proceed the tracking
-                # tracking forward
                 l_faces, face_to_cluster, nb_face_cluster = find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, False, float(args['--threshold_OF']), float(args['--threshold_cov']))
-                # tracking backward
                 l_faces, face_to_cluster, nb_face_cluster = find_new_face(l_faces, face_to_cluster, nb_face_cluster, l_frames_shot, True, float(args['--threshold_OF']), float(args['--threshold_cov']))
                 for f_nb in sorted(l_frames_shot):              # for frame in the current shot
                     for i_face, face in l_faces[f_nb].items():
