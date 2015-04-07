@@ -40,10 +40,10 @@ if __name__ == '__main__':
     # save face detection
     c_frame = 0 
     fout = open(args['<output_file>'], 'w')
-    while (c_frame<=last_frame_to_process):
+    while (c_frame<last_frame_to_process):
         frame = cv.QueryFrame(capture)
         c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))
-        if frame and c_frame  in frames_to_process:
+        if frame and c_frame in frames_to_process:
             print c_frame
             detected = cv.HaarDetectObjects(frame, 
                                             cascade, 
