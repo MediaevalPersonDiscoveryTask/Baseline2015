@@ -288,7 +288,7 @@ if __name__ == '__main__':
             if d < min_dist:
                 min_dist = d
                 best_desc = desc1
-        fout.write(str(i_face)+' '+str(min_dist))
+        fout.write(str(i_face)+' '+str(len(l_desc))+' '+str(min_dist))
         for e in best_desc:
             fout.write(' '+str(e))
         fout.write('\n')
