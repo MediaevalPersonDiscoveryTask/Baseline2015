@@ -6,14 +6,14 @@ Write this 2 scores into an output file <output_file>.
 If x, y, w, h is defined, the score is computed only on a region of interest of the images.
 
 Usage:
-  cut_hist_OF_score.py <video_file> <output_file> [--x=<x> --y=<y> --w=<w> --h=<h>] [--idx=<idx>]
-  cut_hist_OF_score.py -h | --help
+  extract_descriptor.py <video_file> <output_file> [--x=<x> --y=<y> --width=<w> --height=<h>] [--idx=<idx>]
+  extract_descriptor.py -h | --help
 Options:
-  --x=<x>      position left of the ROI (0 > x > video_width) [default: 0]
-  --y=<y>      position bottom of the ROI (0 > y > video_height) [default: 0]
-  --w=<w>      position width of the ROI, (0 > w+x > video_width), default width of the video
-  --h=<h>      position height of the ROI, (0 > h+y > video_height), default height of the video
-  --idx=<idx>  mapping between frame number to timestamp
+  --x=<x>         position of the ROI in percentage (0.0 > x > 1.0) [default: 0.05]
+  --y=<y>         position of the ROI in percentage (0.0 > y > 1.0) [default: 0.05]
+  --width=<w>     position of the ROI in percentage (0.0 > width+x > 1.0) [default: 0.9]
+  --height=<h>    position of the ROI in percentage (0.0 > height+y > 1.0) [default: 0.65]
+  --idx=<idx>     mapping between frame number to timestamp
 """
 
 from docopt import docopt
@@ -22,14 +22,6 @@ import itertools
 import numpy as np
 from mediaeval_util.repere import IDXHack
 from mediaeval_util.imageTools import calcul_hist, prop_pts_find_by_optical_flow
-
-def define_roi(x, y, w, h, capture):
-    # define ROI position
-    x = x and int(x) or 0.0
-    y = y and int(y) or 0.0
-    w = w and int(w) or int(capture.get(cv.CV_CAP_PROP_FRAME_WIDTH))-x
-    h = h and int(h) or int(capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT))-y
-    return x, y, w, h
 
 if __name__ == '__main__': 
     # read args
@@ -49,24 +41,29 @@ if __name__ == '__main__':
     capture = cv2.VideoCapture(args['<video_file>'])
 
     # find_ROI position
-    x, y, w, h = define_roi(args['--x'], args['--y'], args['--w'], args['--h'], capture)
+    video_width = capture.get(cv.CV_CAP_PROP_FRAME_WIDTH)
+    video_height = capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT)   
+    xmin = int(video_width  * float(args['--x']))
+    ymin = int(video_height * float(args['--y']))
+    xmax = int(video_width  * (float(args['--x'])+float(args['--width'])))
+    ymax = int(video_height * (float(args['--y'])+float(args['--height'])))
 
     # read the first frame, take only the ROI and copy as the previous frame
     ret, frame = capture.read()
-    frame_previous = frame[y:y+h, x:x+w].copy()
+    frame_previous = frame[ymin:ymax, xmin:xmax].copy()
     nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT))
-    c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
 
     # defined function from frame to timestamp
     frame2time = IDXHack(args['--idx'])
 
     # save desc into a file
     fout = open(args['<output_file>'], 'w')
+    c_frame = 0
     while (c_frame<nb_frame):
         ret, frame = capture.read()
         c_frame = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
         if ret:
-            frame = frame[y:y+h, x:x+w]
+            frame = frame[ymin:ymax, xmin:xmax]
             # compute and save descriptor 
             fout.write('%06d' %(c_frame))
             fout.write(' %09.3f' %(frame2time(c_frame, capture.get(cv.CV_CAP_PROP_POS_MSEC)/1000.0)))
