@@ -83,9 +83,10 @@ if __name__ == '__main__':
     faceID = 1
     for line in open(args['<detection_face_file>']).read().splitlines():
         frameID, x, y, w, h, n = map(int, line.split(' '))
-        faces[frameID][faceID] = [x, y, x+w, y+h]
-        faceID_to_facetrackID[faceID] = faceID
-        faceID+=1  
+        if frameID in faces:
+            faces[frameID][faceID] = [x, y, x+w, y+h]
+            faceID_to_facetrackID[faceID] = faceID
+            faceID+=1  
     
     fout_pos = open(args['<output_face_tracking_pos>'], 'w')
     fout_seg = open(args['<output_facetracks_segmentation>'], 'w')
