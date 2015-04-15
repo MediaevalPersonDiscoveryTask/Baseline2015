@@ -2,7 +2,7 @@
 Compute BIC distance between speech turns and save it into a matrix file
 
 Usage:
-  compute_BIC_matrix.py <video_name> <wave> <segmentation> <output_matrix_file>
+  compute_BIC_matrix.py <videoID> <wave> <segmentation> <output_matrix_file>
   compute_BIC_matrix.py -h | --help
 """
 
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     # read segmentation
-    seg_speech_turn = MDTMParser().read(args['<segmentation>'])(uri=args['<video_name>'], modality="speaker")
+    seg_speech_turn = MDTMParser().read(args['<segmentation>'])(uri=args['<videoID>'], modality="speaker")
 
     # extract descriptor
     extractor = YaafeMFCC(e=True, coefs=12, De=False, DDe=False, D=False, DD=False)
