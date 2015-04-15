@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  6_learn_normalisation_model.py <video_list> <segmentation_path> <matrix_path> <reference> <output_model_file> [--min_cooc=<mc>]
+  6_learn_normalisation_model.py <video_list> <segmentation_path> <matrix_path> <reference_path> <output_model_file> [--min_cooc=<mc>]
   6_learn_normalisation_model.py -h | --help
 Options:
   --min_cooc=<mc>   minimim duration to consider that a speech turn correspond to a speaker of the reference (>0.0) [default: 0.5]  
@@ -28,7 +28,6 @@ if __name__ == '__main__':
     arguments = docopt(__doc__)
 
     # read references    
-    refs = MDTMParser().read(args['<reference>'])
  
     # read features
     X = []
@@ -36,7 +35,7 @@ if __name__ == '__main__':
     for line in open(arguments['<video_list>']).read().splitlines():
         videoID = path.split('\t')[0]
 
-        ref = refs(uri=videoID, modality="speaker")
+        ref = MDTMParser().read(args['<reference>']+'/'+video+'.mdtm')(uri=videoID, modality="speaker")
         seg_st = MDTMParser().read(args['<segmentation_path>']+'/'+videoID+'.mdtm')(uri=videoID, modality="speaker")
         name_st = align_ref_st(seg_st, ref, float(args['--min_cooc']))
 

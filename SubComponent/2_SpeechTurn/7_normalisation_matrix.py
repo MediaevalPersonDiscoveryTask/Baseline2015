@@ -2,7 +2,7 @@
 Compute speaker versus speaker distance
 
 Usage:
-  normalisation_matrix.py <videoId> <segmentation_path> <matrix_path> <model_file> <output_path>
+  normalisation_matrix.py <videoID> <input_seg> <input_mat> <model_file> <output_mat>
   normalisation_matrix.py -h | --help
 """
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     clas = joblib.load(arguments['<model_file>']) 
 
     # read segmentation
-    seg_st = MDTMParser().read(args['<segmentation_path>']+'/'+arguments['<videoId>']+'.mdtm')(uri=arguments['<videoId>'], modality="speaker")
+    seg_st = MDTMParser().read(args['<input_seg>'])(uri=arguments['<videoID>'], modality="speaker")
 
     dur = {}
     for seg in seg_st.get_timeline():
@@ -25,8 +25,8 @@ if __name__ == '__main__':
         dur[st] = seg.duration
 
     # compute score between speech turn and save it
-    fout = open(arguments['<output_path>']+'/'+videoId+'.svs', 'w')
-    for line in open(args['<matrix_path>']+'/'+arguments['<videoId>']+'.mat').read().splitlines():
+    fout = open(arguments['<output_mat>'], 'w')
+    for line in open(args['<input_mat>']).read().splitlines():
         st1, st2, BIC_dist = line.split(' ')
         desc = [float(BIC_dist), min(dur(st1), dur(st2)), max(dur(st1), dur(st2))]
         fout.write(st1+' '+st2+' '+str(clas.predict_proba([desc])[0][1])+'\n')
