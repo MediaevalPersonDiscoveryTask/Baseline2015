@@ -33,9 +33,11 @@ if __name__ == '__main__':
     # read features
     X = []
     Y = []
-    for video in open(arguments['<list_video_file>']).read().splitlines():
-        ref = refs(uri=video, modality="speaker")
-        seg_st = MDTMParser().read(args['<segmentation_path>']+'/'+video+'.mdtm')(uri=video, modality="speaker")
+    for line in open(arguments['<video_list>']).read().splitlines():
+        videoID = path.split('\t')[0]
+
+        ref = refs(uri=videoID, modality="speaker")
+        seg_st = MDTMParser().read(args['<segmentation_path>']+'/'+videoID+'.mdtm')(uri=videoID, modality="speaker")
         name_st = align_ref_st(seg_st, ref, float(args['--min_cooc']))
 
         dur = {}
@@ -43,7 +45,7 @@ if __name__ == '__main__':
             st = list(seg_st.get_labels(seg))[0] 
             dur[st] = seg.duration
 
-        for line in open(args['<matrix_path>']+'/'+video+'.mat').read().splitlines():
+        for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
             st1, st2, BIC_dist = line.split(' ')
             if st1 in name_st and st2 in name_st:
                 X.append([float(BIC_dist), min(dur(st1), dur(st2)), max(dur(st1), dur(st2))])
