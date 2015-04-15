@@ -29,5 +29,5 @@ if __name__ == '__main__':
     for line in open(args['<matrix_path>']+'/'+arguments['<videoId>']+'.mat').read().splitlines():
         st1, st2, BIC_dist = line.split(' ')
         desc = [float(BIC_dist), min(dur(st1), dur(st2)), max(dur(st1), dur(st2))]
-        fout.write(st1+' '+st2+' '+str(clas.decision_function([desc])[0][1])+'\n')
+        fout.write(st1+' '+st2+' '+str(clas.predict_proba([desc])[0][1])+'\n')
     fout.close()

@@ -2,14 +2,14 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  6_learn_normalisation_model.py <list_video_file> <segmentation_path> <matrix_path> <reference> <output_model_file> [--min_cooc=<mc>]
+  6_learn_normalisation_model.py <video_list> <segmentation_path> <matrix_path> <reference> <output_model_file> [--min_cooc=<mc>]
   6_learn_normalisation_model.py -h | --help
 Options:
   --min_cooc=<mc>   minimim duration to consider that a speech turn correspond to a speaker of the reference (>0.0) [default: 0.5]  
 """
 
 from docopt import docopt
-from sklearn.linear_model import LogisticRegression
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.externals import joblib
 
 def align_ref_st(seg_st, ref, min_cooc):
@@ -55,7 +55,7 @@ if __name__ == '__main__':
                     Y.append(0)
 
     # train model
-    clf = LogisticRegression()
+    clf = CalibratedClassifierCV()
     clf.fit(X, Y) 
     # save model
     joblib.dump(clf, arguments['<output_model_file>']) 
