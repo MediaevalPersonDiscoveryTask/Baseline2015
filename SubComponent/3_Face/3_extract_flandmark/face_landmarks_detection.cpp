@@ -29,12 +29,9 @@ int main( int argc, char** argv )
     int nb_frames = (int) cvGetCaptureProperty(video, CV_CAP_PROP_FRAME_COUNT);
     vector<int> l_frame(nb_frames);
     int count_frame = 0;
-    ofstream fout(output);    
-    
     int num_frame;
 
     std::map< int, std::list< std::vector<int> > > map_frame_box;
-    std::map< int, std::list< std::vector<double> > > map_frame_flandamrk;
 
     ifstream fin;   
     fin.open(face_detection_path);          // open a file
@@ -52,7 +49,6 @@ int main( int argc, char** argv )
                 if (!token[n]) break;       // no more tokens
             }
         }
-
         if (n>0){
             vector<int> fb(5);
             fb[0] = atoi(token[1]);
@@ -64,6 +60,7 @@ int main( int argc, char** argv )
         }
     } 
 
+    ofstream fout(output);    
     while (frame == cvQueryFrame(video)) { 
         num_frame = (int) cvGetCaptureProperty(video, CV_CAP_PROP_POS_FRAMES);  							
 
@@ -76,7 +73,6 @@ int main( int argc, char** argv )
 
             while(!map_frame_box[num_frame].empty()){
                 vector<int> fb(5);
-
                 fb = map_frame_box[num_frame].front();
 
                 box[0] = fb[1];
@@ -84,41 +80,20 @@ int main( int argc, char** argv )
                 box[2] = fb[3];
                 box[3] = fb[4]; 
 
-                vector<double> current_landmarks(21);
+                cout << num_frame << endl ;
 
-                current_landmarks[0] = fb[0];
-                current_landmarks[1] = fb[1];
-                current_landmarks[2] = fb[2];
-                current_landmarks[3] = fb[3];
-                current_landmarks[4] = fb[4];
+                fout << num_frame ;
+                for (int j = 0; j < 5; j++) fout << " " << fb[j];
+                if(flandmark_detect(frame_grayscale, box, model, current_landmarks_tmp)) for (int j = 0; j < 2*model->data.options.M; j++) fout << " " << -1.0;
+                else for (int j = 0; j < 2*model->data.options.M; j++) fout << " " << current_landmarks_tmp[j];
+                fout << endl;
 
-                if(flandmark_detect(frame_grayscale, box, model, current_landmarks_tmp)) for (int j = 0; j < 2*model->data.options.M; j++) current_landmarks[j+5] = -1.0;
-                else                                                                     for (int j = 0; j < 2*model->data.options.M; j++) current_landmarks[j+5] = current_landmarks_tmp[j];
-
-                map_frame_flandamrk[num_frame].push_back(current_landmarks);
                 map_frame_box[num_frame].pop_front();
             }
             cvReleaseImage(&frame_grayscale);            
-
         }            
     }
     cvReleaseImage(&frame);
-    //cvReleaseCapture(&video);
     flandmark_free(model);
-
-    for (int i=0; i < nb_frames; i++){
-        num_frame = l_frame[i];
-        
-        while(!map_frame_flandamrk[num_frame].empty()){
-            vector<double> current_landmarks(21);
-            current_landmarks = map_frame_flandamrk[num_frame].front();
-
-            fout << num_frame ;
-            for (int j = 0; j < 21; j++) fout << " " << current_landmarks[j];
-            fout << endl;
-
-            map_frame_flandamrk[num_frame].pop_front();
-        }
-    }
     fout.close();
 }
