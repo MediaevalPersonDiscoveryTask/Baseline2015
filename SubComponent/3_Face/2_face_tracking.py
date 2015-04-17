@@ -69,11 +69,11 @@ if __name__ == '__main__':
     for line in open(args['<shot_seg_file>']).read().splitlines():
         videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
         shot_boundaries.append(int(endFrame))
-        for frameID in range(int(startFrame), int(endFrame)):
+        for frameID in range(int(startFrame), int(endFrame)+1):
             frames_to_process.append(frameID)
             faces[frameID] = {}
+    last_frame_to_process = max(frames_to_process)+10
 
-    last_frame_to_process = max(frames_to_process)
     # defined function to convert frameID to timestamp
     frame2time = IDXHack(args['--idx'])
     # open the video
