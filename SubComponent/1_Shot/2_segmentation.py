@@ -58,11 +58,14 @@ def find_cut(x, y, threshold):
     minima = argrelmin(np.array(x), order=int(args['--min_duration'])/2)
     # select frame in minima with a score lower than the threshold
     l_cut = []
-    l_cut.append(y[0])
+    start = y[0]
     for i in list(minima)[0]:
         if x[i] < threshold:
-            l_cut.append(y[i])
-    l_cut.append(y[-1])   
+            end = y[i-1]
+            l_cut.append([start, end])
+            start = y[i]
+    end = y[-1]
+    l_cut.append([start, end])
     return l_cut
 
 if __name__ == '__main__':
@@ -85,9 +88,9 @@ if __name__ == '__main__':
     # Save segmentation
     nb_shot=0
     fout = open(args['<output_file>'], 'w')
-    for start, end in zip(l_cut, l_cut[1:]):
+    for start, end in l_cut:
         nb_shot+=1
-        if shot_in_uem(l_uem, start[1], end[1]) and end[0]-start[0] > int(args['--min_duration']):
+        if shot_in_uem(l_uem, start[1], end[1]) and end[0]-start[0] >= int(args['--min_duration']):
             fout.write(args['<videoID>'])
             fout.write(' %06d' % (nb_shot))
             fout.write(' %09.3f %09.3f' % (start[1], end[1]))
