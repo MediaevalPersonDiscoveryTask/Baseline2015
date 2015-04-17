@@ -101,7 +101,7 @@ if __name__ == '__main__':
             frames[frameID] = frame.copy()
             if frameID in shot_boundaries: 
                 faceTracking(faces, faceID_to_facetrackID, frames, False, float(args['--thr_score_OF']), float(args['--thr_coverage']), int(args['--thr_nb_pts_OF']), int(args['--nbFrameTracking']))
-                faceTracking(faces, faceID_to_facetrackID, frames, True,  float(args['--thr_score_OF']), float(args['--thr_coverage']), int(args['--thr_nb_pts_OF']), int(args['--nbFrameTracking']))
+                #faceTracking(faces, faceID_to_facetrackID, frames, True,  float(args['--thr_score_OF']), float(args['--thr_coverage']), int(args['--thr_nb_pts_OF']), int(args['--nbFrameTracking']))
                 # write face position
                 seg_face = {}
                 for frameID in sorted(frames):                          
