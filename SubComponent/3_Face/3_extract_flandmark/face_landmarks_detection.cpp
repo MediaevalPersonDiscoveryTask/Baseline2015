@@ -19,6 +19,8 @@ int main( int argc, char** argv )
     char * output = argv[3];
     char * flandmark_model = argv[4];
     
+    ofstream fout(output);    
+
     FLANDMARK_Model * model = flandmark_init(flandmark_model);
     double * current_landmarks_tmp = (double*)malloc(2*model->data.options.M*sizeof(double));  
     int * box = (int*)malloc(4*sizeof(int));
@@ -60,7 +62,6 @@ int main( int argc, char** argv )
         }
     } 
 
-    ofstream fout(output);    
     while (frame == cvQueryFrame(video)) { 
         num_frame = (int) cvGetCaptureProperty(video, CV_CAP_PROP_POS_FRAMES);  							
 

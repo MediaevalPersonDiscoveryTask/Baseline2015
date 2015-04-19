@@ -62,6 +62,9 @@ def faceTracking(faces, faceID_to_facetrackID, l_frames_shot, backward, thr_scor
 if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
+
+    fout_pos = open(args['<output_face_tracking_pos>'], 'w')
+    fout_seg = open(args['<output_facetracks_segmentation>'], 'w')
     # read file with the list of shot
     frames_to_process = []
     shot_boundaries = []
@@ -88,8 +91,7 @@ if __name__ == '__main__':
             faceID_to_facetrackID[faceID] = faceID
             faceID+=1  
     
-    fout_pos = open(args['<output_face_tracking_pos>'], 'w')
-    fout_seg = open(args['<output_facetracks_segmentation>'], 'w')
+
     frameID = 0                                                 # number of the current frame read in the video
     frames = {}
     frame_to_timestamp = {}                                     # list of frame number in the current shot 
