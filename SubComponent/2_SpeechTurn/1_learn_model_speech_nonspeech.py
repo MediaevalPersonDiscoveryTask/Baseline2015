@@ -36,7 +36,7 @@ if __name__ == '__main__':
         features = extractor(wavePath[video])
         l_features.append(features)
  
-        ref = parser_atseg(reference_path+'/'+video+'.atseg', video)
+        ref = parser_atseg(args['<reference_path>']+'/'+video+'.atseg', video)
 
         # rename all segment with speech
         mapping = {source: 'speech' for source in ref.labels()}
