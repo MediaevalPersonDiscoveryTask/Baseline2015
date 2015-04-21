@@ -2,12 +2,12 @@
 learn segmenter model for speech nonspeech segmentation
 
 Usage:
-  learn_model_speech_nonspeech.py <wave_path> <video_list> <reference_path> <uem_file> <model_output>
+  learn_model_speech_nonspeech.py <source_path> <dataPath.lst> <video_list> <reference_path> <uem_file> <model_output>
   learn_model_speech_nonspeech.py -h | --help
 """
 
 from docopt import docopt
-from pyannote.parser import MDTMParser
+from mediaeval_util.repere import parser_atseg
 from pyannote.parser import UEMParser
 from pyannote.features.audio.yaafe import YaafeCompound, YaafeZCR, YaafeMFCC
 from pyannote.algorithms.segmentation.hmm import GMMSegmentation 
@@ -24,13 +24,20 @@ if __name__ == '__main__':
 
     audio_features = []
     ref_speech_nonspeech = []
-    for line in open(args['<video_list>']).read().splitlines():
-        videoID = path.split('\t')[0]
+
+    wavePath = {}
+    for path in open(args['<dataPath.lst>']).read().splitlines():
+        video, wave_file, video_avi_file, video_mpeg_file, trs_file, xgtf_file, idx_file = path.split(' ')
+        wavePath[video] = args['<source_path>']+'/'+wave_file
+
+    for video in open(args['<video_list>']).read().splitlines():
+        print video
         # extract features
-        audio_features = extractor(args['<wave_path>']+'/'+wave_file)
+        audio_features = extractor(wavePath[video])
         audio_features.append(audio_features)
  
-        ref = MDTMParser().read(args['<reference>']+'/'+video+'.mdtm')(uri=videoID, modality="speaker")
+        ref = parser_atseg(reference_path+'/'+video+'.atseg', video)
+
         # rename all segment with speech
         mapping = {source: 'speech' for source in ref.labels()}
         ref = ref.translate(mapping)
@@ -42,7 +49,7 @@ if __name__ == '__main__':
         ref_speech_nonspeech.append(ref.crop(uem, mode='intersection'))
 
     # train model
-    segmenter = GMMSegmentation(n_components=64, lbg=True)
+    segmenter = GMMSegmentation(n_components=256, lbg=True)
     segmenter.fit(audio_features, ref_speech_nonspeech)
  
     # save segmenter model
