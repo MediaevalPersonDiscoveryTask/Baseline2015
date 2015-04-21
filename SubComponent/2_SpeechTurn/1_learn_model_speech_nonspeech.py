@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # extractor Yaafe
     extractor = YaafeCompound([YaafeZCR(), YaafeMFCC(e=False, De=False, DDe=False, D=True, DD = True)])
 
-    audio_features = []
+    l_features = []
     ref_speech_nonspeech = []
 
     wavePath = {}
@@ -33,8 +33,8 @@ if __name__ == '__main__':
     for video in open(args['<video_list>']).read().splitlines():
         print video
         # extract features
-        audio_features = extractor(wavePath[video])
-        audio_features.append(audio_features)
+        features = extractor(wavePath[video])
+        l_features.append(features)
  
         ref = parser_atseg(reference_path+'/'+video+'.atseg', video)
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # train model
     segmenter = GMMSegmentation(n_components=256, lbg=True)
-    segmenter.fit(audio_features, ref_speech_nonspeech)
+    segmenter.fit(l_features, ref_speech_nonspeech)
  
     # save segmenter model
     pickle.dump(segmenter, open(args['<model_output>'], "wb" ) )
