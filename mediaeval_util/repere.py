@@ -4,6 +4,23 @@ from pandas import read_table
 from sklearn.isotonic import IsotonicRegression
 
 
+def parser_vtseg(f, video):
+    anno = Annotation(uri=video)
+    for line in open(f):
+        video, startTime, endTime, startFrame, endFrame, name = line[:-1].split(' ')
+        segment = Segment(start=float(startTime), end=float(endTime))
+        anno[segment] = name
+    return anno
+
+def parser_atseg(f, video):
+    anno = Annotation(uri=video)
+    for line in open(f):
+        video, startTime, endTime, name = line[:-1].split(' ')
+        segment = Segment(start=float(startTime), end=float(endTime))
+        anno[segment] = name
+    return anno
+
+
 class IDXHack(object):
     """
 
