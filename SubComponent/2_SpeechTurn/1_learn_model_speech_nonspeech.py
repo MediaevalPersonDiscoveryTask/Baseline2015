@@ -45,7 +45,7 @@ if __name__ == '__main__':
         for segment in ref.get_timeline().gaps():
             ref[segment] = 'non_speech'
         # used only segment in uem part
-        uem = uems(uri=videoID)
+        uem = uems(uri=video)
         ref_speech_nonspeech.append(ref.crop(uem, mode='intersection'))
 
     # train model
