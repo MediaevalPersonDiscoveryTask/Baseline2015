@@ -2,7 +2,7 @@
 import numpy as np
 from pandas import read_table
 from sklearn.isotonic import IsotonicRegression
-
+from pyannote.core import Annotation, Segment
 
 def parser_vtseg(f, video):
     anno = Annotation(uri=video)
