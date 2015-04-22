@@ -2,7 +2,7 @@
 Speech nonspeech segmentation
 
 Usage:
-  speech_nonspeech_segmentation.py <wave> <segmenter_model> <output_seg> [--min_dur_speech=<mds>] [--min_dur_non_speech=<mdns>] 
+  speech_nonspeech_segmentation.py <videoID> <wave> <segmenter_model> <output_seg> [--min_dur_speech=<mds>] [--min_dur_non_speech=<mdns>] 
   speech_nonspeech_segmentation.py -h | --help
 Options:
   --min_dur_speech=<mds>       minimum duration of a speech segment (>0) [default: 1.0]
@@ -33,5 +33,5 @@ if __name__ == '__main__':
                                                           }
                                             ), 
                            f=f, 
-                           uri=video, 
+                           uri=args['<videoID>'], 
                            modality='speaker')
