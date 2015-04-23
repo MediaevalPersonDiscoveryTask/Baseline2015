@@ -24,14 +24,8 @@ if __name__ == '__main__':
     # Extract descriptor
     extractor = YaafeCompound([YaafeZCR(), YaafeMFCC(e=False, De=False, DDe=False, D=True, DD = True)])    
     audio_features = extractor(args['<wave>'])
-
-    # segment audio signal and write in output_path
+    # segment audio signal
+    seg = segmenter.predict(audio_features, min_duration={'speech':float(args['--min_dur_speech']), 'non_speech':float(args['--min_dur_non_speech'])})
+    # write segmentation
     with open(args['<output_seg>'], 'w') as f:
-        MDTMParser().write(segmenter.predict(audio_features, 
-                                             min_duration={'speech':float(args['--min_dur_speech']), 
-                                                           'non_speech':float(args['--min_dur_non_speech'])
-                                                          }
-                                            ), 
-                           f=f, 
-                           uri=args['<videoID>'], 
-                           modality='speaker')
+        MDTMParser().write(seg, f=f, uri=args['<videoID>'], modality='speaker')
