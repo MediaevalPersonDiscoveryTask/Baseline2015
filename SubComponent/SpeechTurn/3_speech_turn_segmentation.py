@@ -28,7 +28,7 @@ if __name__ == '__main__':
     audio_features = extractor(args['<wave>'])
 
     # segment audio stream
-    segmenter = BICSegmentation(penalty_coef=float(args['<penalty_coef>']), min_duration=float(args['--min_duration']))
+    segmenter = BICSegmentation(penalty_coef=float(args['--penalty_coef']), min_duration=float(args['--min_duration']))
     speech_turns = segmenter.apply(audio_features, segmentation=speech_nonspeech.label_timeline('speech'))
 
     # create a new annotation 
