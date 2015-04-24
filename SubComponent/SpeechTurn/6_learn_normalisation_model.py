@@ -10,6 +10,7 @@ Options:
 
 from docopt import docopt
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.linear_model import Perceptron
 from sklearn.externals import joblib
 
 def align_ref_st(seg_st, ref, min_cooc):
@@ -54,7 +55,7 @@ if __name__ == '__main__':
                     Y.append(0)
 
     # train model
-    clf = CalibratedClassifierCV()
+    clf = CalibratedClassifierCV(Perceptron(), method='isotonic')
     clf.fit(X, Y) 
     # save model
     joblib.dump(clf, arguments['<output_model_file>']) 
