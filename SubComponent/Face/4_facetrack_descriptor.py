@@ -2,7 +2,7 @@
 Compute HoG descriptor projected by LDML for each facetrack
 
 Usage:
-  facetrack_descriptor <video> <flandmark> <features_model> <ldml_matrix> <output_file> 
+  facetrack_descriptor <video_file> <flandmark> <features_model> <ldml_matrix> <output_file> 
   facetrack_descriptor -h | --help
 """
 
@@ -254,7 +254,7 @@ if __name__ == '__main__':
     L = np.array(L)
     L = L.reshape(K, dim_HoG_total)  
     # open video
-    capture = cv2.VideoCapture(args['<video>'])
+    capture = cv2.VideoCapture(args['<video_file>'])
     # load features model
     features_model = load_feature_model(args['<features_model>']); 
     # read position of facial landmark
