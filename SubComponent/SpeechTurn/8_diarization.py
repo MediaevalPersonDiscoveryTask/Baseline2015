@@ -2,8 +2,10 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  8_diarization.py <videoID> <st_seg> <matrix> <output_diarization> <threshold>
+  8_diarization.py <videoID> <st_seg> <matrix> <output_diarization> [--threshold=<t>]
   8_diarization.py -h | --help
+Options:
+  --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
 """
 
 from docopt import docopt
@@ -53,7 +55,7 @@ def diarization(mat, original_mat, threshold):
 if __name__ == '__main__':
     args = docopt(__doc__)
 
-    threshold = float(args['<threshold>'])
+    threshold = float(args['--threshold'])
 
     # read matrix
     mat = {}
