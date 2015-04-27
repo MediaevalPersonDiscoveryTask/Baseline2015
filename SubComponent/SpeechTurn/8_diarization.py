@@ -18,7 +18,7 @@ def diarization(mat, original_mat, threshold):
     # agglomerative clustering
     max_proba = np.inf
     while(max_proba>threshold):
-        max_proba = 0.0
+        max_proba = -np.inf
         best_c1, best_c2 = '', ''
         for c1 in mat:
             for c2 in mat[c1]:
