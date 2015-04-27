@@ -27,12 +27,9 @@ def diarization(mat, original_mat, threshold):
 
         if max_proba>threshold:
             new_c = best_c1+';'+best_c2
-
             # remove best_c1 best_c2 from mat
-            if best_c1 in mat:
-                del mat[best_c1]
-            if best_c2 in mat:
-                del mat[best_c2]
+            del mat[best_c1]
+            del mat[best_c2]
             for clus in mat:
                 if best_c1 in mat[clus]:
                     del mat[clus][best_c1]
@@ -40,13 +37,17 @@ def diarization(mat, original_mat, threshold):
                     del mat[clus][best_c2]
 
             # add new_c in mat
-            for c in mat:        
-                moyenne = 0.0
-                count_d = len(new_c.split(';')) + len(c.split(';'))             
-                for track_new_c in new_c.split(';'):
-                    for track_c in c.split(';'):   
-                        moyenne += original_mat[track_new_c][track_c]
-                mat[c][new_c] = moyenne/count_d  
+            mat[new_c] = {}
+            for c in mat:      
+                if c != new_c:  
+                    moyenne = 0.0
+                    count_d = 0.0        
+                    for st_new_c in new_c.split(';'):
+                        for st_c in c.split(';'): 
+                            moyenne += original_mat[st_c][st_new_c]
+                            count_d+=1.0
+                    mat[c][new_c] = moyenne/count_d  
+                    mat[new_c][c] = moyenne/count_d
     return mat
 
 if __name__ == '__main__':
@@ -56,16 +57,14 @@ if __name__ == '__main__':
 
     # read matrix
     mat = {}
-    original_mat = {}
     for line in open(args['<matrix>']).read().splitlines():
         st1, st2, proba = line.split(' ')  
         proba = float(proba)
         mat.setdefault(st1, {})
         mat[st1][st2] = proba
-        original_mat.setdefault(st1, {})
-        original_mat[st1][st2] = proba
-        original_mat.setdefault(st2, {})
-        original_mat[st2][st1] = proba
+        mat.setdefault(st2, {})
+        mat[st2][st1] = proba
+    original_mat = copy.deepcopy(mat)
 
     mat = diarization(mat, original_mat, threshold)
 
