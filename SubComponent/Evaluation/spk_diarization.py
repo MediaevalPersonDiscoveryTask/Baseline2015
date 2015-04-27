@@ -14,18 +14,22 @@ if __name__ == '__main__':
 
 
     #l_thr = [0.2, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.30, 0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38]
-    l_thr = [-200, -180, -160, -140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200]
+    l_thr = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200]
+    
+    for pc in [2.0, 2.2, 2.4, 2.6]:
+        for thr in sorted(l_thr):
+            DER = DiarizationErrorRate()
+            for videoID in open(l_video).read().splitlines():
 
-    for thr in sorted(l_thr):
-        DER = DiarizationErrorRate()
-        for videoID in open(l_video).read().splitlines():
+                hyp = MDTMParser().read(st_seg_path+'/'+videoID+'_'+str(pc)+'_'+str(thr)+'.mdtm')(uri=videoID, modality="speaker")
+                ref = parser_atseg(ref_path+'/'+videoID+'.atseg', videoID)
+                uem = parser_uem(uri=videoID)
 
-            hyp = MDTMParser().read(st_seg_path+'/'+videoID+'_'+str(thr)+'.mdtm')(uri=videoID, modality="speaker")
-            ref = parser_atseg(ref_path+'/'+videoID+'.atseg', videoID)
-            uem = parser_uem(uri=videoID)
+                hyp = hyp.crop(uem, mode='intersection')
 
-            hyp = hyp.crop(uem, mode='intersection')
+                DER(ref, hyp, uem=uem)
 
-            DER(ref, hyp, uem=uem)
+            print pc, thr, DER
 
-        print thr, DER
+
+
