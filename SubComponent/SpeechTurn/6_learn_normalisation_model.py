@@ -47,8 +47,7 @@ if __name__ == '__main__':
             t1 = label_to_track[st1]
             t2 = label_to_track[st2]
             if t1 in track_to_name and t2 in track_to_name:
-                #X.append([float(BIC_dist), min(dur[st1], dur[st2]), max(dur[st1], dur[st2])])
-                X.append([float(BIC_dist)])
+                X.append([float(BIC_dist), min(dur[st1], dur[st2]), max(dur[st1], dur[st2])])
                 if track_to_name[t1] == track_to_name[t2]:
                     Y.append(1)
                 else:
