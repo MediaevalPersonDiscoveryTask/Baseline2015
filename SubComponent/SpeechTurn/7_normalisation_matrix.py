@@ -28,5 +28,5 @@ if __name__ == '__main__':
     fout = open(args['<output_mat>'], 'w')
     for line in open(args['<input_mat>']).read().splitlines():
         st1, st2, BIC_dist = line.split(' ')
-        fout.write(st1+' '+st2+' '+str(clas.predict_proba([[float(BIC_dist), min(dur[st1], dur[st2]), max(dur[st1], dur[st2])]])[0][1])+'\n')
+        fout.write(st1+' '+st2+' '+str(clas.predict_proba([[float(BIC_dist)]])[0][1])+'\n')
     fout.close()
