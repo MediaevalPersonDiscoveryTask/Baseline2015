@@ -54,22 +54,17 @@ if __name__ == '__main__':
             faceID = int(l[1])
             desc = map(float, l[2:])
 
+            for startTime, endTime, spkName in ref_spk:
+                if startTime <= timestamp and timestamp <= endTime:
+                    break
+                    
+            SpeakingFace = 0
             if faceID in facetrack_vs_ref:
-
-                for startTime, endTime, spkName in ref_spk:
-                    if startTime <= timestamp and timestamp <= endTime:
-                        break
-                SpeakingFace = False
-                if faceID in d_align:
-                    if d_align[faceID] == spkName:
-                        SpeakingFace = True
-
-                SpeakingFace = 0
-                if facetrack_vs_ref[faceID] == st_vs_ref[stID]:
+                if facetrack_vs_ref[faceID] == spkName:
                     SpeakingFace = 1
 
-                X.append(desc)
-                Y.append(SpeakingFace)
+            X.append(desc)
+            Y.append(SpeakingFace)
 
     clf = CalibratedClassifierCV(LogisticRegression(), method='isotonic')
     # train model
