@@ -87,9 +87,9 @@ def align_facetrack_ref(ref_f, facetracks):
                             if faceID in facetracks[i]:
                                 xmin, ymin, xmax, ymax = facetracks[i][faceID]
                                 score = (abs(x-(xmin+xmax)/2) + abs(y-(ymin+ymax)/2))/2
-
                         tot_score += score
-                    matrix[row][col] = tot_score / (end-start+1)
+                    if start<=end:
+                        matrix[row][col] = tot_score / (end-start+1)
                     col+=1
                 row+=1
 
