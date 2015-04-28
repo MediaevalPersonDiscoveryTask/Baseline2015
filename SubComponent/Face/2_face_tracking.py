@@ -112,7 +112,7 @@ if __name__ == '__main__':
                         seg_face.setdefault(faceID, []).append(frameID)
                         fout_pos.write(str(frameID)+' '+str(faceID_to_facetrackID[faceID])+' '+str(int(round(xmin, 0)))+' '+str(int(round(ymin, 0)))+' '+str(int(round(xmax-xmin, 0)))+' '+str(int(round(ymax-ymin, 0)))+'\n')
             frames.clear()
-    fout_seg.close()
+    fout_pos.close()
     
     # write face segmentation
     for faceID in sorted(seg_face):                                
@@ -121,6 +121,6 @@ if __name__ == '__main__':
         startTime = frame_to_timestamp[startFrame]
         endTime = frame_to_timestamp[endFrame]
         fout_seg.write(str(faceID_to_facetrackID[faceID])+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+'\n')
-    fout_pos.close()
+    fout_seg.close()
 
     capture.release()                                           # release the video
