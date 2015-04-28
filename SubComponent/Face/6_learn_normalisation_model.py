@@ -7,13 +7,15 @@ Usage:
 """
 
 from docopt import docopt
-from mediaeval_util.repere import align_facetrack_ref
+from mediaeval_util.repere import read_ref_facetrack_position, align_facetrack_ref
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
 
 if __name__ == '__main__':
     args = docopt(__doc__)
+
+    tempo_margin = 3
 
     X = []
     Y = []
