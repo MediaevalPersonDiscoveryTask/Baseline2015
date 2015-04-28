@@ -5,7 +5,7 @@ Usage:
   8_diarization.py <videoID> <st_seg> <matrix> <output_diarization> [--threshold=<t>]
   8_diarization.py -h | --help
 Options:
-  --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.73]
+  --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
 """
 
 from docopt import docopt
@@ -26,13 +26,13 @@ if __name__ == '__main__':
     X = np.zeros((N, N))
     for line in open(args['<matrix>']).read().splitlines():
         st1, st2, proba = line.split(' ')  
-        proba = -float(proba)
+        proba = 1.0-float(proba)
         X[label_to_indice[st1]][label_to_indice[st2]] = proba
         X[label_to_indice[st2]][label_to_indice[st1]] = proba
 
     y = spatial.distance.squareform(X, checks=False)
     Z = cluster.hierarchy.average(y)
-    clusters = cluster.hierarchy.fcluster(Z, float(args['--threshold']), criterion='distance')
+    clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
 
     st_to_clus = {}
     for c, st in zip(clusters, label_to_indice):
