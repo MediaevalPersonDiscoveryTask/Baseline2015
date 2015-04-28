@@ -2,7 +2,7 @@
 Compute speaker versus speaker distance
 
 Usage:
-  normalisation_matrix.py <videoID> <input_seg> <input_mat> <model_file> <output_mat>
+  normalisation_matrix.py <videoID> <input_mat> <model_file> <output_mat>
   normalisation_matrix.py -h | --help
 """
 
@@ -15,14 +15,6 @@ if __name__ == '__main__':
 
     # open model
     clas = joblib.load(args['<model_file>']) 
-
-    # read segmentation
-    seg_st = MDTMParser().read(args['<input_seg>'])(uri=args['<videoID>'], modality="speaker")
-
-    dur = {}
-    for seg in seg_st.get_timeline():
-        st = list(seg_st.get_labels(seg))[0] 
-        dur[st] = seg.duration
 
     # compute score between speech turn and save it
     fout = open(args['<output_mat>'], 'w')
