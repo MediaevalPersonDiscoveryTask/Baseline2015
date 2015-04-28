@@ -2,7 +2,7 @@
 Learn a classifier model to compute the probability that a facetrack is speaking
 
 Usage:
-  learn_model_proba_speaking_face.py <video_list> <corpusPath> <dataPath.lst> <facetrack_pos> <st_seg> <descriptor_path> <reference_head_path> <reference_speaker_path> <output_model_file>
+  learn_model_proba_speaking_face.py <video_list> <corpusPath> <dataPath.lst> <facetrack_pos> <descriptor_path> <reference_head_path> <reference_speaker_path> <output_model_file>
   learn_model_proba_speaking_face.py -h | --help
 """
 
