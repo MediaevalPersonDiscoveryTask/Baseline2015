@@ -52,7 +52,6 @@ def faceTracking(faces, faceID_to_facetrackID, l_frames_shot, backward, thr_scor
                 ymax += np.mean(l_move_y)
                 faceID_next_find = find_face_detected_at_the_good_place([xmin, ymin, xmax, ymax], faces[frameIDTrackingNext], thr_coverage)
                 if faceID_next_find:                                        # stop tracking due to face detected at the same place
-                    #print '   find face ', faceID_next_find
                     for frameID2 in l_temp:
                         faces[frameID2][faceID] = l_temp[frameID2]
                     faceID_to_facetrackID[faceID_next_find] = faceID_to_facetrackID[faceID]  # merge the name of the current faceId and the face detected at the same place
@@ -90,11 +89,11 @@ if __name__ == '__main__':
             faces[frameID][faceID] = [x, y, x+w, y+h]
             faceID_to_facetrackID[faceID] = faceID
             faceID+=1  
-    
 
     frameID = 0                                                 # number of the current frame read in the video
     frames = {}
     frame_to_timestamp = {}                                     # list of frame number in the current shot 
+    seg_face = {}
     while (frameID<last_frame_to_process):
         ret, frame = capture.read()                             # read the video
         frameID = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
@@ -103,24 +102,24 @@ if __name__ == '__main__':
             frames[frameID] = frame.copy()
             if frameID in shot_boundaries: 
                 faceTracking(faces, faceID_to_facetrackID, frames, False, float(args['--thr_score_OF']), float(args['--thr_coverage']), int(args['--thr_nb_pts_OF']), int(args['--nbFrameTracking']))
-                #faceTracking(faces, faceID_to_facetrackID, frames, True,  float(args['--thr_score_OF']), float(args['--thr_coverage']), int(args['--thr_nb_pts_OF']), int(args['--nbFrameTracking']))
                 # write face position
-                seg_face = {}
                 for frameID in sorted(frames):                          
                     for faceID in sorted(faces[frameID]):
                         xmin, ymin, xmax, ymax = faces[frameID][faceID]
-                        seg_face.setdefault(faceID, []).append(frameID)
+                        seg_face.setdefault(faceID_to_facetrackID[faceID], {'frameID':[], 'time':[]})
+                        seg_face[faceID_to_facetrackID[faceID]]['frameID'].append(frameID)
+                        seg_face[faceID_to_facetrackID[faceID]]['time'].append(frame_to_timestamp[frameID])
                         fout_pos.write(str(frameID)+' '+str(faceID_to_facetrackID[faceID])+' '+str(int(round(xmin, 0)))+' '+str(int(round(ymin, 0)))+' '+str(int(round(xmax-xmin, 0)))+' '+str(int(round(ymax-ymin, 0)))+'\n')
-            frames.clear()
+                frames.clear()
     fout_pos.close()
     
     # write face segmentation
-    for faceID in sorted(seg_face):                                
-        startFrame = min(seg_face[faceID])
-        endFrame = max(seg_face[faceID])
-        startTime = frame_to_timestamp[startFrame]
-        endTime = frame_to_timestamp[endFrame]
-        fout_seg.write(str(faceID_to_facetrackID[faceID])+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+'\n')
+    for faceID in sorted(seg_face): 
+        startFrame = min(seg_face[faceID]['frameID'])
+        endFrame = max(seg_face[faceID]['frameID'])
+        startTime = min(seg_face[faceID]['time'])
+        endTime = max(seg_face[faceID]['time'])
+        fout_seg.write(str(faceID)+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+'\n')
     fout_seg.close()
 
-    capture.release()                                           # release the video
+    capture.release()
