@@ -2,7 +2,7 @@
 Learn a classifier model to compute the probability that a facetrack is speaking
 
 Usage:
-  learn_model_proba_speaking_face.py <video_list> <corpusPath> <dataPath.lst> <facetrack_pos> <descriptor_path> <reference_head_path> <reference_speaker_path> <output_model_file>
+  learn_model_proba_speaking_face.py <video_list> <idxPath> <facetrack_pos> <descriptor_path> <reference_head_path> <reference_speaker_path> <output_model_file>
   learn_model_proba_speaking_face.py -h | --help
 """
 
@@ -17,11 +17,6 @@ import random
 if __name__ == '__main__':
     # read arguments       
     args = docopt(__doc__)
-    # dictionnary with the IDX file
-    idxPath = {}
-    for path in open(args['<dataPath.lst>']).read().splitlines():
-        videoID, wave_file, video_avi_file, video_mpeg_file, trs_file, xgtf_file, idx_file = path.split(' ')
-        idxPath[videoID] = args['<corpusPath>']+'/'+idx_file
 
     X, Y = [], []
     for videoID in open(args['<video_list>']).read().splitlines():
@@ -44,7 +39,7 @@ if __name__ == '__main__':
             ref_spk[spkName] = [float(startTime), float(endTime)]
 
         # fct to convert frameID to timestamp 
-        frame2time = IDXHack(idxPath[videoID])
+        frame2time = IDXHack(args['<idxPath>']+'/'+videoID+'.MPG.idx')
 
         # read visual descriptors
         visual_desc = {}
