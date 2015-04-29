@@ -30,7 +30,7 @@ if __name__ == '__main__':
         st_to_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
 
         for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
-            st1, st2, BIC_dist = line.split(' ')
+            st1, st2, proba = line.split(' ')
             if st1 in st_to_ref and st2 in st_to_ref:
                 if st_to_ref[st1] == st_to_ref[st2]:
                     l_true.append(proba)
