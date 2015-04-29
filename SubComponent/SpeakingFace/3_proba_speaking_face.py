@@ -18,7 +18,7 @@ if __name__ == '__main__':
     clf = joblib.load(args['<input_model_file>']) 
 
     # read speech turn segmentation
-    st_seg = []
+    st_seg = {}
     for line in open(args['<st_seg>']).read().splitlines():
         v, p, start, dur, spk, na, na, st = line.split(' ')
         st_seg[st] = [float(start), float(start)+float(dur)]
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     for st in visual_desc:
         proba_st_facetrack[st] = {}
 
-        startTime, endTime = seg_st[st]
+        startTime, endTime = st_seg[st]
         spk_duration = (endTime-startTime)*25
         l = []
         for faceID in visual_desc[st]:
