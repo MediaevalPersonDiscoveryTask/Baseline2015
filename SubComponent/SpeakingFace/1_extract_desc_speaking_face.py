@@ -2,8 +2,8 @@
 Extract descriptor to find speaking face
 
 Usage:
-  extract_desc_svh.py <video> <flandmark> <output_desc>
-  extract_desc_svh.py -h | --help
+  extract_desc_speaking_face.py <video> <flandmark> <output_desc>
+  extract_desc_speaking_face.py -h | --help
 """
 
 from docopt import docopt
