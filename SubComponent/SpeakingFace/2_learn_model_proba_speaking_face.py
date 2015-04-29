@@ -57,7 +57,7 @@ if __name__ == '__main__':
             for startTime, endTime, spkName in ref_spk:
                 if startTime <= timestamp and timestamp <= endTime:
                     break
-                    
+
             SpeakingFace = 0
             if faceID in facetrack_vs_ref:
                 if facetrack_vs_ref[faceID] == spkName:
@@ -66,7 +66,7 @@ if __name__ == '__main__':
             X.append(desc)
             Y.append(SpeakingFace)
 
-    clf = CalibratedClassifierCV(LogisticRegression(), method='isotonic')
+    clf = CalibratedClassifierCV(Perceptron(), method='sigmoid')
     # train model
     clf.fit(X, Y) 
     # save model
