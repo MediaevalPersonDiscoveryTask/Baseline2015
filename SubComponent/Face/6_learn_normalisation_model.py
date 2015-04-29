@@ -13,23 +13,23 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
 
 if __name__ == '__main__':
+    # read args
     args = docopt(__doc__)
-
-    tempo_margin = 3
 
     X = []
     Y = []
     for videoID in open(args['<video_list>']).read().splitlines():
-        print videoID
 
+        # find alignement between facetrack and reference
         facetracks = {}
         for line in open(args['<facetrack_pos>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
-        ref_f = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', tempo_margin)
+        ref_f = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', 0)
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
+        # read matrix
         for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
             ft1, ft2, dist = line.split(' ')
             if ft1 in facetrack_vs_ref and ft2 in facetrack_vs_ref:
