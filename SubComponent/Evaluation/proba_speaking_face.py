@@ -2,7 +2,7 @@
 compute probability that a facetrack is speaking
 
 Usage:
-  proba_speaking_face.py <video_list> <idx_path> <matrix_path> <st_seg> <reference_speaker> <facetrack_pos> <reference_head>
+  proba_speaking_face.py <video_list> <matrix_path> <st_seg> <reference_speaker> <facetrack_pos> <reference_head>
   proba_speaking_face.py -h | --help
 """
 
@@ -25,17 +25,11 @@ if __name__ == '__main__':
     l_false = []
 
     for videoID in open(args['<video_list>']).read().splitlines():
-        print videoID
-
-        frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
 
         st_seg = []
-        seg_st = {}
         for line in open(args['<st_seg>']+videoID+'.mdtm').read().splitlines():
             v, p, start, dur, spk, na, na, st = line.split(' ')
             st_seg.append([float(start), float(start)+float(dur), st])
-            seg_st[st] = [float(start), float(start)+float(dur)]
-
         ref_spk = []
         for line in open(args['<reference_speaker>']+videoID+'.atseg').read().splitlines():
             v, startTime, endTime, spkName = line.split(' ') 
