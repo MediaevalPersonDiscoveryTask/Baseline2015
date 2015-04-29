@@ -32,7 +32,6 @@ if __name__ == '__main__':
         for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
             st1, st2, BIC_dist = line.split(' ')
             if st1 in st_to_ref and st2 in st_to_ref:
-                X.append([float(BIC_dist)])
                 if st_to_ref[st1] == st_to_ref[st2]:
                     l_true.append(proba)
                 else:
