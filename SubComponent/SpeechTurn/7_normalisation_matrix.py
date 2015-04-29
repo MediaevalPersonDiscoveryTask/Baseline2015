@@ -8,7 +8,6 @@ Usage:
 
 from docopt import docopt
 from sklearn.externals import joblib
-from pyannote.parser import MDTMParser
 
 if __name__ == '__main__':
     args = docopt(__doc__)
