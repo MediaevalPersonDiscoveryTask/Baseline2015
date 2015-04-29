@@ -10,6 +10,7 @@ from docopt import docopt
 from sklearn.externals import joblib
 
 if __name__ == '__main__':
+    # read arguments
     args = docopt(__doc__)
 
     # open model

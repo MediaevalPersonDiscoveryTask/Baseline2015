@@ -14,6 +14,7 @@ import numpy as np
 from scipy import spatial, cluster
 
 if __name__ == '__main__':
+    # read arguments
     args = docopt(__doc__)
 
     faceID_to_indice = {}
@@ -36,10 +37,12 @@ if __name__ == '__main__':
         X[faceID_to_indice[ft1]][faceID_to_indice[ft2]] = dist
         X[faceID_to_indice[ft2]][faceID_to_indice[ft1]] = dist
 
+    # compute diarization
     y = spatial.distance.squareform(X, checks=False)
     Z = cluster.hierarchy.average(y)
     clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
 
+    # compute cluster name
     clusName = {}
     for i in sorted(indice_to_face):
         clusID = clusters[i]
@@ -48,6 +51,7 @@ if __name__ == '__main__':
         else:
             clusName[clusID] += ";"+indice_to_face[i]
 
+    # save clustering
     fout = open(args['<output_diarization>'], 'w')
     for i in sorted(face_seg):
         startTime, endTime = face_seg[i]

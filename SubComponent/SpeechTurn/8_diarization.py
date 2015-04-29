@@ -14,6 +14,7 @@ import numpy as np
 from scipy import spatial, cluster
 
 if __name__ == '__main__':
+    # read arguments
     args = docopt(__doc__)
 
     label_to_indice = {}
@@ -30,12 +31,12 @@ if __name__ == '__main__':
         X[label_to_indice[st1]][label_to_indice[st2]] = dist
         X[label_to_indice[st2]][label_to_indice[st1]] = dist
 
+    # compute diarization
     y = spatial.distance.squareform(X, checks=False)
     Z = cluster.hierarchy.average(y)
-
-    #clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
     clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
 
+    # save clustering
     fout = open(args['<output_diarization>'], 'w')
     for s, t, l in seg_st.itertracks(label=True):
         fout.write(args['<videoID>']+' 1 '+str(s.start)+' '+str(s.duration)+' speaker na na spk_'+str(clusters[t])+'\n')

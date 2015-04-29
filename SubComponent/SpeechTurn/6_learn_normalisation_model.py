@@ -13,7 +13,7 @@ from sklearn.externals import joblib
 from mediaeval_util.repere import align_st_ref
 
 if __name__ == '__main__':
-    # read args
+    # read arguments
     args = docopt(__doc__)
 
     X, Y = [], []

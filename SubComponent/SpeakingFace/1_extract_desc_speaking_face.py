@@ -66,9 +66,9 @@ if __name__ == "__main__":
     # read arguments   
     args = docopt(__doc__)
     fout = open(args['<output_desc>'], 'w')
-
+    # read flandmark
     flandmark = read_flandmark_file(args['<flandmark>'])
-
+    # open the video
     capture = cv2.VideoCapture(args['<video>'])
 
     ret, frame_current = capture.read()
@@ -77,7 +77,6 @@ if __name__ == "__main__":
     video_h = capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT) 
     frameID = capture.get(cv.CV_CAP_PROP_POS_FRAMES)  
     nb_frame = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT)-1)
-
     while (frameID<nb_frame):
         frame_previous2 = frame_previous1.copy()
         frame_previous1 = frame_current.copy()
@@ -91,10 +90,12 @@ if __name__ == "__main__":
                 x, y, w, h, mx1, my1, mx2, my2 = p
                 l_size.append(w*h)
 
+            # compute desc and write into the output file
             for head, p in flandmark[frameID].items():
                 x, y, w, h, mx1, my1, mx2, my2 = p
                 fout.write(str(frameID)+" "+str(head))
 
+                # face centrality and size
                 centre_face_x = x + w/2
                 if nb_face == 2: 
                     center_window_x1 = video_w/3
@@ -103,11 +104,11 @@ if __name__ == "__main__":
                 else:
                     center_window_x = video_w/2   
                     central = abs(centre_face_x-center_window_x)
-
                 fout.write(" "+str(central/video_w))
                 fout.write(" "+str(w*h/video_h))
                 fout.write(" "+str(1 - (w*h / max(l_size))))
 
+                # face mouvement
                 if head in flandmark[frameID-1]:
                     x_p1, y_p1, w_p1, h_p1, mx1_p1, my1_p1, mx2_p1, my2_p1 = flandmark[frameID-1][head]
                     fout.write(" "+str(abs(mx1-mx1_p1)))
@@ -116,7 +117,6 @@ if __name__ == "__main__":
                     fout.write(" "+str(abs(my2-my2_p1))) 
                 else:
                     fout.write(" -1 -1 -1 -1")
-
                 if head in flandmark[frameID-2]:
                     x_p2, y_p2, w_p2, h_p2, mx1_p2, my1_p2, mx2_p2, my2_p2 = flandmark[frameID-2][head]
                     fout.write(" "+str(abs(mx1-mx1_p2)))

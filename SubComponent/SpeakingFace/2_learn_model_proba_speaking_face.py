@@ -15,8 +15,9 @@ from sklearn.externals import joblib
 import random
 
 if __name__ == '__main__':
+    # read arguments       
     args = docopt(__doc__)
-
+    # dictionnary with the IDX file
     idxPath = {}
     for path in open(args['<dataPath.lst>']).read().splitlines():
         videoID, wave_file, video_avi_file, video_mpeg_file, trs_file, xgtf_file, idx_file = path.split(' ')
@@ -24,8 +25,6 @@ if __name__ == '__main__':
 
     X, Y = [], []
     for videoID in open(args['<video_list>']).read().splitlines():
-        print videoID
-
         # find the name corresponding to facetracks
         ref_f = read_ref_facetrack_position(args['<reference_head_path>']+'/'+videoID+'.position', 3)
         facetracks = {}
@@ -82,7 +81,8 @@ if __name__ == '__main__':
                 for desc in visual_desc[spk][faceID]:
                     X.append([propdur_best_duration_faceID, prop_dur_spk_dur]+desc)
                     Y.append(SpeakingFace)
-
+    # train model
     clf = CalibratedClassifierCV(LogisticRegression(), method='sigmoid')
-    clf.fit(X, Y) 
+    clf.fit(X, Y)
+    # save model     
     joblib.dump(clf, args['<output_model_file>']) 
