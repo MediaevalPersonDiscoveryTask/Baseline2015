@@ -26,15 +26,7 @@ if __name__ == '__main__':
 
     for videoID in open(args['<video_list>']).read().splitlines():
 
-        st_seg = []
-        for line in open(args['<st_seg>']+videoID+'.mdtm').read().splitlines():
-            v, p, start, dur, spk, na, na, st = line.split(' ')
-            st_seg.append([float(start), float(start)+float(dur), st])
-        ref_spk = []
-        for line in open(args['<reference_speaker>']+videoID+'.atseg').read().splitlines():
-            v, startTime, endTime, spkName = line.split(' ') 
-            ref_spk.append([float(startTime), float(endTime), spkName])
-        ref_spk.sort()
+        st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
 
         ref_f = read_ref_facetrack_position(args['<reference_head>']+videoID+'.position', 0)
         facetracks = {}
@@ -47,7 +39,6 @@ if __name__ == '__main__':
                 l_facetrack_in_annotated_frame.add(faceID)            
 
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
-        st_vs_ref = align_st_ref(st_seg, ref_spk)
 
         for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
