@@ -1,36 +1,54 @@
+### files
 
-# add path_to_source_code to the PYTHONPATH
+ - `videoID`: video identifier
+ - `videoList`: list au videoID to process (.lst)
+ - `wavePath`: path to the wave file
+ - `audioFile`: audio file in wave format (.wav)
+ - `refspeakerSegmentationPath`: path to manual speaker segmentation (.atseg)
+ - `speechNonSpeechSegmentation`: segmentation of the audio into speech non speech (.mdtm)
+ - `speechTurnSegmentation`: segmentation of the audio into speech turns (.mdtm)
+ - `linearClustering`: segmentation after the linear clustering (.mdtm)
+ - `linearClusteringPath`: path to the linear clustering
+ - `BICMatrix`: distance matrix between speech turn (.mat) [st1 st2 BICDistance]
+ - `BICMatrixPath`: path to BIC matrix 
+ - `probaMatrix` probability that 2 speech turns correspond to the same person (.mat) [faceID1 faceID2 probability]
+ - `diarization` face dirization (.mdtm)
+
+## add path_to_source_code to the PYTHONPATH
 
 export PYTHONPATH=$PYTHONPATH:path_to_source_code
 
-# Learn segmenter model for speech nonspeech segmentation
+## Learn segmenter model for speech nonspeech segmentation
 
-python 1_learn_model_speech_nonspeech.py wave_path video_list Spk_seg_ref_path segment.uem model_speech_nonspeech 
+python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `refspeakerSegmentationPath` segment.uem modelSpeechNonSpeech 
 
-# Speech nonspeech segmentation
+## Speech nonspeech segmentation
 
-python 2_speech_nonspeech_segmentation.py videoID.wav model_speech_nonspeech seg_speech_nonspeech/videoID.mdtm --min_dur_speech=1.0 --min_dur_non_speech=0.8
+python 2_speech_nonspeech_segmentation.py `audioFile` modelSpeechNonSpeech `speechNonSpeechSegmentation`
 
-# Speech turn segmentation
+## Speech turn segmentation
 
-python 3_speech_turn_segmentation.py videoID videoID.wav seg_speech_nonspeech/videoID.mdtm speech_turn_segmentation/videoID.mdtm --penalty_coef=1.6 --minduration=0.8
+python 3_speech_turn_segmentation.py videoID `audioFile` `speechNonSpeechSegmentation` `speechTurnSegmentation`
 
-# Linear clustering
+## Linear clustering
 
-python 4_linear_bic_clustering.py videoID videoID.wav speech_turn_segmentation/videoID.mdtm linear_clustering/videoID.mdtm --penalty_coef=1.8 --gap=0.8
+python 4_linear_bic_clustering.py videoID `audioFile` `speechTurnSegmentation` `linearClustering`
 
-# Compute BIC matrix
+## Compute BIC matrix
 
-python 5_compute_BIC_matrix.py videoID videoID.wav linear_clustering/videoID.mdtm matrix_BIC/videoID.mat
+python 5_compute_BIC_matrix.py videoID `audioFile` `linearClustering` `BICMatrix`
 
-# learn normalisation model
+## learn normalisation model
 
-python 6_learn_normalisation_model.py video_list linear_clustering_path matrix_BIC_path Spk_seg_ref_path spk_vs_spk_normalisation_model --min_cooc=0.5
+python 6_learn_normalisation_model.py `videoList` `linearClusteringPath` `BICMatrixPath` `refspeakerSegmentationPath` normalisationModel
 
-# compute score normalized between speech turn
+## compute score normalized between speech turns
 
-python 7_normalisation_matrix.py videoID linear_clustering/videoID.mdtm matrix_BIC/videoID.mat spk_vs_spk_normalisation_model matrix_normalized/videoID.mat
+python 7_normalisation_matrix.py `videoID` `linearClustering` `BICMatrix` normalisationModel `probaMatrix`
 
+## compute facetrack clustering
+
+python 8_diarization.py `videoID` `linearClustering` `probaMatrix` `diarization`
 
 
 
