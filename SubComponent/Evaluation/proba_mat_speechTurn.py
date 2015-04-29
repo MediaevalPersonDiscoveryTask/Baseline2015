@@ -7,6 +7,8 @@ Usage:
 """
 
 from docopt import docopt
+from pyannote.algorithms.tagging import ArgMaxDirectTagger
+from pyannote.parser import MDTMParser
 from mediaeval_util.repere import align_st_ref
 from sklearn.externals import joblib
 import numpy as np
@@ -25,24 +27,13 @@ if __name__ == '__main__':
 
     for videoID in open(args['<video_list>']).read().splitlines():
 
-        st_seg = []
-        for line in open(args['<st_seg>']+videoID+'.mdtm').read().splitlines():
-            v, p, start, dur, spk, na, na, st = line.split(' ')
-            st_seg.append([float(start), float(start)+float(dur), st])
-        ref_spk = []
-        for line in open(args['<reference_speaker>']+videoID+'.atseg').read().splitlines():
-            v, startTime, endTime, spkName = line.split(' ') 
-            ref_spk.append([float(startTime), float(endTime), spkName])
-        ref_spk.sort()
+        st_to_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
 
-        st_vs_ref = align_st_ref(st_seg, ref_spk)
-
-        for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
-            st1, st2, proba = line.split(' ')
-
-            if st1 in st_vs_ref and st2 in st_vs_ref:
-                proba = float(proba)
-                if st_vs_ref[st1] == st_vs_ref[st2]:
+        for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
+            st1, st2, BIC_dist = line.split(' ')
+            if st1 in st_to_ref and st2 in st_to_ref:
+                X.append([float(BIC_dist)])
+                if st_to_ref[st1] == st_to_ref[st2]:
                     l_true.append(proba)
                 else:
                     l_false.append(proba)

@@ -3,6 +3,10 @@ import numpy as np
 from pandas import read_table
 from sklearn.isotonic import IsotonicRegression
 from pyannote.core import Annotation, Segment
+from pyannote.parser import MDTMParser
+from pyannote.algorithms.tagging import ArgMaxDirectTagger
+
+
 from munkres import Munkres
 
 def parser_vtseg(f, video):
@@ -28,18 +32,22 @@ def cooc(seg1, seg2):
         return 0.0    
     return end-start
 
-def align_st_ref(seg, ref):
-    seg_vs_ref = {}
-    for startTimeSt, endTimeSt, st in seg:
-        best_name = '?'
-        best_cooc = 0.0
-        for startTimeRef, endTimeRef, name in ref:
-            dur_cooc = cooc([startTimeSt, endTimeSt], [startTimeRef, endTimeRef])
-            if dur_cooc > best_cooc:
-                best_cooc = dur_cooc
-                best_name = name
-        seg_vs_ref[st] = best_name
-    return seg_vs_ref
+def align_st_ref(seg_st_path, ref_path, videoID):
+    st_vs_ref = {}
+    ref = parser_atseg(ref_path+'/'+videoID+'.atseg', videoID)
+    seg_st = MDTMParser().read(seg_st_path+'/'+videoID+'.mdtm')(uri=videoID, modality="speaker")
+
+    direct = ArgMaxDirectTagger()
+    named_st = direct(ref, seg_st)
+
+    track_to_st = {}
+    for s, t, l in seg_st.itertracks(label=True):
+        track_to_st[t] = l
+
+    for s, t, name in named_st.itertracks(label=True):
+        if 'st_' not in name:
+            st_vs_ref[track_to_st[t]] = name
+    return st_vs_ref
 
 def read_ref_facetrack_position(f, tempo_margin):
     ref = {}
