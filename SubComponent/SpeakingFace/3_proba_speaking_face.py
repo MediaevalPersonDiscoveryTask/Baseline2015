@@ -28,7 +28,8 @@ if __name__ == '__main__':
         frameID = int(l[0])
         timestamp = frame2time(frameID, 0.0)
         faceID = int(l[1])
-        proba = clf.predict_proba([map(float, l[2:])])[0][1])
+        proba = clf.predict_proba([map(float, l[2:])])[0][1]
+        print faceID, timestamp, proba
         for startTime, endTime, st in st_seg:
             if startTime <= timestamp and timestamp <= endTime:
                 break
