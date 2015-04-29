@@ -32,9 +32,9 @@ if __name__ == '__main__':
 
         for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
             ft1, ft2, dist = line.split(' ')
-            if ft1 in facetrack_vs_ref and ft2 in track_to_name:
+            if ft1 in facetrack_vs_ref and ft2 in facetrack_vs_ref:
                 X.append([float(dist)])
-                if track_to_name[ft1] == track_to_name[ft2]:
+                if facetrack_vs_ref[ft1] == facetrack_vs_ref[ft2]:
                     Y.append(1)
                 else:
                     Y.append(0)
