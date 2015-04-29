@@ -5,7 +5,7 @@ Usage:
   linear_bic_clustering.py <videoID> <wave> <input_seg> <output_seg> [--penalty_coef=<pc>] [--gap=<g>]
   linear_bic_clustering.py -h | --help
 Options:
-  --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 1.8]
+  --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 2.4]
   --gap=<g>             maximum gap between 2 speech turns that can be merged (>0.0) [default: 0.8]  
 """
 
