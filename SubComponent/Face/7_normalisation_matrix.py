@@ -2,7 +2,7 @@
 Compute speaker versus speaker distance
 
 Usage:
-  normalisation_matrix.py <videoID> <input_seg> <input_mat> <model_file> <output_mat>
+  normalisation_matrix.py <input_mat> <model_file> <output_mat>
   normalisation_matrix.py -h | --help
 """
 
