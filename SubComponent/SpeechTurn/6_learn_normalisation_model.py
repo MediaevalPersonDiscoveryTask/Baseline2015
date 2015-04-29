@@ -10,6 +10,7 @@ from docopt import docopt
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
+from mediaeval_util.repere import align_st_ref
 
 if __name__ == '__main__':
     # read args
