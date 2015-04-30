@@ -22,7 +22,7 @@ if __name__ == '__main__':
     seg_st = MDTMParser().read(args['<st_seg>'])(uri=args['<videoID>'], modality="speaker")
     for s, t, l in seg_st.itertracks(label=True):
         label_to_indice[l] = t
-        indice_to_face[t] = l
+        indice_to_st[t] = l
 
     # read matrix
     N = len(label_to_indice)
