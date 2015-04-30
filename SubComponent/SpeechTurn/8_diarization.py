@@ -18,9 +18,11 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     label_to_indice = {}
+    indice_to_st = {}
     seg_st = MDTMParser().read(args['<st_seg>'])(uri=args['<videoID>'], modality="speaker")
     for s, t, l in seg_st.itertracks(label=True):
         label_to_indice[l] = t
+        indice_to_face[t] = l
 
     # read matrix
     N = len(label_to_indice)
@@ -36,9 +38,18 @@ if __name__ == '__main__':
     Z = cluster.hierarchy.average(y)
     clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
 
+    # compute cluster name
+    clusName = {}
+    for i in sorted(indice_to_st):
+        clusID = clusters[i]
+        if clusID not in clus_name:
+            clusName[clusID] = indice_to_st[i]
+        else:
+            clusName[clusID] += ";"+indice_to_st[i]
+
     # save clustering
     fout = open(args['<output_diarization>'], 'w')
     for s, t, l in seg_st.itertracks(label=True):
-        fout.write(args['<videoID>']+' 1 '+str(s.start)+' '+str(s.duration)+' speaker na na spk_'+str(clusters[t])+'\n')
+        fout.write(args['<videoID>']+' 1 '+str(s.start)+' '+str(s.duration)+' speaker na na '+str(clusName[clusters[t]])+'\n')
     fout.close()
     
