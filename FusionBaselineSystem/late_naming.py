@@ -5,7 +5,7 @@ Usage:
   late_naming.py <videoID> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_file> [--thr_propagation=<tp>]
   late_naming.py -h | --help
 Options:
-  --thr_propagation=<tp>  minimum score to propagate speaker identity to facetrack
+  --thr_propagation=<tp>  minimum score to propagate speaker identity to facetrack [default: 0.5]
 """
 
 from docopt import docopt
