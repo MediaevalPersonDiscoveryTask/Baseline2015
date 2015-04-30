@@ -15,6 +15,16 @@ def drange(start, stop, step):
         yield r
         r += step
 
+def parser_shot_seg(f, video):
+    anno = Annotation(uri=video)
+    nb_track=0
+    for line in open(f):
+        video, shotName, startTime, endTime, startFrame, endFrame = line[:-1].split(' ')
+        segment = Segment(start=float(startTime), end=float(endTime))
+        anno[segment, nb_track] = shotName
+        nb_track+=1
+    return anno
+
 def parser_vtseg(f, video):
     anno = Annotation(uri=video)
     nb_track=0
