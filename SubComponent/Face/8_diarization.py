@@ -46,7 +46,7 @@ if __name__ == '__main__':
     clusName = {}
     for i in sorted(indice_to_face):
         clusID = clusters[i]
-        if clusID not in clus_name:
+        if clusID not in clusName:
             clusName[clusID] = indice_to_face[i]
         else:
             clusName[clusID] += ";"+indice_to_face[i]

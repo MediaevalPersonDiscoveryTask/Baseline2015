@@ -42,7 +42,7 @@ if __name__ == '__main__':
     clusName = {}
     for i in sorted(indice_to_st):
         clusID = clusters[i]
-        if clusID not in clus_name:
+        if clusID not in clusName:
             clusName[clusID] = indice_to_st[i]
         else:
             clusName[clusID] += ";"+indice_to_st[i]
