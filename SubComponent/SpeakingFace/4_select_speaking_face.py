@@ -52,7 +52,7 @@ if __name__ == '__main__':
     hist_1 = np.histogram(l_true, l_range)    
     hist_0 = np.histogram(l_false, l_range)
 
-    ref = float(np.sum(l_true))
+    ref = float(l_true)
 
     for i in range(len(l_range)-1):
         thr = l_range[i]
@@ -60,10 +60,7 @@ if __name__ == '__main__':
         correct = float(np.sum(hist_1[0][i:]))
         hyp = float(np.sum(hist_0[0][i:]) + np.sum(hist_1[0][i:]))
         
-        print correct, hyp, ref
-
-
-        '''
+        print thr , correct, hyp, ref,
 
         P=0.0
         if hyp > 0:
@@ -71,8 +68,6 @@ if __name__ == '__main__':
         R = correct / ref
         F = (2*P*R) / (P+R)
 
-        print thr , P, R, F
-        '''
-
-
+        print P, R, F
+        
 
