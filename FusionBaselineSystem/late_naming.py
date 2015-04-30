@@ -79,7 +79,7 @@ if __name__ == "__main__":
                     if ON == p:
                         print '    ', ON, sON
                         sInter = sON & sSpk
-                        print '    ', sInter,
+                        print '    ', sInter
 
                         '''
                         sInter = sON & sSpk
