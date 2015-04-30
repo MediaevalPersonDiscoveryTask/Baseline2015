@@ -19,15 +19,15 @@ if __name__ == "__main__":
     args = docopt(__doc__)
 
     evidences = {}
-    for videoID in open(args['<videoID_list>']).read().splitlines():
+    for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
 
         # read segmentation file
-        sd = MDTMParser().read(args['<spk_dia>'])(uri=videoID, modality = 'speaker')
-        st = MDTMParser().read(args['<st_seg>'])(uri=videoID, modality = 'speaker')
-        faces = parser_vtseg(args['<face_seg>'], videoID)
+        sd = MDTMParser().read(args['<spk_dia>']+'/'+videoID+'.mdtm')(uri=videoID, modality = 'speaker')
+        st = MDTMParser().read(args['<st_seg>']+'/'+videoID+'.mdtm')(uri=videoID, modality = 'speaker')
+        faces = parser_vtseg(args['<face_seg>']+'/'+videoID+'.vtseg', videoID)
         ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
-        shots = parser_shot_seg(args['<shot_seg>'], videoID)
+        shots = parser_shot_seg(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
 
         # name speakers
         direct = ConservativeDirectTagger()
@@ -46,7 +46,7 @@ if __name__ == "__main__":
             dic_st_to_speakingFace[st] = ['', 0.0]
 
         thr_propagation = float(args['--thr_propagation'])
-        for line in open(args['<mat_speaking_face>']).read().splitlines():
+        for line in open(args['<mat_speaking_face>']+'/'+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             proba = float(proba)
             if proba >= thr_propagation and proba > dic_st_to_speakingFace[st][1]: dic_st_to_speakingFace[st] = [faceID, proba]
