@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  6_learn_normalisation_model.py <videoList> <faceTracking> <l2Matrix> <facePositionReferencePath> <modell2ToProba>
+  6_learn_normalisation_model.py <videoList> <faceTracking> <l2MatrixPath> <facePositionReferencePath> <modell2ToProba>
   6_learn_normalisation_model.py -h | --help
 """
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
         # read matrix
-        for line in open(args['<l2Matrix>']+'/'+videoID+'.mat').read().splitlines():
+        for line in open(args['<l2MatrixPath>']+'/'+videoID+'.mat').read().splitlines():
             ft1, ft2, dist = line.split(' ')
             if ft1 in facetrack_vs_ref and ft2 in facetrack_vs_ref:
                 X.append([float(dist)])

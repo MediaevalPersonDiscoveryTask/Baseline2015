@@ -12,6 +12,7 @@
  - `flandmark`: facial landmark position (.flandmark) [frameID xmin yminn xmax ymax (x y)*8]
  - `faceTrackDescriptor`: central HoG descriptor projected by LDML in 100 dimension (.desc) [faceID nb_desc distance_central d*100]
  - `l2Matrix`: distance matrix between facetracks (.mat) [faceID1 faceID2 nbHoGFaceID1  nbHoGFaceID2 distCenterFaceID1 distCenterFaceID2 l2Distance]
+ - `l2MatrixPath`: path to l2 distance matrix
  - `facePositionReferencePath`: path to face postion in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
  - `probaMatrix`: probability that 2 facetracks correspond to the same person (.mat) [faceID1 faceID2 probability]
  - `diarization`: face diarization (.mdtm)
@@ -53,7 +54,7 @@ python 5_compute_hvh_matrix.py `faceTrackDescriptor` `l2Matrix`
 
 ## Learn normalisation model
 
-python 6_learn_normalisation_model.py `video_list` `faceTracking` `facePositionReferencePath` `modell2ToProba` 
+python 6_learn_normalisation_model.py `video_list` `faceTracking`  `l2MatrixPath` `facePositionReferencePath` `modell2ToProba` 
 
 ## normalize l2 distance into probability
 
