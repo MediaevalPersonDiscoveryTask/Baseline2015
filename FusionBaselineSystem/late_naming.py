@@ -72,7 +72,9 @@ if __name__ == "__main__":
             for sSpk in NamedSpkShot.label_timeline(p):
                 for sON, tON, ON in NamedSpk.itertracks(label=True):
                     if ON == p:
-                        print sON & sSpk, sON ^ sSpk
+                        sInter = sON & sSpk
+                        sDist = sON ^ sSpk
+                        print sInter, sDist 
                         c = sON & sSpk and (sON & sSpk).duration or 1/(sON ^ sSpk).duration
                         if c > conf: conf = c
             for sFace in NamedFaceShot.label_timeline(p):
