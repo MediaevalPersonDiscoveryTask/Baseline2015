@@ -34,7 +34,7 @@ if __name__ == "__main__":
         if 'st_' in name:
             l_to_remove.append([s, t])
     for s, t in l_to_remove:
-        del annotation[s, t]
+        del NamedSpk[s, t]
 
     # propagate speakers identity to best speakingFace
     dic_trackID_to_st = {}
