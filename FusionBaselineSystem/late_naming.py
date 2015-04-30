@@ -93,6 +93,7 @@ if __name__ == "__main__":
                 evidences.setdefault(p, []).append([conf, videoID, shot])
         fout_label.close()
     
+    # select and write evidence
     fout_evidence = open(args['<output_evidence>'], 'w')
     for p in evidences:
         conf, videoID, shot = sorted(evidences[p], reverse=True)[0]
