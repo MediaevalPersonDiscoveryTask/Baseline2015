@@ -84,7 +84,8 @@ if __name__ == "__main__":
                         else:
                             sDist = sON ^ sSpk
                             print '     ', sDist.duration
-                            
+                            c = 1/sDist.duration
+                        if c > conf: conf = c
 
                         '''
                         sInter = sON & sSpk
@@ -96,10 +97,11 @@ if __name__ == "__main__":
                             if sDist.duration > 0.0:
                                 c = 1/sDist.duration
                         #c = sON & sSpk and sInter.duration or 1/sDist.duration
-                        if c > conf: conf = c
                         print
+                        if c > conf: conf = c
 
                         '''
+
             '''
             for sFace in NamedFaceShot.label_timeline(p):
                 for sON, tON, ON in NamedSpk.itertracks(label=True):
