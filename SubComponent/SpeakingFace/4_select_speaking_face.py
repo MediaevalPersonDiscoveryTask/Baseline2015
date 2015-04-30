@@ -64,6 +64,8 @@ if __name__ == '__main__':
             best_F = F
             best_thr = l_range[i]
 
+    print best_thr, best_F
+
     nbFaceSelected = 0.0
     nbFaceTotal = 0.0
 
