@@ -36,11 +36,11 @@ if __name__ == '__main__':
             faceID = int(faceID)
             if faceID in l_facetrack_in_annotated_frame:
                 proba = float(proba)
-                SpeakingFace = 0
+                SpeakingFace = False
                 if faceID in facetrack_vs_ref and st in st_vs_ref:
                     if facetrack_vs_ref[faceID] == st_vs_ref[st]:
-                        SpeakingFace = 1
-                if SpeakingFace == 1:
+                        SpeakingFace = True
+                if SpeakingFace:
                     l_true.append(proba)
                 else:
                     l_false.append(proba)
