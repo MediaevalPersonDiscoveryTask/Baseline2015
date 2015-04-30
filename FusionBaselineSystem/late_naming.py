@@ -32,7 +32,7 @@ if __name__ == "__main__":
     l_to_remove = []
     for s, t, name in NamedSpk.itertracks(label=True):
         if 'st_' in name:
-            l_to_remove.append(s, t)
+            l_to_remove.append([s, t])
     for s, t in l_to_remove:
         del annotation[s, t]
 
