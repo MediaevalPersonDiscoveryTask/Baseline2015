@@ -7,7 +7,7 @@ Usage:
 """
 
 from docopt import docopt
-from mediaeval_util.repere import IDXHack, read_ref_facetrack_position, align_facetrack_ref, align_st_ref, drange
+from mediaeval_util.repere import read_ref_facetrack_position, align_facetrack_ref, align_st_ref, drange
 from sklearn.externals import joblib
 import numpy as np
 
