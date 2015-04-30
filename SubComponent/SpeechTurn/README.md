@@ -13,6 +13,9 @@
  - `BICMatrixPath`: path to BIC matrix 
  - `probaMatrix` probability that 2 speech turns correspond to the same person (.mat) [faceID1 faceID2 probability]
  - `diarization` face dirization (.mdtm)
+ - `segment.uem`: segment to process
+ - `modelSpeechNonSpeech`: model to segment audio signal into speech non speech
+ - `modelBICToProba`: model to convert BIC distance similarity into probability
 
 ## add path_to_source_code to the PYTHONPATH
 
@@ -20,11 +23,11 @@ export PYTHONPATH=$PYTHONPATH:path_to_source_code
 
 ## Learn segmenter model for speech nonspeech segmentation
 
-python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `speakerSegmentationReferencePath` segment.uem modelSpeechNonSpeech 
+python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `speakerSegmentationReferencePath` `segment.uem` `modelSpeechNonSpeech` 
 
 ## Speech nonspeech segmentation
 
-python 2_speech_nonspeech_segmentation.py `audioFile` modelSpeechNonSpeech `speechNonSpeechSegmentation`
+python 2_speech_nonspeech_segmentation.py `audioFile` `modelSpeechNonSpeech` `speechNonSpeechSegmentation`
 
 ## Speech turn segmentation
 
@@ -40,11 +43,11 @@ python 5_compute_BIC_matrix.py videoID `audioFile` `linearClustering` `BICMatrix
 
 ## learn normalisation model
 
-python 6_learn_normalisation_model.py `videoList` `linearClusteringPath` `BICMatrixPath` `speakerSegmentationReferencePath` modelBICToProba
+python 6_learn_normalisation_model.py `videoList` `linearClusteringPath` `BICMatrixPath` `speakerSegmentationReferencePath` `modelBICToProba`
 
 ## compute score normalized between speech turns
 
-python 7_normalisation_matrix.py `videoID` `BICMatrix` modelBICToProba `probaMatrix`
+python 7_normalisation_matrix.py `videoID` `BICMatrix` `modelBICToProba` `probaMatrix`
 
 ## compute facetrack clustering
 

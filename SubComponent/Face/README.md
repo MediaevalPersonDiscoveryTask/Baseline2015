@@ -15,6 +15,11 @@
  - `facePositionReferencePath`: path to face postion in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
  - `probaMatrix`: probability that 2 facetracks correspond to the same person (.mat) [faceID1 faceID2 probability]
  - `diarization`: face diarization (.mdtm)
+ - `haarcascade_frontalface_default.xml`: haar cascasde used by opencv to find face
+ - `flandmark_model.dat`: facial landmark model
+ - `features_model.txt`: features model for affine transformation
+ - `ldml.txt`: projection matrix of the HoG descriptor into a smaller dimension (100)
+ - `modell2ToProba`: model to convert l2 distance to probability
 
 ## add path_to_source_code to the PYTHONPATH
 
@@ -22,7 +27,7 @@ export PYTHONPATH=$PYTHONPATH:path_to_source_code
 
 ## face detection
 
-python 1_faceDetection.py `videoFile` `faceDetection` haarcascade_frontalface_default.xml --shot_segmentation=`shotSegmentation`
+python 1_faceDetection.py `videoFile` `faceDetection` `haarcascade_frontalface_default.xml` --shot_segmentation=`shotSegmentation`
 
 ## face tracking
 
@@ -36,11 +41,11 @@ cd build
 cmake ..
 make 
 
-./face_landmarks_detection `videoFile` `faceTracking` `flandmark` flandmark_model.dat
+./face_landmarks_detection `videoFile` `faceTracking` `flandmark` `flandmark_model.dat`
 
 ## compute central HoG descriptor projected by LDML for each facetrack
 
-python 4_face_HoG_descriptor.py `videoFile` `flandmark` features_model.txt ldml.txt `faceTrackDescriptor`
+python 4_face_HoG_descriptor.py `videoFile` `flandmark` `features_model.txt` `ldml.txt` `faceTrackDescriptor`
 
 ## compute l2 distance between facetracks
 
@@ -48,11 +53,11 @@ python 5_compute_hvh_matrix.py `faceTrackDescriptor` `l2Matrix`
 
 ## Learn normalisation model
 
-python 6_learn_normalisation_model.py `video_list` `faceTracking` `facePositionReferencePath` modell2ToProba 
+python 6_learn_normalisation_model.py `video_list` `faceTracking` `facePositionReferencePath` `modell2ToProba` 
 
 ## normalize l2 distance into probability
 
-python 7_normalisation_matrix.py `l2Matrix` modell2ToProba `probaMatrix`
+python 7_normalisation_matrix.py `l2Matrix` `modell2ToProba` `probaMatrix`
 
 ## compute facetrack clustering
 

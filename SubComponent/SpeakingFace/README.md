@@ -12,6 +12,7 @@
  - `speakerSegmentationReferencePath`: path to manual speaker segmentation (.atseg)
  - `speechTurnSegmentation`: speech turn segmentation (.mdtm)
  - `probaSpeakingFace` probability that a face track speaks (.mat) [st faceID probability]
+ - `modelProbaSpeakingFace`: classifier model to compute the probabilty that a facetrack correspond to the current speech turn
 
 ## add path_to_source_code to the PYTHONPATH
 
@@ -23,8 +24,8 @@ python 1_extract_desc_speaking_face.py `videoFile` `flandmark` `SpeakingFaceDesc
 
 ## learn a model to find speaking face
 
-python 2_learn_model_proba_speaking_face.py `videoList` `idxPath` `faceTracking` `SpeakingFaceDescriptorPath` `facePositionReferencePath` `speakerSegmentationReferencePath` modelProbaSpeakingFace
+python 2_learn_model_proba_speaking_face.py `videoList` `idxPath` `faceTracking` `SpeakingFaceDescriptorPath` `facePositionReferencePath` `speakerSegmentationReferencePath` `modelProbaSpeakingFace`
 
 ## Compute score between face tracks and speech turns
 
-python 3_proba_speaking_face.py `SpeakingFaceDescriptor` `speechTurnSegmentation` `idx` modelProbaSpeakingFace `probaSpeakingFace`
+python 3_proba_speaking_face.py `SpeakingFaceDescriptor` `speechTurnSegmentation` `idx` `modelProbaSpeakingFace` `probaSpeakingFace`
