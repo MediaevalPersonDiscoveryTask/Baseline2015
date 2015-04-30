@@ -9,15 +9,9 @@ Usage:
 from docopt import docopt
 from pyannote.algorithms.tagging import ArgMaxDirectTagger
 from pyannote.parser import MDTMParser
-from mediaeval_util.repere import align_st_ref
+from mediaeval_util.repere import align_st_ref, drange
 from sklearn.externals import joblib
 import numpy as np
-
-def drange(start, stop, step):
-    r = start
-    while r < stop:
-        yield r
-        r += step
 
 if __name__ == '__main__':
     args = docopt(__doc__)

@@ -9,6 +9,12 @@ from pyannote.algorithms.tagging import ArgMaxDirectTagger
 
 from munkres import Munkres
 
+def drange(start, stop, step):
+    r = start
+    while r < stop:
+        yield r
+        r += step
+
 def parser_vtseg(f, video):
     anno = Annotation(uri=video)
     for line in open(f):
