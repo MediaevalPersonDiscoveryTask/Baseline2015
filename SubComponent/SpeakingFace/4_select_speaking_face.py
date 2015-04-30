@@ -54,20 +54,28 @@ if __name__ == '__main__':
 
     ref = float(len(l_true))
 
+    best_thr = 0.0
+    best_F = 0.0
     for i in range(len(l_range)-1):
         thr = l_range[i]
 
         correct = float(np.sum(hist_1[0][i:]))
         hyp = float(np.sum(hist_0[0][i:]) + np.sum(hist_1[0][i:]))
         
-        print thr , correct, hyp, ref,
-
         P=0.0
         if hyp > 0:
             P = correct / hyp
         R = correct / ref
-        F = (2*P*R) / (P+R)
+        F = 0.0
+        if P+R > 0:
+            F = (2*P*R) / (P+R)
 
-        print P, R, F
+        print thr, round(P, 3)*100, round(R, 3)*100, round(F, 3)*100
         
+        if F > best_F:
+            best_F = F
+            best_thr = thr
+
+    print
+    print 'best: ', best_thr, best_F
 
