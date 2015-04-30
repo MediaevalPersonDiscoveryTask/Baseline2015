@@ -5,7 +5,7 @@ Usage:
   8_diarization.py <videoID> <st_seg> <matrix> <output_diarization> [--threshold=<t>]
   8_diarization.py -h | --help
 Options:
-  --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
+  --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.28]
 """
 
 from docopt import docopt
