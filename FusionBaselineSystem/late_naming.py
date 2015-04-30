@@ -56,7 +56,7 @@ if __name__ == "__main__":
         if dic_st_to_speakingFace[st][0] != '':
             faceID_to_name[dic_st_to_speakingFace[st][0]] = name
 
-    namedFaces = Annotation(uri=video)
+    namedFaces = Annotation(uri=args['<videoID>'])
     for s, t, faceID in faces.itertracks(label=True):
         if faceID in faceID_to_name:
             namedFaces[s, t] = faceID_to_name[faceID]
