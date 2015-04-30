@@ -1,6 +1,8 @@
 """
+Evaluate the face detection after tracking step (all faces and only speaking faces)
+
 Usage:
-  face_tracking.py <video_list> <facetrack_pos> <reference_head_position_path> <idx_path> <speaker_ref>
+  face_tracking.py <video_list> <face_tracking> <reference_head_position_path> <idx_path> <speaker_ref>
   face_tracking.py -h | --help
 """
 
@@ -30,7 +32,7 @@ if __name__ == '__main__':
 
         facetracks = {}
         l_ft = []
-        for line in open(args['<facetrack_pos>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<face_tracking>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h

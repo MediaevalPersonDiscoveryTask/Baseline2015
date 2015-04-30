@@ -1,5 +1,5 @@
 """
-Draw distribution of the probability between positive and negative pair
+Distribution of the probability between positive and negative pair of speech turns
 
 Usage:
   proba_mat_speechTurn.py <video_list> <matrix_path> <st_seg> <reference_speaker>

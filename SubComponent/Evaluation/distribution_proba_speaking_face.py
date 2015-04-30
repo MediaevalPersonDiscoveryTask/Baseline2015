@@ -1,9 +1,9 @@
 """
-compute probability that a facetrack is speaking
+Distribution of the probability between positive and negative pair of speech turns/facetracks
 
 Usage:
-  proba_speaking_face.py <video_list> <matrix_path> <st_seg> <reference_speaker> <facetrack_pos> <reference_head>
-  proba_speaking_face.py -h | --help
+  distribution_proba_speaking_face.py <video_list> <matrix> <st_seg> <speaker_reference> <facetrack_pos> <face_position_reference>
+  distribution_proba_speaking_face.py -h | --help
 """
 
 from docopt import docopt
@@ -19,9 +19,9 @@ if __name__ == '__main__':
 
     for videoID in open(args['<video_list>']).read().splitlines():
 
-        st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
+        st_vs_ref = align_st_ref(args['<st_seg>'], args['<speaker_reference>'], videoID)
 
-        ref_f = read_ref_facetrack_position(args['<reference_head>']+videoID+'.position', 0)
+        ref_f = read_ref_facetrack_position(args['<face_position_reference>']+videoID+'.position', 0)
         facetracks = {}
         l_facetrack_in_annotated_frame = set([])
         for line in open(args['<facetrack_pos>']+videoID+'.facetrack').read().splitlines():
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
-        for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
+        for line in open(args['<matrix>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             faceID = int(faceID)
             if faceID in l_facetrack_in_annotated_frame:
