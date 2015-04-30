@@ -32,6 +32,7 @@ if __name__ == '__main__':
         # read matrix
         for line in open(args['<l2MatrixPath>']+'/'+videoID+'.mat').read().splitlines():
             ft1, ft2, nbHoGFaceID1, nbHoGFaceID2, distCenterFaceID1, distCenterFaceID2, l2Distance = line.split(' ')
+            ft1, ft2 = int(ft1), int(ft2)
             if ft1 in facetrack_vs_ref and ft2 in facetrack_vs_ref:
                 print ft1, ft2, facetrack_vs_ref[ft1], facetrack_vs_ref[ft2], l2Distance
                 X.append([float(l2Distance)])
