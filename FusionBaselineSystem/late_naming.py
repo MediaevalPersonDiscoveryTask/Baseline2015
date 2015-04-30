@@ -66,25 +66,16 @@ if __name__ == "__main__":
         NamedSpkShot = NamedSpk.crop(s)
         NamedFaceShot = namedFaces.crop(s)
         PersonShot = set(NamedSpkShot.labels()) & set(NamedFaceShot.labels())
-        print shot
-        print NamedSpkShot
-        print NamedFaceShot
-        print PersonShot
         for p in PersonShot:
-            print p
             conf = 0.0
             for sSpk in NamedSpkShot.label_timeline(p):
-                print '  ', sSpk
                 for sON, tON, ON in NamedSpk.itertracks(label=True):
                     if ON == p:
-                        print '     ', ON, sON
                         sInter = sON & sSpk
-                        if sInter:
-                            c = sInter.duration
+                        if sON & sSpk:c = 1.0 + sON & sSpk.duration
                         else:
-                            sDist = sON ^ sSpk
-                            print '     ', sDist.duration
-                            c = 1/sDist.duration
+                            if sON ^ sSpk == 0: c=1.0
+                            else: c = 1/(sON ^ sSpk).duration
                         if c > conf: conf = c
 
                         '''
