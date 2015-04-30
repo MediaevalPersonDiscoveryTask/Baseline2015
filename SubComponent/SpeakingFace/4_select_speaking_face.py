@@ -17,7 +17,6 @@ if __name__ == '__main__':
     l_false, l_true = [], []
 
     for videoID in open(args['<video_train_list>']).read().splitlines():
-        print videoID
 
         st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
 
@@ -30,7 +29,6 @@ if __name__ == '__main__':
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
             if frameID in ref_f:
                 l_facetrack_in_annotated_frame.add(faceID)            
-
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
         for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
@@ -57,91 +55,34 @@ if __name__ == '__main__':
     best_thr = 0.0
     best_F = 0.0
     for i in range(len(l_range)-1):
-        thr = l_range[i]
-
         correct = float(np.sum(hist_1[0][i:]))
         hyp = float(np.sum(hist_0[0][i:]) + np.sum(hist_1[0][i:]))
-        
-        P=0.0
-        if hyp > 0:
-            P = correct / hyp
+        P = hyp > 0 and P = correct / hyp or 0.0
         R = correct / ref
-        F = 0.0
-        if P+R > 0:
-            F = (2*P*R) / (P+R)
-
-        print thr, round(P, 3)*100, round(R, 3)*100, round(F, 3)*100
-        
+        F = P+R > 0 and F = (2*P*R) / (P+R) or 0.0
         if F > best_F:
             best_F = F
-            best_thr = thr
+            best_thr = l_range[i]
 
-    print
-    print 'best: ', best_thr, best_F
-
-
-
-    l_false, l_true = [], []
+    nbFaceSelected = 0.0
+    nbFaceTotal = 0.0
 
     for videoID in open(args['<video_test_list>']).read().splitlines():
-        print videoID
 
-        st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
-
-        ref_f = read_ref_facetrack_position(args['<reference_head>']+videoID+'.position', 0)
-        facetracks = {}
-        l_facetrack_in_annotated_frame = set([])
-        for line in open(args['<facetrack_pos>']+videoID+'.facetrack').read().splitlines():
-            frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
-            facetracks.setdefault(frameID, {})
-            facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
-            if frameID in ref_f:
-                l_facetrack_in_annotated_frame.add(faceID)            
-
-        facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
-
+        l = set([])
+        lall = set([])
+        
         for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             faceID = int(faceID)
-            if faceID in l_facetrack_in_annotated_frame:
-                proba = float(proba)
-                SpeakingFace = 0
-                if faceID in facetrack_vs_ref and st in st_vs_ref:
-                    if facetrack_vs_ref[faceID] == st_vs_ref[st]:
-                        SpeakingFace = 1
-                if SpeakingFace == 1:
-                    l_true.append(proba)
-                else:
-                    l_false.append(proba)
+            proba = float(proba)
+            if proba >= best_thr:
+                l.add(faceID)
+            lall.add(faceID)
 
-    l_range = list(drange(0.0, 1.0, 0.01))
+        nbFaceSelected += len(l)
+        nbFaceTotal += len(lall)
 
-    hist_1 = np.histogram(l_true, l_range)    
-    hist_0 = np.histogram(l_false, l_range)
+        #fout = open(args['<output_path>']+'/'+videoID+'.lfacetrack', 'w')
 
-    ref = float(len(l_true))
 
-    best_thr = 0.0
-    best_F = 0.0
-    for i in range(len(l_range)-1):
-        thr = l_range[i]
-
-        correct = float(np.sum(hist_1[0][i:]))
-        hyp = float(np.sum(hist_0[0][i:]) + np.sum(hist_1[0][i:]))
-        
-        P=0.0
-        if hyp > 0:
-            P = correct / hyp
-        R = correct / ref
-        F = 0.0
-        if P+R > 0:
-            F = (2*P*R) / (P+R)
-
-        print thr, round(P, 3)*100, round(R, 3)*100, round(F, 3)*100
-        
-        if F > best_F:
-            best_F = F
-            best_thr = thr
-
-    print
-    print 'best: ', best_thr, best_F
