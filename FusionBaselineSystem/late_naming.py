@@ -80,7 +80,11 @@ if __name__ == "__main__":
                         print '     ', ON, sON
                         sInter = sON & sSpk
                         if sInter:
-                            print '     ', sInter
+                            c = sInter.duration
+                        else:
+                            sDist = sON ^ sSpk
+                            print '     ', sDist.duration
+                            
 
                         '''
                         sInter = sON & sSpk
