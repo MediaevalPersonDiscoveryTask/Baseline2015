@@ -74,12 +74,13 @@ if __name__ == "__main__":
             print p
             conf = 0.0
             for sSpk in NamedSpkShot.label_timeline(p):
-                print '   ', sSpk
+                print '  ', sSpk
                 for sON, tON, ON in NamedSpk.itertracks(label=True):
                     if ON == p:
-                        print '    ', ON, sON
+                        print '     ', ON, sON
                         sInter = sON & sSpk
-                        print '    ', sInter
+                        if sInter:
+                            print '     ', sInter
 
                         '''
                         sInter = sON & sSpk
