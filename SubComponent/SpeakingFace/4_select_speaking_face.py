@@ -57,9 +57,9 @@ if __name__ == '__main__':
     for i in range(len(l_range)-1):
         correct = float(np.sum(hist_1[0][i:]))
         hyp = float(np.sum(hist_0[0][i:]) + np.sum(hist_1[0][i:]))
-        P = hyp > 0 and P = correct / hyp or 0.0
+        P = hyp > 0 and correct/hyp or 0.0
         R = correct / ref
-        F = P+R > 0 and F = (2*P*R) / (P+R) or 0.0
+        F = P+R > 0 and (2*P*R)/(P+R) or 0.0
         if F > best_F:
             best_F = F
             best_thr = l_range[i]
