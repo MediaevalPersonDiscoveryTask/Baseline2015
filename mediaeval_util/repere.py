@@ -17,18 +17,22 @@ def drange(start, stop, step):
 
 def parser_vtseg(f, video):
     anno = Annotation(uri=video)
+    nb_track=0
     for line in open(f):
         video, startTime, endTime, startFrame, endFrame, name = line[:-1].split(' ')
         segment = Segment(start=float(startTime), end=float(endTime))
-        anno[segment] = name
+        anno[segment, nb_track] = name
+        nb_track+=1
     return anno
 
 def parser_atseg(f, video):
     anno = Annotation(uri=video)
+    nb_track=0    
     for line in open(f):
         video, startTime, endTime, name = line[:-1].split(' ')
         segment = Segment(start=float(startTime), end=float(endTime))
-        anno[segment] = name
+        anno[segment, nb_track] = name
+        nb_track+=1
     return anno
 
 def cooc(seg1, seg2):
