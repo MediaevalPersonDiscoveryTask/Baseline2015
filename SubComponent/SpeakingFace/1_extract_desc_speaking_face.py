@@ -2,7 +2,7 @@
 Extract descriptor to find speaking face
 
 Usage:
-  extract_desc_speaking_face.py <video> <flandmark> <output_desc>
+  extract_desc_speaking_face.py <videoFile> <flandmark> <SpeakingFaceDescriptor>
   extract_desc_speaking_face.py -h | --help
 """
 
@@ -65,11 +65,11 @@ def read_flandmark_file(f_flandmark):
 if __name__ == "__main__": 
     # read arguments   
     args = docopt(__doc__)
-    fout = open(args['<output_desc>'], 'w')
+    fout = open(args['<SpeakingFaceDescriptor>'], 'w')
     # read flandmark
     flandmark = read_flandmark_file(args['<flandmark>'])
     # open the video
-    capture = cv2.VideoCapture(args['<video>'])
+    capture = cv2.VideoCapture(args['<videoFile>'])
 
     ret, frame_current = capture.read()
     frame_previous1 = frame_current.copy()

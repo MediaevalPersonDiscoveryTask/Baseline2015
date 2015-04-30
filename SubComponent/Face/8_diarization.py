@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  8_diarization.py <videoID> <facetrack_seg> <matrix> <output_diarization> [--threshold=<t>]
+  8_diarization.py <videoID> <faceTrackSegmentation> <probaMatrix> <diarization> [--threshold=<t>]
   8_diarization.py -h | --help
 Options:
   --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     indice_to_face = {}
     face_seg = {}
     i=0
-    for line in open(args['<facetrack_seg>']).read().splitlines():
+    for line in open(args['<faceTrackSegmentation>']).read().splitlines():
         faceID, startTime, endTime, startFrame, endFrame = line.split(' ')        
         faceID_to_indice[faceID] = i
         indice_to_face[i] = faceID
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # read matrix
     N = len(faceID_to_indice)
     X = np.zeros((N, N))
-    for line in open(args['<matrix>']).read().splitlines():
+    for line in open(args['<probaMatrix>']).read().splitlines():
         ft1, ft2, proba = line.split(' ')
         dist = 1.0-float(proba)
         X[faceID_to_indice[ft1]][faceID_to_indice[ft2]] = dist
@@ -52,7 +52,7 @@ if __name__ == '__main__':
             clusName[clusID] += ";"+indice_to_face[i]
 
     # save clustering
-    fout = open(args['<output_diarization>'], 'w')
+    fout = open(args['<diarization>'], 'w')
     for i in sorted(face_seg):
         startTime, endTime = face_seg[i]
         fout.write(args['<videoID>']+' 1 '+str(startTime)+' '+str(endTime)+' head na na '+str(clusName[clusters[i]])+'\n')

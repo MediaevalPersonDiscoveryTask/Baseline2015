@@ -2,10 +2,10 @@
 Face detection based on Viola & Jones method
 
 Usage:
-  face_detection.py <video_file> <output_file> <cascade_file> [--shot_segmentation=<ss>] [--scaleFactor=<sf>] [--minNeighbors=<mn>] [--minSize=<min>]
+  face_detection.py <videoFile> <faceDetection> <haarcascade> [--shotSegmentation=<ss>] [--scaleFactor=<sf>] [--minNeighbors=<mn>] [--minSize=<min>]
   face_detection.py -h | --help
 Options:
-  --shot_segmentation=<ss>  shot to process
+  --shotSegmentation=<ss>   shot to process
   --scaleFactor=<sf>        scaleFactor value (>1.0) [default: 1.1]
   --minNeighbors=<mn>       minNeighbors value (>1) [default: 4]
   --minSize=<min>           min size of a face (>1) [default: 50]
@@ -22,13 +22,13 @@ if __name__ == '__main__':
     # storage for face detected  
     storage = cv.CreateMemStorage()
     # load cascade file
-    cascade = cv.Load(args['<cascade_file>'])
+    cascade = cv.Load(args['<haarcascade>'])
     # read video
-    capture = cv.CaptureFromFile(args['<video_file>'])
+    capture = cv.CaptureFromFile(args['<videoFile>'])
     # Read shot segmentation
     frames_to_process = []
-    if args['--shot_segmentation']:        
-        for line in open(args['--shot_segmentation']).read().splitlines():
+    if args['--shotSegmentation']:        
+        for line in open(args['--shotSegmentation']).read().splitlines():
             videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
             for c_frame in range(int(startFrame), int(endFrame)+1):
                 frames_to_process.append(c_frame)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     last_frame_to_process = max(frames_to_process)
     # save face detection
     c_frame = 0 
-    fout = open(args['<output_file>'], 'w')
+    fout = open(args['<faceDetection>'], 'w')
     while (c_frame<last_frame_to_process):
         frame = cv.QueryFrame(capture)
         c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))

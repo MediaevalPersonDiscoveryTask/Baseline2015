@@ -7,14 +7,14 @@
  - `faceDetection`: face detection (.face) [frameID xmin ymin width height number_of_neighbors]
  - `shotSegmentation`: list of shot to process with their segmentation (.shot)
  - `faceTracking`: face tracks position in each frame (.facetrack) [frameID xmin ymin width height]
- - `facetrackSegmentation`: temporal face tracks segmentation (.seg) [faceID StartTime endTime startFrame endFrame]
+ - `faceTrackSegmentation`: temporal face tracks segmentation (.seg) [faceID StartTime endTime startFrame endFrame]
  - `idx`: Indexes of the video files (.MPG.idx), to convert frame number of the video.avi read with opencv to timestamp [frameID typeFrame positionInTheVideo timestamp]
  - `flandmark`: facial landmark position (.flandmark) [frameID xmin yminn xmax ymax (x y)*8]
  - `faceTrackDescriptor`: central HoG descriptor projected by LDML in 100 dimension (.desc) [faceID nb_desc distance_central d*100]
  - `l2Matrix`: distance matrix between facetracks (.mat) [faceID1 faceID2 nbHoGFaceID1  nbHoGFaceID2 distCenterFaceID1 distCenterFaceID2 l2Distance]
- - `refFacePosition`: face postion in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
+ - `facePositionReferencePath`: path to face postion in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
  - `probaMatrix`: probability that 2 facetracks correspond to the same person (.mat) [faceID1 faceID2 probability]
- - `diarization`: face dirization (.mdtm)
+ - `diarization`: face diarization (.mdtm)
 
 ## add path_to_source_code to the PYTHONPATH
 
@@ -48,12 +48,12 @@ python 5_compute_hvh_matrix.py `faceTrackDescriptor` `l2Matrix`
 
 ## Learn normalisation model
 
-python 6_learn_normalisation_model.py `video_list` `faceTracking` `refFacePosition` model_normalisation_l2_to_proba 
+python 6_learn_normalisation_model.py `video_list` `faceTracking` `facePositionReferencePath` modell2ToProba 
 
 ## normalize l2 distance into probability
 
-python 7_normalisation_matrix.py `l2Matrix` model_normalisation_l2_to_proba `probaMatrix`
+python 7_normalisation_matrix.py `l2Matrix` modell2ToProba `probaMatrix`
 
 ## compute facetrack clustering
 
-python 8_diarization.py `videoID` `facetrackSegmentation` `probaMatrix` `diarization` --threshold=0.5
+python 8_diarization.py `videoID` `facetrackSegmentation` `probaMatrix` `diarization`

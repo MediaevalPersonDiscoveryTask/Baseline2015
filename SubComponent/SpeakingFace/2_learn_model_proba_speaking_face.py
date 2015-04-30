@@ -2,7 +2,7 @@
 Learn a classifier model to compute the probability that a facetrack is speaking
 
 Usage:
-  learn_model_proba_speaking_face.py <video_list> <idxPath> <facetrack_pos> <descriptor_path> <reference_head_path> <reference_speaker_path> <output_model_file>
+  learn_model_proba_speaking_face.py <videoList> <idxPath> <faceTracking> <SpeakingFaceDescriptorPath> <facePositionReferencePath> <speakerSegmentationReferencePath> <modelProbaSpeakingFace>
   learn_model_proba_speaking_face.py -h | --help
 """
 
@@ -19,12 +19,12 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     X, Y = [], []
-    for videoID in open(args['<video_list>']).read().splitlines():
+    for videoID in open(args['<videoList>']).read().splitlines():
         # find the name corresponding to facetracks
-        ref_f = read_ref_facetrack_position(args['<reference_head_path>']+'/'+videoID+'.position', 3)
+        ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>']+'/'+videoID+'.position', 3)
         facetracks = {}
         l_facetrack_used_to_learn_model = set([])
-        for line in open(args['<facetrack_pos>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTracking>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
         # read speaker reference
         ref_spk = {}
-        for line in open(args['<reference_speaker_path>']+'/'+videoID+'.atseg').read().splitlines():
+        for line in open(args['<speakerSegmentationReferencePath>']+'/'+videoID+'.atseg').read().splitlines():
             v, startTime, endTime, spkName = line.split(' ') 
             ref_spk[spkName] = [float(startTime), float(endTime)]
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
         # read visual descriptors
         visual_desc = {}
-        for line in open(args['<descriptor_path>']+'/'+videoID+'.desc'):
+        for line in open(args['<SpeakingFaceDescriptorPath>']+'/'+videoID+'.desc'):
             l = line[:-1].split(' ')
             faceID = int(l[1])
             if faceID in l_facetrack_used_to_learn_model:
@@ -80,4 +80,4 @@ if __name__ == '__main__':
     clf = CalibratedClassifierCV(LogisticRegression(), method='sigmoid')
     clf.fit(X, Y)
     # save model     
-    joblib.dump(clf, args['<output_model_file>']) 
+    joblib.dump(clf, args['<modelProbaSpeakingFace>']) 

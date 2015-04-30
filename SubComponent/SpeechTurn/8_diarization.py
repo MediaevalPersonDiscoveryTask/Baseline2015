@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  8_diarization.py <videoID> <st_seg> <matrix> <output_diarization> [--threshold=<t>]
+  8_diarization.py <videoID> <linearClustering> <probaMatrix> <diarization> [--threshold=<t>]
   8_diarization.py -h | --help
 Options:
   --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.28]
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     label_to_indice = {}
     indice_to_st = {}
-    seg_st = MDTMParser().read(args['<st_seg>'])(uri=args['<videoID>'], modality="speaker")
+    seg_st = MDTMParser().read(args['<linearClustering>'])(uri=args['<videoID>'], modality="speaker")
     for s, t, l in seg_st.itertracks(label=True):
         label_to_indice[l] = t
         indice_to_st[t] = l
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # read matrix
     N = len(label_to_indice)
     X = np.zeros((N, N))
-    for line in open(args['<matrix>']).read().splitlines():
+    for line in open(args['<probaMatrix>']).read().splitlines():
         st1, st2, proba = line.split(' ')
         dist = 1.0-float(proba)
         X[label_to_indice[st1]][label_to_indice[st2]] = dist
@@ -48,7 +48,7 @@ if __name__ == '__main__':
             clusName[clusID] += ";"+indice_to_st[i]
 
     # save clustering
-    fout = open(args['<output_diarization>'], 'w')
+    fout = open(args['<diarization>'], 'w')
     for s, t, l in seg_st.itertracks(label=True):
         fout.write(args['<videoID>']+' 1 '+str(s.start)+' '+str(s.duration)+' speaker na na '+str(clusName[clusters[t]])+'\n')
     fout.close()

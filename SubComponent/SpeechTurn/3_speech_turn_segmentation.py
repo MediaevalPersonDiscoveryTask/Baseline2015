@@ -2,7 +2,7 @@
 speech turn segmentation
 
 Usage:
-  speech_turn_segmentation.py <videoID> <wave> <input_seg> <output_seg> [--penalty_coef=<pc>] [--min_duration=<md>] 
+  speech_turn_segmentation.py <videoID> <audioFile> <speechNonSpeechSegmentation> <speechTurnSegmentation> [--penalty_coef=<pc>] [--min_duration=<md>] 
   speech_turn_segmentation.py -h | --help
 Options:
   --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 1.0]
@@ -21,11 +21,11 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     # read segmentation speech nonspeech
-    speech_nonspeech = MDTMParser().read(args['<input_seg>'])(uri=args['<videoID>'], modality="speaker")
+    speech_nonspeech = MDTMParser().read(args['<speechNonSpeechSegmentation>'])(uri=args['<videoID>'], modality="speaker")
 
     # extract descriptor
     extractor = YaafeMFCC(e=True, coefs=12, De=False, DDe=False, D=False, DD=False)
-    audio_features = extractor(args['<wave>'])
+    audio_features = extractor(args['<audioFile>'])
 
     # segment audio stream
     segmenter = BICSegmentation(penalty_coef=float(args['--penalty_coef']), min_duration=float(args['--min_duration']))
@@ -40,5 +40,5 @@ if __name__ == '__main__':
         nb_st+=1
 
     # save the segmentation
-    with open(args['<output_seg>'], 'w') as f:
+    with open(args['<speechTurnSegmentation>'], 'w') as f:
         MDTMParser().write(anno, f=f, uri=args['<videoID>'], modality='speaker')

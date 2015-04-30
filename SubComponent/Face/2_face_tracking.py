@@ -2,12 +2,12 @@
 Face tracking based on the face detection and optical flow for miss detection
 
 Usage:
-  face_tracker.py <video_file> <shot_seg_file> <detection_face_file> <output_face_tracking_pos> <output_facetracks_segmentation> [--thr_score_OF=<of>] [--thr_coverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
+  face_tracker.py <videoFile> <shotSegmentation> <faceDetection> <faceTracking> <faceTrackSegmentation> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
   face_tracker.py -h | --help
 Options:
-  --thr_score_OF=<of>       value of the threshold on the optical flow for the tracking [default: 0.3]
-  --thr_nb_pts_OF=<of>      minimum number of point of interest find by th optical flow [default: 8]
-  --thr_coverage=<tc>      if the coverage of 2 boxes is higher than thr_coverage, we consider they correspond to the same face track [default: 0.2]
+  --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
+  --thrNbPtsOF=<nof>        minimum number of point of interest find by th optical flow [default: 8]
+  --thrCoverage=<tc>        if the coverage of 2 boxes is higher than thrCoverage, we consider they correspond to the same face track [default: 0.2]
   --nbFrameTracking=<nft>   number of frame where with try to find the net detection [default: 15]
   --idx=<idx>               mapping between frame number to timestamp
 """
@@ -23,9 +23,9 @@ import copy
 lk_params = dict(winSize  = (20, 20), maxLevel = 2, criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 feature_params = dict(maxCorners = 100, qualityLevel = 0.01, minDistance = 10, blockSize = 3)
 
-def find_face_detected_at_the_good_place(roi_current, l_face, thr_coverage):
+def find_face_detected_at_the_good_place(roi_current, l_face, thrCoverage):
     faceID_next_find = False
-    best_coverage = thr_coverage
+    best_coverage = thrCoverage
     for faceID_next, roi_next in l_face.items():  
         coverage = score_coverage_ROI(roi_current, roi_next)  # compute the coverage between the 2 roi
         if coverage > best_coverage:            
@@ -33,7 +33,7 @@ def find_face_detected_at_the_good_place(roi_current, l_face, thr_coverage):
             faceID_next_find = faceID_next 
     return faceID_next_find
 
-def faceTracking(faces, faceID_to_facetrackID, l_frames_shot, backward, thr_score_OF, thr_coverage, thr_nb_pts_OF, nbFrameTracking):
+def faceTracking(faces, faceID_to_facetrackID, l_frames_shot, backward, thrScoreOF, thrCoverage, thrNbPtsOF, nbFrameTracking):
     step = backward and -1 or 1
     faces_original = copy.deepcopy(faces)
     for frameID in sorted(l_frames_shot, reverse=backward):
@@ -44,13 +44,13 @@ def faceTracking(faces, faceID_to_facetrackID, l_frames_shot, backward, thr_scor
             l_frame_tracking.sort(reverse=backward)
             for frameIDTracking, frameIDTrackingNext in zip(l_frame_tracking, l_frame_tracking[1:]):
                 score, l_move_x, l_move_y = OpticalFlow(l_frames_shot[frameIDTracking][ymin:ymax, xmin:xmax], l_frames_shot[frameIDTrackingNext][ymin:ymax, xmin:xmax], lk_params, feature_params)
-                if score < thr_score_OF or len(l_move_x) < thr_nb_pts_OF: break # stop tracking due to wrong optical flow
+                if score < thrScoreOF or len(l_move_x) < thrNbPtsOF: break # stop tracking due to wrong optical flow
                 # update position of the face
                 xmin += np.mean(l_move_x)
                 xmax += np.mean(l_move_x)
                 ymin += np.mean(l_move_y)
                 ymax += np.mean(l_move_y)
-                faceID_next_find = find_face_detected_at_the_good_place([xmin, ymin, xmax, ymax], faces[frameIDTrackingNext], thr_coverage)
+                faceID_next_find = find_face_detected_at_the_good_place([xmin, ymin, xmax, ymax], faces[frameIDTrackingNext], thrCoverage)
                 if faceID_next_find:                                        # stop tracking due to face detected at the same place
                     for frameID2 in l_temp:
                         faces[frameID2][faceID] = l_temp[frameID2]
@@ -62,13 +62,13 @@ if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
 
-    fout_pos = open(args['<output_face_tracking_pos>'], 'w')
-    fout_seg = open(args['<output_facetracks_segmentation>'], 'w')
+    fout_pos = open(args['<faceTracking>'], 'w')
+    fout_seg = open(args['<faceTrackSegmentation>'], 'w')
     # read file with the list of shot
     frames_to_process = []
     shot_boundaries = []
     faces = {}                                                  # face detected
-    for line in open(args['<shot_seg_file>']).read().splitlines():
+    for line in open(args['<shotSegmentation>']).read().splitlines():
         videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
         shot_boundaries.append(int(endFrame))
         for frameID in range(int(startFrame), int(endFrame)+1):
@@ -79,11 +79,11 @@ if __name__ == '__main__':
     # defined function to convert frameID to timestamp
     frame2time = IDXHack(args['--idx'])
     # open the video
-    capture = cv2.VideoCapture(args['<video_file>'])
+    capture = cv2.VideoCapture(args['<videoFile>'])
     # read face detection
     faceID_to_facetrackID = {}                                       # name of the face cluster 
     faceID = 1
-    for line in open(args['<detection_face_file>']).read().splitlines():
+    for line in open(args['<faceDetection>']).read().splitlines():
         frameID, x, y, w, h, n = map(int, line.split(' '))
         if frameID in faces:
             faces[frameID][faceID] = [x, y, x+w, y+h]
@@ -101,7 +101,7 @@ if __name__ == '__main__':
             frame_to_timestamp[frameID] = frame2time(frameID, capture.get(cv.CV_CAP_PROP_POS_MSEC)/1000.0)
             frames[frameID] = frame.copy()
             if frameID in shot_boundaries: 
-                faceTracking(faces, faceID_to_facetrackID, frames, False, float(args['--thr_score_OF']), float(args['--thr_coverage']), int(args['--thr_nb_pts_OF']), int(args['--nbFrameTracking']))
+                faceTracking(faces, faceID_to_facetrackID, frames, False, float(args['--thrScoreOF']), float(args['--thrCoverage']), int(args['--thrNbPtsOF']), int(args['--nbFrameTracking']))
                 # write face position
                 for frameID in sorted(frames):                          
                     for faceID in sorted(faces[frameID]):

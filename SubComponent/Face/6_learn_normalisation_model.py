@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  6_learn_normalisation_model.py <video_list> <facetrack_pos> <matrix_path> <reference_head_position_path> <output_model_file>
+  6_learn_normalisation_model.py <videoList> <faceTracking> <l2Matrix> <facePositionReferencePath> <modell2ToProba>
   6_learn_normalisation_model.py -h | --help
 """
 
@@ -18,19 +18,19 @@ if __name__ == '__main__':
 
     X = []
     Y = []
-    for videoID in open(args['<video_list>']).read().splitlines():
+    for videoID in open(args['<videoList>']).read().splitlines():
 
         # find alignement between facetrack and reference
         facetracks = {}
-        for line in open(args['<facetrack_pos>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTracking>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
-        ref_f = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', 0)
+        ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>']+'/'+videoID+'.position', 0)
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
         # read matrix
-        for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
+        for line in open(args['<l2Matrix>']+'/'+videoID+'.mat').read().splitlines():
             ft1, ft2, dist = line.split(' ')
             if ft1 in facetrack_vs_ref and ft2 in facetrack_vs_ref:
                 X.append([float(dist)])
@@ -43,4 +43,4 @@ if __name__ == '__main__':
     clf = CalibratedClassifierCV(LogisticRegression(), method='sigmoid')
     clf.fit(X, Y) 
     # save model
-    joblib.dump(clf, args['<output_model_file>']) 
+    joblib.dump(clf, args['<modell2ToProba>']) 

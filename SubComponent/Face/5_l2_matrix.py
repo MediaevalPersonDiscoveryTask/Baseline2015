@@ -2,7 +2,7 @@
 Compute head versus head distance
 
 Usage:
-  compute_hvh_matrix.py <facetracks_descriptor> <matrix_output>
+  compute_hvh_matrix.py <faceTrackDescriptor> <l2Matrix>
   compute_hvh_matrix.py -h | --help
 """
 
@@ -22,12 +22,12 @@ if __name__ == '__main__':
 
     # read face track descriptors
     dic = {}
-    for line in open(args['<facetracks_descriptor>']).read().splitlines():
+    for line in open(args['<faceTrackDescriptor>']).read().splitlines():
         l = line.split(' ')
         dic[int(l[0])] = [int(l[1]), float(l[2]), np.array(l[3:], dtype='|S20').astype(np.float)]
 
     # compute and save distance between face tracks
-    fout = open(args['<matrix_output>'], 'w')
+    fout = open(args['<l2Matrix>'], 'w')
     for h1 in sorted(dic):
         for h2 in sorted(dic):
             if h1 < h2:

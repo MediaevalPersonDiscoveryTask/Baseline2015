@@ -2,7 +2,7 @@
 compute probability that a facetrack is speaking
 
 Usage:
-  proba_speaking_face.py <descriptors> <st_seg> <idx> <input_model_file> <output_mat>
+  proba_speaking_face.py <SpeakingFaceDescriptor> <speechTurnSegmentation> <idx> <modelProbaSpeakingFace> <probaSpeakingFace>
   proba_speaking_face.py -h | --help
 """
 
@@ -15,11 +15,11 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     # load classifier model
-    clf = joblib.load(args['<input_model_file>']) 
+    clf = joblib.load(args['<modelProbaSpeakingFace>']) 
 
     # read speech turn segmentation
     st_seg = {}
-    for line in open(args['<st_seg>']).read().splitlines():
+    for line in open(args['<speechTurnSegmentation>']).read().splitlines():
         v, p, start, dur, spk, na, na, st = line.split(' ')
         st_seg[st] = [float(start), float(start)+float(dur)]
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # read visual descriptors
     visual_desc = {}
-    for line in open(args['<descriptors>']):
+    for line in open(args['<SpeakingFaceDescriptor>']):
         l = line[:-1].split(' ')
         faceID = int(l[1])
         timestamp = frame2time(int(l[0]), 0.0)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
                 proba_st_facetrack[st][faceID].append(clf.predict_proba([[propdur_best_duration_faceID, prop_dur_spk_dur]+desc])[0][1])
 
     # save matrix
-    fout = open(args['<output_mat>'], 'w')
+    fout = open(args['<probaSpeakingFace>'], 'w')
     for st in proba_st_facetrack:
         for faceID in proba_st_facetrack[st]:
             proba = np.median(np.array(proba_st_facetrack[st][faceID]))            

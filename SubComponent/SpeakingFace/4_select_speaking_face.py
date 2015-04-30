@@ -2,7 +2,7 @@
 Select speaking face base on probability matrix
 
 Usage:
-  select_speaking_face.py <video_train_list> <video_test_list> <matrix_path> <output_path> <st_seg> <reference_speaker> <facetrack_pos> <reference_head>
+  select_speaking_face.py <videoListTrain> <videoListTest> <probaSpeakingFacePath> <FaceTrackingSelection> <speechTurnSegmentation> <speakerSegmentationReferencePath> <faceTracking> <facePositionReferencePath>
   select_speaking_face.py -h | --help
 """
 
@@ -16,14 +16,14 @@ if __name__ == '__main__':
 
     l_false, l_true = [], []
 
-    for videoID in open(args['<video_train_list>']).read().splitlines():
+    for videoID in open(args['<videoListTrain>']).read().splitlines():
 
-        st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
+        st_vs_ref = align_st_ref(args['<speechTurnSegmentation>'], args['<speakerSegmentationReferencePath>'], videoID)
 
-        ref_f = read_ref_facetrack_position(args['<reference_head>']+videoID+'.position', 0)
+        ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>']+videoID+'.position', 0)
         facetracks = {}
         l_facetrack_in_annotated_frame = set([])
-        for line in open(args['<facetrack_pos>']+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTracking>']+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                 l_facetrack_in_annotated_frame.add(faceID)            
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
-        for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
+        for line in open(args['<probaSpeakingFacePath>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             faceID = int(faceID)
             if faceID in l_facetrack_in_annotated_frame:
@@ -69,12 +69,12 @@ if __name__ == '__main__':
     nbFaceSelected = 0.0
     nbFaceTotal = 0.0
 
-    for videoID in open(args['<video_test_list>']).read().splitlines():
+    for videoID in open(args['<videoListTest>']).read().splitlines():
 
         l = set([])
         lall = set([])
         
-        for line in open(args['<matrix_path>']+videoID+'.mat').read().splitlines():
+        for line in open(args['<probaSpeakingFacePath>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             faceID = int(faceID)
             proba = float(proba)
@@ -85,6 +85,6 @@ if __name__ == '__main__':
         nbFaceSelected += len(l)
         nbFaceTotal += len(lall)
 
-        #fout = open(args['<output_path>']+'/'+videoID+'.lfacetrack', 'w')
+        #fout = open(args['<FaceTrackingSelection>']+'/'+videoID+'.lfacetrack', 'w')
 
     print nbFaceTotal, nbFaceSelected

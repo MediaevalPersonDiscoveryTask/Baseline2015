@@ -2,7 +2,7 @@
 Compute HoG descriptor projected by LDML for each facetrack
 
 Usage:
-  facetrack_descriptor <video_file> <flandmark> <features_model> <ldml_matrix> <output_file> 
+  facetrack_descriptor <videoFile> <flandmark> <features_model> <ldml> <faceTrackDescriptor> 
   facetrack_descriptor -h | --help
 """
 
@@ -250,11 +250,11 @@ if __name__ == '__main__':
     # size of the descriptor after projection
     K = 100    
     # load projection matrix
-    L = np.fromfile(args['<ldml_matrix>'], sep=' ')
+    L = np.fromfile(args['<ldml>'], sep=' ')
     L = np.array(L)
     L = L.reshape(K, dim_HoG_total)  
     # open video
-    capture = cv2.VideoCapture(args['<video_file>'])
+    capture = cv2.VideoCapture(args['<videoFile>'])
     # load features model
     features_model = load_feature_model(args['<features_model>']); 
     # read position of facial landmark
@@ -275,7 +275,7 @@ if __name__ == '__main__':
                     projected_desc = np.dot(np.array(HoG_desc, dtype='|S20').astype(np.float), L.T)
                     desc_facetrack.setdefault(i_face, []).append(projected_desc)
     # save the central projected descriptor for each facetrack
-    fout = open(args['<output_file>'], 'w')
+    fout = open(args['<faceTrackDescriptor>'], 'w')
     for i_face, l_desc in sorted(desc_facetrack.items()):
         min_dist = +np.inf
         best_desc = []

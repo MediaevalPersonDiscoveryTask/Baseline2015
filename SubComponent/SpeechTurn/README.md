@@ -1,10 +1,10 @@
-### files
+## files
 
  - `videoID`: video identifier
  - `videoList`: list au videoID to process (.lst)
  - `wavePath`: path to the wave file
  - `audioFile`: audio file in wave format (.wav)
- - `refspeakerSegmentationPath`: path to manual speaker segmentation (.atseg)
+ - `speakerSegmentationReferencePath`: path to manual speaker segmentation (.atseg)
  - `speechNonSpeechSegmentation`: segmentation of the audio into speech non speech (.mdtm)
  - `speechTurnSegmentation`: segmentation of the audio into speech turns (.mdtm)
  - `linearClustering`: segmentation after the linear clustering (.mdtm)
@@ -20,7 +20,7 @@ export PYTHONPATH=$PYTHONPATH:path_to_source_code
 
 ## Learn segmenter model for speech nonspeech segmentation
 
-python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `refspeakerSegmentationPath` segment.uem modelSpeechNonSpeech 
+python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `speakerSegmentationReferencePath` segment.uem modelSpeechNonSpeech 
 
 ## Speech nonspeech segmentation
 
@@ -40,11 +40,11 @@ python 5_compute_BIC_matrix.py videoID `audioFile` `linearClustering` `BICMatrix
 
 ## learn normalisation model
 
-python 6_learn_normalisation_model.py `videoList` `linearClusteringPath` `BICMatrixPath` `refspeakerSegmentationPath` normalisationModel
+python 6_learn_normalisation_model.py `videoList` `linearClusteringPath` `BICMatrixPath` `speakerSegmentationReferencePath` modelBICToProba
 
 ## compute score normalized between speech turns
 
-python 7_normalisation_matrix.py `videoID` `linearClustering` `BICMatrix` normalisationModel `probaMatrix`
+python 7_normalisation_matrix.py `videoID` `BICMatrix` modelBICToProba `probaMatrix`
 
 ## compute facetrack clustering
 

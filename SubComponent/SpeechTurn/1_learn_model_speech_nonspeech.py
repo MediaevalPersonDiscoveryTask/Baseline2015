@@ -2,7 +2,7 @@
 learn segmenter model for speech nonspeech segmentation
 
 Usage:
-  learn_model_speech_nonspeech.py <source_path> <dataPath.lst> <video_list> <reference_path> <uem_file> <model_output>
+  learn_model_speech_nonspeech.py <wavePath> <videoList> <speakerSegmentationReferencePath> <segment.uem> <modelSpeechNonSpeech>
   learn_model_speech_nonspeech.py -h | --help
 """
 
@@ -18,25 +18,19 @@ if __name__ == '__main__':
     args = docopt(__doc__)
     # read ref
     # segment manually annotated in the reference
-    uems = UEMParser().read(args['<uem_file>'])
+    uems = UEMParser().read(args['<segment.uem>'])
     # extractor Yaafe
     extractor = YaafeCompound([YaafeZCR(), YaafeMFCC(e=False, De=False, DDe=False, D=True, DD = True)])
 
     l_features = []
     ref_speech_nonspeech = []
 
-    wavePath = {}
-    for path in open(args['<dataPath.lst>']).read().splitlines():
-        video, wave_file, video_avi_file, video_mpeg_file, trs_file, xgtf_file, idx_file = path.split(' ')
-        wavePath[video] = args['<source_path>']+'/'+wave_file
-
-    for video in open(args['<video_list>']).read().splitlines():
-        print video
+    for videoID in open(args['<videoList>']).read().splitlines():
         # extract features
-        features = extractor(wavePath[video])
+        features = extractor(args['<wavePath>']+'/'+videoID+'.wav')
         l_features.append(features)
  
-        ref = parser_atseg(args['<reference_path>']+'/'+video+'.atseg', video)
+        ref = parser_atseg(args['<speakerSegmentationReferencePath>']+'/'+videoID+'.atseg', videoID)
 
         # rename all segment with speech
         mapping = {source: 'speech' for source in ref.labels()}
@@ -45,7 +39,7 @@ if __name__ == '__main__':
         for segment in ref.get_timeline().gaps():
             ref[segment] = 'non_speech'
         # used only segment in uem part
-        uem = uems(uri=video)
+        uem = uems(uri=videoID)
         ref_speech_nonspeech.append(ref.crop(uem, mode='intersection'))
 
     # train model
@@ -53,4 +47,4 @@ if __name__ == '__main__':
     segmenter.fit(l_features, ref_speech_nonspeech)
  
     # save segmenter model
-    pickle.dump(segmenter, open(args['<model_output>'], "wb" ) )
+    pickle.dump(segmenter, open(args['<modelSpeechNonSpeech>'], "wb" ) )

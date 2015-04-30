@@ -2,7 +2,7 @@
 Linear BIC clustering
 
 Usage:
-  linear_bic_clustering.py <videoID> <wave> <input_seg> <output_seg> [--penalty_coef=<pc>] [--gap=<g>]
+  linear_bic_clustering.py <videoID> <audioFile> <speechTurnSegmentation> <linearClustering> [--penalty_coef=<pc>] [--gap=<g>]
   linear_bic_clustering.py -h | --help
 Options:
   --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 2.4]
@@ -19,10 +19,10 @@ if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
     # read speech turn segmentation
-    annotation = MDTMParser().read(args['<input_seg>'])(uri=args['<videoID>'], modality="speaker")
+    annotation = MDTMParser().read(args['<speechTurnSegmentation>'])(uri=args['<videoID>'], modality="speaker")
     # extract descriptor
     extractor = YaafeMFCC(e=True, coefs=12, De=False, DDe=False, D=False, DD=False)
-    audio_features = extractor(args['<wave>'])
+    audio_features = extractor(args['<audioFile>'])
     # initialize the model
     model = BICModel(covariance_type='diag', penalty_coef=float(args['--penalty_coef']))
     
@@ -48,7 +48,7 @@ if __name__ == '__main__':
                     break
     
     # save segmentation
-    with open(args['<output_seg>'], 'w') as f:
+    with open(args['<linearClustering>'], 'w') as f:
         MDTMParser().write(annotation, f=f)
 
                           

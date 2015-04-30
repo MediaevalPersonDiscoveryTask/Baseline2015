@@ -2,7 +2,7 @@
 Speech nonspeech segmentation
 
 Usage:
-  speech_nonspeech_segmentation.py <videoID> <wave> <segmenter_model> <output_seg> [--min_dur_speech=<mds>] [--min_dur_non_speech=<mdns>] 
+  speech_nonspeech_segmentation.py <videoID> <audioFile> <modelSpeechNonSpeech> <speechNonSpeechSegmentation> [--min_dur_speech=<mds>] [--min_dur_non_speech=<mdns>] 
   speech_nonspeech_segmentation.py -h | --help
 Options:
   --min_dur_speech=<mds>       minimum duration of a speech segment (>0) [default: 1.0]
@@ -19,13 +19,13 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     # load model
-    segmenter = pickle.load(open(args['<segmenter_model>'], "rb" ) )
+    segmenter = pickle.load(open(args['<modelSpeechNonSpeech>'], "rb" ) )
 
     # Extract descriptor
     extractor = YaafeCompound([YaafeZCR(), YaafeMFCC(e=False, De=False, DDe=False, D=True, DD = True)])    
-    audio_features = extractor(args['<wave>'])
+    audio_features = extractor(args['<audioFile>'])
     # segment audio signal
     seg = segmenter.predict(audio_features, min_duration={'speech':float(args['--min_dur_speech']), 'non_speech':float(args['--min_dur_non_speech'])})
     # write segmentation
-    with open(args['<output_seg>'], 'w') as f:
+    with open(args['<speechNonSpeechSegmentation>'], 'w') as f:
         MDTMParser().write(seg, f=f, uri=args['<videoID>'], modality='speaker')
