@@ -89,7 +89,8 @@ if __name__ == "__main__":
                                 if sDist.duration == 0 : c=1.0
                                 else: c = 1/sDist.duration
                             if c > conf: conf = c
-                fout_label.write(videoID+' '+shot+' '+p+' '+str(conf)+'\n')
+
+                fout_label.write(videoID+' '+shot+' '+p.lower().replace('-', '_').replace('.', '_')+' '+str(conf)+'\n')
                 evidences.setdefault(p, []).append([conf, videoID, shot])
         fout_label.close()
     
@@ -97,7 +98,7 @@ if __name__ == "__main__":
     fout_evidence = open(args['<output_evidence>'], 'w')
     for p in evidences:
         conf, videoID, shot = sorted(evidences[p], reverse=True)[0]
-        fout_evidence.write(p+' '+videoID+' '+shot+' image\n')
+        fout_evidence.write(p.lower().replace('-', '_').replace('.', '_')+' '+videoID+' '+shot+' image\n')
     fout_evidence.close()
 
 
