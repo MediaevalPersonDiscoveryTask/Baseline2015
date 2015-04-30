@@ -19,7 +19,6 @@ if __name__ == '__main__':
     for videoID in open(args['<video_train_list>']).read().splitlines():
         print videoID
 
-
         st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
 
         ref_f = read_ref_facetrack_position(args['<reference_head>']+videoID+'.position', 0)
@@ -53,12 +52,18 @@ if __name__ == '__main__':
     hist_1 = np.histogram(l_true, l_range)    
     hist_0 = np.histogram(l_false, l_range)
 
+    ref = float(np.sum(l_true))
+
     for i in range(len(l_range)-1):
         thr = l_range[i]
 
         correct = float(np.sum(hist_1[0][i:]))
         hyp = float(np.sum(hist_0[0][i:]) + np.sum(hist_1[0][i:]))
-        ref = float(np.sum(l_true))
+        
+        print correct, hyp, ref
+
+
+        '''
 
         P=0.0
         if hyp > 0:
@@ -67,7 +72,7 @@ if __name__ == '__main__':
         F = (2*P*R) / (P+R)
 
         print thr , P, R, F
-
+        '''
 
 
 
