@@ -72,10 +72,11 @@ if __name__ == "__main__":
                 for sON, tON, ON in NamedSpk.itertracks(label=True):
                     if ON == p:
                         sInter = sON & sSpk
-                        if sON & sSpk:c = 1.0 + sON & sSpk.duration
+                        if sInter : c = 1.0 + sInter.duration
                         else:
-                            if sON ^ sSpk == 0: c=1.0
-                            else: c = 1/(sON ^ sSpk).duration
+                            sDist = sON ^ sSpk
+                            if sDist.duration == 0 : c=1.0
+                            else: c = 1/sDist.duration
                         if c > conf: conf = c
 
                         '''
