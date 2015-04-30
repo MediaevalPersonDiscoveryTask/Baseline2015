@@ -87,4 +87,4 @@ if __name__ == '__main__':
 
         #fout = open(args['<output_path>']+'/'+videoID+'.lfacetrack', 'w')
 
-
+    print nbFaceTotal, nbFaceSelected
