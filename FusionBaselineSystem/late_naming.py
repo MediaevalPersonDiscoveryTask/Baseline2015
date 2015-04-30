@@ -44,7 +44,7 @@ if __name__ == "__main__":
         dic_st_to_speakingFace[st] = ['', 0.0]
 
     thr_propagation = float(args['--thr_propagation'])
-    for line in open(args['<matrix_path>']+'/'+args['<videoID>']+'.mat').read().splitlines():
+    for line in open(args['<mat_speaking_face>']+'/'+args['<videoID>']+'.mat').read().splitlines():
         st, faceID, proba = line.split(' ')
         proba = float(proba)
         if proba >= thr_propagation and proba > dic_st_to_speakingFace[st][1]:
