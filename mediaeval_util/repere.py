@@ -29,9 +29,9 @@ def parser_vtseg(f, video):
     anno = Annotation(uri=video)
     nb_track=0
     for line in open(f):
-        video, startTime, endTime, startFrame, endFrame, name = line[:-1].split(' ')
+        FaceID, startTime, endTime, startFrame, endFrame = line[:-1].split(' ')
         segment = Segment(start=float(startTime), end=float(endTime))
-        anno[segment, nb_track] = name
+        anno[segment, nb_track] = FaceID
         nb_track+=1
     return anno
 
