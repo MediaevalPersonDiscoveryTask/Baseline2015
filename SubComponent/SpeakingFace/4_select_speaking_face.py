@@ -7,6 +7,7 @@ Usage:
 """
 
 from docopt import docopt
+from mediaeval_util.repere import read_ref_facetrack_position, align_facetrack_ref, align_st_ref, drange
 import numpy as np
 
 if __name__ == '__main__':
