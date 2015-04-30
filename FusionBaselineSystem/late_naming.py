@@ -21,9 +21,9 @@ if __name__ == "__main__":
     # read segmentation file
     sd = MDTMParser().read(args['<spk_dia>'])(uri=args['<videoID>'], modality = 'speaker')
     st = MDTMParser().read(args['<st_seg>'])(uri=args['<videoID>'], modality = 'speaker')
-    faces = parser_vtseg(args['<face_seg>'], uri=args['<videoID>'])
+    faces = parser_vtseg(args['<face_seg>'], args['<videoID>'])
     ON = REPEREParser().read(args['<overlaid_names>'])(uri=args['<videoID>'], modality = 'written')
-    shots = parser_shot_seg(args['<shot_seg>'], uri=args['<videoID>'])
+    shots = parser_shot_seg(args['<shot_seg>'], args['<videoID>'])
 
     # name speakers
     direct = ConservativeDirectTagger()
