@@ -39,10 +39,7 @@ if __name__ == "__main__":
     # propagate speakers identity to best speakingFace
     dic_trackID_to_st = {}
     dic_st_to_speakingFace = {}
-    for s, t, l in st.itertracks(label=True):
-        print s, t, l
-
-
+    for s, t, st in st.itertracks(label=True):
         dic_trackID_to_st[t] = l
         dic_st_to_speakingFace[st] = ['', 0.0]
 
