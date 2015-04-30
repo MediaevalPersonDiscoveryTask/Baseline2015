@@ -40,7 +40,7 @@ if __name__ == "__main__":
     dic_trackID_to_st = {}
     dic_st_to_speakingFace = {}
     for s, t, st in st.itertracks(label=True):
-        dic_trackID_to_st[t] = l
+        dic_trackID_to_st[t] = st
         dic_st_to_speakingFace[st] = ['', 0.0]
 
     thr_propagation = float(args['--thr_propagation'])
