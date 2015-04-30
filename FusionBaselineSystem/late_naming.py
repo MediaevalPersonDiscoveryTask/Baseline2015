@@ -43,7 +43,7 @@ if __name__ == "__main__":
         dic_trackID_to_st[t] = l
         dic_st_to_speakingFace[st] = ['', 0.0]
 
-    thr_propagation = float(args['--thr_propagation')
+    thr_propagation = float(args['--thr_propagation'])
     for line in open(args['<matrix_path>']+'/'+args['<videoID>']+'.mat').read().splitlines():
         st, faceID, proba = line.split(' ')
         proba = float(proba)
