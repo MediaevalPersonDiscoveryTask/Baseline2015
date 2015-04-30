@@ -14,7 +14,11 @@ if __name__ == '__main__':
     # read arguments       
     args = docopt(__doc__)
 
+    l_false, l_true = [], []
+
     for videoID in open(args['<video_train_list>']).read().splitlines():
+        print videoID
+
 
         st_vs_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
 
