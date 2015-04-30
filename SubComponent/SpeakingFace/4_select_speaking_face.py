@@ -52,7 +52,7 @@ if __name__ == '__main__':
     hist_1 = np.histogram(l_true, l_range)    
     hist_0 = np.histogram(l_false, l_range)
 
-    ref = float(l_true)
+    ref = float(len(l_true))
 
     for i in range(len(l_range)-1):
         thr = l_range[i]
