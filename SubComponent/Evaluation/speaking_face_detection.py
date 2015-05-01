@@ -36,10 +36,13 @@ if __name__ == '__main__':
             if frameID not in frames_to_process:
                 del ref_f[frameID]
         facetracks = {}
+        l_ft = []
         for line in open(args['<face_tracking>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
+            if frameID in ref_f:
+                l_ft.append(faceID)
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
 
@@ -60,10 +63,11 @@ if __name__ == '__main__':
         for line in open(args['<matrix_speaking_face>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             faceID = int(faceID)
-            proba = float(proba)
-            speaking_frame.setdefault(st, [proba, faceID])
-            if proba > speaking_frame[st][0]:
-                speaking_frame[st] = [proba, faceID]
+            if faceID in l_ft:
+                proba = float(proba)
+                speaking_frame.setdefault(st, [proba, faceID])
+                if proba > speaking_frame[st][0]:
+                    speaking_frame[st] = [proba, faceID]
 
         for frameID in ref_f:
             timestamp =  frame2time(frameID, 0.0)
@@ -80,7 +84,7 @@ if __name__ == '__main__':
 
             for startTime, endTime, st in st_seg:
                 if timestamp >= startTime and timestamp <= endTime:
-                    if st in speaking_frame and speaking_frame[st][0] >= 0.8 :
+                    if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
                         #print '     ', st, speaking_frame[st][1], 
 
                         nb_hyp_speakingFace+=1
