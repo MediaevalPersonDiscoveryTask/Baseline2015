@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
             for startTime, endTime, st in st_seg:
                 if timestamp >= startTime and timestamp <= endTime:
-                    if st in speaking_frame and speaking_frame[st][0] >= 0,5
+                    if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
                         faceIDSpeaking = speaking_frame[st][1]
                         nb_hyp_speakingFace+=1
                         if faceIDSpeaking in facetrack_vs_ref and facetrack_vs_ref[faceIDSpeaking] in l_speaking_face:
