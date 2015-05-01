@@ -85,9 +85,11 @@ if __name__ == '__main__':
 
                         nb_hyp_speakingFace+=1
                         faceIDSpeaking = speaking_frame[st][1]
-                        if faceIDSpeaking in facetrack_vs_ref and facetrack_vs_ref[faceIDSpeaking] in l_speaking_face:
-                            correct_speakingFace+=1
+                        if faceIDSpeaking in facetrack_vs_ref :
                             print facetrack_vs_ref[faceIDSpeaking],
+                            if facetrack_vs_ref[faceIDSpeaking] in l_speaking_face:
+                                correct_speakingFace+=1
+                            
             print
 
 
