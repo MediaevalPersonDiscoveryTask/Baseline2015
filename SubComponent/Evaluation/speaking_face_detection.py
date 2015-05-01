@@ -12,6 +12,7 @@ from pyannote.parser import MDTMParser
 from mediaeval_util.repere import IDXHack, align_st_ref, drange, read_ref_facetrack_position, align_facetrack_ref
 from sklearn.externals import joblib
 import numpy as np
+import copy
 
 if __name__ == '__main__':
     args = docopt(__doc__)
