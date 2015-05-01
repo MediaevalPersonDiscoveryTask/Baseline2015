@@ -76,7 +76,7 @@ if __name__ == '__main__':
                             nb_ref_speakingFace+=1
                             l_speaking_face.append(spkName)
 
-            print '   ', frameID, l_speaking_face
+            print '   ', frameID, l_speaking_face,
 
             for startTime, endTime, st in st_seg:
                 if timestamp >= startTime and timestamp <= endTime:
@@ -88,7 +88,7 @@ if __name__ == '__main__':
                         if faceIDSpeaking in facetrack_vs_ref and facetrack_vs_ref[faceIDSpeaking] in l_speaking_face:
                             correct_speakingFace+=1
                             print facetrack_vs_ref[faceIDSpeaking],
-                        print
+            print
 
 
     print 'precision:', round(correct_speakingFace/nb_hyp_speakingFace,3)*100, '%    ',
