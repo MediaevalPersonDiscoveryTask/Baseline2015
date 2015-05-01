@@ -2,12 +2,13 @@
 Evaluate the face detection after tracking step (all faces and only speaking faces)
 
 Usage:
-  face_tracking.py <video_list> <face_tracking> <reference_head_position_path> <idx_path> <speaker_ref>
+  face_tracking.py <video_list> <face_tracking> <reference_head_position_path> <idx_path> <speaker_ref> <shotSegmentation>
   face_tracking.py -h | --help
 """
 
 from docopt import docopt
 from mediaeval_util.repere import IDXHack, read_ref_facetrack_position, align_facetrack_ref
+import copy
 
 if __name__ == '__main__':
     args = docopt(__doc__)
@@ -21,7 +22,17 @@ if __name__ == '__main__':
 
     for videoID in open(args['<video_list>']).read().splitlines():
 
-        ref_f = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', 0)
+        frames_to_process = []
+        for line in open(args['<shotSegmentation>']+'/'+videoID+'.shot').read().splitlines():
+            videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
+            for frameID in range(int(startFrame), int(endFrame)+1):
+                frames_to_process.append(frameID)
+                
+        ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', 0)
+        ref_f = copy.deepcopy(ref_f_tmp)
+        for frameID in ref_f_tmp:
+            if frameID not in frames_to_process:
+                del ref_f[frameID]
 
         ref_spk = []
         for line in open(args['<speaker_ref>']+videoID+'.atseg').read().splitlines():
