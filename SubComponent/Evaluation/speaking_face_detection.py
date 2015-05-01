@@ -56,7 +56,7 @@ if __name__ == '__main__':
         frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
 
         speaking_frame = {}
-        for line in open(args['<matrix>']+videoID+'.mat').read().splitlines():
+        for line in open(args['<matrix_speaking_face>']+videoID+'.mat').read().splitlines():
             st, faceID, proba = line.split(' ')
             faceID = int(faceID)
             proba = float(proba)
