@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
             for startTime, endTime, st in st_seg:
                 if timestamp >= startTime and timestamp <= endTime:
-                    if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
+                    if st in speaking_frame and speaking_frame[st][0] >= 0.8 :
                         #print '     ', st, speaking_frame[st][1], 
 
                         nb_hyp_speakingFace+=1
