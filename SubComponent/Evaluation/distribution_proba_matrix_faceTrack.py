@@ -2,7 +2,7 @@
 Distribution of the probability between positive and negative pair of speech turns
 
 Usage:
-  proba_mat_speechTurn.py <video_list> <faceTracking> <l2MatrixPath> <facePositionReferencePath>
+  proba_mat_speechTurn.py <video_list> <faceTracking> <matrix_path> <facePositionReferencePath>
   proba_mat_speechTurn.py -h | --help
 """
 
