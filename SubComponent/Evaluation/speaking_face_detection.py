@@ -21,8 +21,12 @@ if __name__ == '__main__':
     nb_hyp_speakingFace = 0.0
     correct_speakingFace = 0.0
 
+    l_ref = set([])
+    l_hyp = set([])
+
+
     for videoID in open(args['<video_list>']).read().splitlines():
-        print videoID
+        #print videoID
 
         frames_to_process = []
         for line in open(args['<shotSegmentation>']+'/'+videoID+'.shot').read().splitlines():
@@ -73,30 +77,36 @@ if __name__ == '__main__':
                 if timestamp >= startTime and timestamp <= endTime:
                     for headName in ref_f[frameID]:
                         if headName == spkName:
+
+                            l_ref.add(str(frameID)+'_'+spkName)
+
                             nb_ref_speakingFace+=1
                             l_speaking_face.append(spkName)
 
-            print '   ', frameID, l_speaking_face,
+            #print '   ', frameID, l_speaking_face,
 
             for startTime, endTime, st in st_seg:
                 if timestamp >= startTime and timestamp <= endTime:
                     if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
-                        print '     ', st, speaking_frame[st][1], 
+                        #print '     ', st, speaking_frame[st][1], 
 
                         nb_hyp_speakingFace+=1
                         faceIDSpeaking = speaking_frame[st][1]
                         if faceIDSpeaking in facetrack_vs_ref :
-                            print facetrack_vs_ref[faceIDSpeaking],
+
+                            l_hyp.add(str(frameID)+'_'+facetrack_vs_ref[faceIDSpeaking])
+
+                            #print facetrack_vs_ref[faceIDSpeaking],
                             if facetrack_vs_ref[faceIDSpeaking] in l_speaking_face:
                                 correct_speakingFace+=1
                             
-            print
+            #print
 
 
     print 'precision:', round(correct_speakingFace/nb_hyp_speakingFace,3)*100, '%    ',
     print 'recall:',    round(correct_speakingFace/nb_ref_speakingFace,3)*100, '%    '
 
-
+    print len(l_ref), len(l_hyp), len(l_ref & l_hyp)
 
 
 
