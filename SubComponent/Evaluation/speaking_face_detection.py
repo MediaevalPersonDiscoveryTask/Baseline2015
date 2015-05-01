@@ -107,7 +107,8 @@ if __name__ == '__main__':
     print 'recall:',    round(correct_speakingFace/nb_ref_speakingFace,3)*100, '%    '
 
     print len(l_ref), len(l_hyp), len(l_ref & l_hyp)
-
+    print float(len(l_ref & l_hyp)) / float(len(l_hyp))
+    print float(len(l_ref & l_hyp)) / float(len(l_ref))
 
 
 
