@@ -44,7 +44,7 @@ if __name__ == '__main__':
         st_vs_ref = align_st_ref(args['<st_seg>'], args['<speaker_ref>'], videoID)
         st_seg = []
         for line in open(args['<st_seg>']+'/'+videoID+'.mdtm'):
-            v, p, start, dur, spk, na, na, st : line[:-1].split(' ')
+            v, p, start, dur, spk, na, na, st = line[:-1].split(' ')
             st_seg.append([float(start), float(start)+float(dur), st])
 
         ref_spk = []
