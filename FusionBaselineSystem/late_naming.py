@@ -22,7 +22,7 @@ if __name__ == "__main__":
     evidences = {}
     for videoID in open(args['<video_list>']).read().splitlines():
         ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
-        shots = parser_shot_seg(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
+        shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
         for sON, tON, name in ON.itertracks(label=True):
             for sshot, tshot, shot in shots.itertracks(label=True):
                 if s & sshot:
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         st = MDTMParser().read(args['<st_seg>']+'/'+videoID+'.mdtm')(uri=videoID, modality = 'speaker')
         faces = parser_vtseg(args['<face_seg>']+'/'+videoID+'.seg', videoID)
         ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
-        shots = parser_shot_seg(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
+        shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
 
         # name speakers
         direct = ConservativeDirectTagger()
