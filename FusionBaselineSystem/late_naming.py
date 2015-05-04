@@ -1,8 +1,20 @@
+## face position (facePosition/videoID.position)
+
+Position of the faces in the annotated frames
+
+```
+annotatedFrame trackID personName pointsPosition
+```
+
+- `annotatedFrame`: frame manually annotated
+- `trackID`: unique identifier of the track
+- `personName`: person name (according to convention)
+- `pointsPosition`: position of some points around the face x1:y1;x2:y2;...xn:yn
 """
 name speakers by overlaid names and then propagate speakers identity to the best speaking Face in higher a threshold
 
 Usage:
-  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> [--thr_propagation=<tp>]
+  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> <uem> [--thr_propagation=<tp>]
   late_naming.py -h | --help
 Options:
   --thr_propagation=<tp>  minimum score to propagate speaker identity to facetrack [default: 0.5]
@@ -14,11 +26,23 @@ from pyannote.algorithms.tagging import HungarianTagger, ConservativeDirectTagge
 from pyannote.core import Annotation, Segment
 from mediaeval_util.repere import parser_vtseg, parser_shot_seg
 
+
 if __name__ == "__main__":   
     # read arguments
     args = docopt(__doc__)
 
     evidences = {}
+    for videoID in open(args['<video_list>']).read().splitlines():
+        ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
+        shots = parser_shot_seg(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
+        for sON, tON, name in ON.itertracks(label=True):
+            for sshot, tshot, shot in shots.itertracks(label=True):
+                if s & sshot:
+                    d = (s & sshot).duration
+                    evidences.setdefault(p, d)
+                    if evidences[p] < d: evidences[p] = d
+
+
     for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
 
@@ -60,13 +84,27 @@ if __name__ == "__main__":
         for s, t, faceID in faces.itertracks(label=True):
             if faceID in faceID_to_name: namedFaces[s, t] = faceID_to_name[faceID]
 
-        fout_label = open(args['<output_label>']+'/'+videoID+'.label', 'w')
-        # write person visible ans speaking in a shot:
+
+
+        l_p_to_return_tmp = set([])
         for sshot, tshot, shot in shots.itertracks(label=True):
             NamedSpkShot = NamedSpk.crop(sshot)
             NamedFaceShot = namedFaces.crop(sshot)
             PersonShot = set(NamedSpkShot.labels()) & set(NamedFaceShot.labels())
-            for p in PersonShot:
+
+            l_p_to_return_tmp += PersonShot
+
+
+
+        fout_label = open(args['<output_label>']+'/'+videoID+'.label', 'w')
+        # write person visible and speaking in a shot:
+
+        for sshot, tshot, shot in shots.itertracks(label=True):
+            NamedSpkShot = NamedSpk.crop(sshot)
+            NamedFaceShot = namedFaces.crop(sshot)
+            PersonShot = set(NamedSpkShot.labels()) & set(NamedFaceShot.labels())
+
+            for p in PersonShot & l_p_to_return & evidences.keys():
                 conf = 0.0
                 for sSpk in NamedSpkShot.label_timeline(p):
                     for sON, tON, name in ON.itertracks(label=True):
@@ -91,7 +129,6 @@ if __name__ == "__main__":
                             if c > conf: conf = c
 
                 fout_label.write(videoID+' '+shot+' '+p.lower().replace('-', '_').replace('.', '_')+' '+str(conf)+'\n')
-                evidences.setdefault(p, []).append([conf, videoID, shot])
         fout_label.close()
     
     # select and write evidence
