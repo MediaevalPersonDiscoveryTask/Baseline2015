@@ -30,6 +30,8 @@ def MESegParser(f, video):
         anno[s, int(t)] = l
         if conf != 'na': scores[s, int(t), l] = float(conf)
     return anno, scores
+
+def ShotSegParser(f, video):
     anno = Annotation(uri=video)
     nb_track=0
     for line in open(f):
