@@ -2,7 +2,7 @@
 name speakers by overlaid names and then propagate speakers identity to the best speaking Face in higher a threshold
 
 Usage:
-  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> <uem> [--thr_propagation=<tp>]
+  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> [--thr_propagation=<tp>]
   late_naming.py -h | --help
 Options:
   --thr_propagation=<tp>  minimum score to propagate speaker identity to facetrack [default: 0.5]
