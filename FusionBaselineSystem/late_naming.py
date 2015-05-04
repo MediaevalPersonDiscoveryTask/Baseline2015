@@ -12,7 +12,7 @@ from docopt import docopt
 from pyannote.parser import MDTMParser, REPEREParser
 from pyannote.algorithms.tagging import HungarianTagger, ConservativeDirectTagger
 from pyannote.core import Annotation, Segment
-from mediaeval_util.repere import parser_vtseg, parser_shot_seg
+from mediaeval_util.repere import parser_vtseg, ShotSegParser
 
 
 if __name__ == "__main__":   
