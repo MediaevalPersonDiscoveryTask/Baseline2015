@@ -73,20 +73,8 @@ if __name__ == "__main__":
             if faceID in faceID_to_name: namedFaces[s, t] = faceID_to_name[faceID]
 
 
-
-        l_p_to_return_tmp = set([])
-        for sshot, tshot, shot in shots.itertracks(label=True):
-            NamedSpkShot = NamedSpk.crop(sshot)
-            NamedFaceShot = namedFaces.crop(sshot)
-            PersonShot = set(NamedSpkShot.labels()) & set(NamedFaceShot.labels())
-
-            l_p_to_return_tmp += PersonShot
-
-
-
         fout_label = open(args['<output_label>']+'/'+videoID+'.label', 'w')
         # write person visible and speaking in a shot:
-
         for sshot, tshot, shot in shots.itertracks(label=True):
             NamedSpkShot = NamedSpk.crop(sshot)
             NamedFaceShot = namedFaces.crop(sshot)
