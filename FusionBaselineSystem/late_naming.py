@@ -1,15 +1,3 @@
-## face position (facePosition/videoID.position)
-
-Position of the faces in the annotated frames
-
-```
-annotatedFrame trackID personName pointsPosition
-```
-
-- `annotatedFrame`: frame manually annotated
-- `trackID`: unique identifier of the track
-- `personName`: person name (according to convention)
-- `pointsPosition`: position of some points around the face x1:y1;x2:y2;...xn:yn
 """
 name speakers by overlaid names and then propagate speakers identity to the best speaking Face in higher a threshold
 
