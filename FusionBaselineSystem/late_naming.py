@@ -27,8 +27,8 @@ if __name__ == "__main__":
             for sshot, tshot, shot in shots.itertracks(label=True):
                 if sON & sshot:
                     d = (sON & sshot).duration
-                    evidences.setdefault(p, d)
-                    if evidences[p] < d: evidences[p] = d
+                    evidences.setdefault(name, d)
+                    if evidences[name] < d: evidences[name] = d
 
 
     for videoID in open(args['<video_list>']).read().splitlines():
