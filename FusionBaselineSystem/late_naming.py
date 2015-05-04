@@ -25,8 +25,8 @@ if __name__ == "__main__":
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
         for sON, tON, name in ON.itertracks(label=True):
             for sshot, tshot, shot in shots.itertracks(label=True):
-                if s & sshot:
-                    d = (s & sshot).duration
+                if sON & sshot:
+                    d = (sON & sshot).duration
                     evidences.setdefault(p, d)
                     if evidences[p] < d: evidences[p] = d
 
