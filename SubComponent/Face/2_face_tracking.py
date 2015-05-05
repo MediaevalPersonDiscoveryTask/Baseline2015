@@ -60,8 +60,6 @@ def faceTracking(faces, faceToFacetrack, frames, backward, thrScoreOF, thrCovera
 if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
-
-    fout_pos = open(args['<faceTracking>'], 'w')
     videoID = args['<videoID>']
     # read file with the list of shot
     frames_to_process = []
@@ -74,7 +72,6 @@ if __name__ == '__main__':
             frames_to_process.append(frameID)
             faces[frameID] = {}
     last_frame_to_process = max(frames_to_process)+10
-
     # defined function to convert frameID to timestamp
     frame2time = IDXHack(args['--idx'])
     # open the video
@@ -93,11 +90,11 @@ if __name__ == '__main__':
     frames = {}
     frameToTimestamp = {}                                     # list of frame number in the current shot 
     seg_face = {}
+    fout_pos = open(args['<faceTracking>']+videoID+'.tracking', 'w')
     while (frameID<last_frame_to_process):
         ret, frame = capture.read()                             # read the video
         frameID = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
         if ret and frameID in frames_to_process:
-            frame_to_timestamp[frameID] = frame2time(frameID, capture.get(cv.CV_CAP_PROP_POS_MSEC)/1000.0)
             frames[frameID] = frame.copy()
             if frameID in shot_boundaries: 
                 faceTracking(faces, faceToFacetrack, frames, False, float(args['--thrScoreOF']), float(args['--thrCoverage']), int(args['--thrNbPtsOF']), int(args['--nbFrameTracking']))
@@ -109,7 +106,8 @@ if __name__ == '__main__':
                         fout_pos.write(str(frameID)+' '+str(faceToFacetrack[faceID])+' '+str(int(round(xmin, 0)))+' '+str(int(round(ymin, 0)))+' '+str(int(round(xmax-xmin, 0)))+' '+str(int(round(ymax-ymin, 0)))+'\n')
                 frames.clear()
     fout_pos.close()
-    
+    capture.release()
+
     # write face segmentation
     fout_seg = open(args['<faceTrackSegmentation>']+videoID+'.MESeg', 'w')
     t=0
@@ -120,4 +118,3 @@ if __name__ == '__main__':
         t+=1
     fout_seg.close()
 
-    capture.release()
