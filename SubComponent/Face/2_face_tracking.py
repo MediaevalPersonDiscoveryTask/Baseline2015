@@ -63,7 +63,6 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     fout_pos = open(args['<faceTracking>'], 'w')
-    fout_seg = open(args['<faceTrackSegmentation>'], 'w')
     # read file with the list of shot
     frames_to_process = []
     shot_boundaries = []
@@ -114,12 +113,13 @@ if __name__ == '__main__':
     fout_pos.close()
     
     # write face segmentation
+    fout_seg = open(args['<faceTrackSegmentation>']+videoID+'.MESeg', 'w')
+    t=0
     for faceID in sorted(seg_face): 
-        startFrame = min(seg_face[faceID]['frameID'])
-        endFrame = max(seg_face[faceID]['frameID'])
-        startTime = min(seg_face[faceID]['time'])
-        endTime = max(seg_face[faceID]['time'])
-        fout_seg.write(str(faceID)+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+'\n')
+        startFrame, endFrame = min(seg_face[faceID]), max(seg_face[faceID])
+        startTime, endTime = frame2time(startFrame, 0.0), frame2time(endFrame, 0.0)
+        fout.write(videoID+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+' '+str(t)+' '+str(faceID)+' na\n')
+        t+=1
     fout_seg.close()
 
     capture.release()
