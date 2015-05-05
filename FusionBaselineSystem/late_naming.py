@@ -21,6 +21,7 @@ if __name__ == "__main__":
 
     evidences = {}
     for videoID in open(args['<video_list>']).read().splitlines():
+        print videoID
         ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
         for sON, tON, name in ON.itertracks(label=True):
@@ -30,7 +31,14 @@ if __name__ == "__main__":
                     evidences.setdefault(name, d)
                     if evidences[name] < d: evidences[name] = d
 
+    # select and write evidence
+    fout_evidence = open(args['<output_evidence>'], 'w')
+    for p in evidences:
+        conf, videoID, shot = sorted(evidences[p], reverse=True)[0]
+        fout_evidence.write(p.lower().replace('-', '_').replace('.', '_')+' '+videoID+' '+shot+' image\n')
+    fout_evidence.close()
 
+    fout_label = open(args['<output_label>'], 'w')
     for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
 
@@ -72,15 +80,13 @@ if __name__ == "__main__":
         for s, t, faceID in faces.itertracks(label=True):
             if faceID in faceID_to_name: namedFaces[s, t] = faceID_to_name[faceID]
 
-
-        fout_label = open(args['<output_label>']+'/'+videoID+'.label', 'w')
         # write person visible and speaking in a shot:
         for sshot, tshot, shot in shots.itertracks(label=True):
             NamedSpkShot = NamedSpk.crop(sshot)
             NamedFaceShot = namedFaces.crop(sshot)
             PersonShot = set(NamedSpkShot.labels()) & set(NamedFaceShot.labels())
 
-            for p in PersonShot & l_p_to_return & evidences.keys():
+            for p in (PersonShot & set(evidences.keys())):
                 conf = 0.0
                 for sSpk in NamedSpkShot.label_timeline(p):
                     for sON, tON, name in ON.itertracks(label=True):
@@ -105,14 +111,9 @@ if __name__ == "__main__":
                             if c > conf: conf = c
 
                 fout_label.write(videoID+' '+shot+' '+p.lower().replace('-', '_').replace('.', '_')+' '+str(conf)+'\n')
-        fout_label.close()
+    fout_label.close()
     
-    # select and write evidence
-    fout_evidence = open(args['<output_evidence>'], 'w')
-    for p in evidences:
-        conf, videoID, shot = sorted(evidences[p], reverse=True)[0]
-        fout_evidence.write(p.lower().replace('-', '_').replace('.', '_')+' '+videoID+' '+shot+' image\n')
-    fout_evidence.close()
+
 
 
 
