@@ -2,7 +2,7 @@
 name speakers by overlaid names and then propagate speakers identity to the best speaking Face in higher a threshold
 
 Usage:
-  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> [--thr_propagation=<tp>]
+  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> <annotatedFrames> [--thr_propagation=<tp>]
   late_naming.py -h | --help
 Options:
   --thr_propagation=<tp>  minimum score to propagate speaker identity to facetrack [default: 0.5]
@@ -12,7 +12,7 @@ from docopt import docopt
 from pyannote.parser import MDTMParser, REPEREParser
 from pyannote.algorithms.tagging import HungarianTagger, ConservativeDirectTagger
 from pyannote.core import Annotation, Segment
-from mediaeval_util.repere import parser_vtseg, ShotSegParser
+from mediaeval_util.repere import parser_vtseg, ShotSegParser, MESegParser
 
 
 if __name__ == "__main__":   
@@ -22,23 +22,28 @@ if __name__ == "__main__":
     evidences = {}
     for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
-        ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
+        annotatedFrames, scoresF = MESegParser(args['<annotatedFrames>'], videoID)
+
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
+        ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
+
         for sON, tON, name in ON.itertracks(label=True):
-            for sshot, tshot, shot in shots.itertracks(label=True):
-                if sON & sshot:
-                    d = (sON & sshot).duration
-                    evidences.setdefault(name, d)
-                    if evidences[name] < d: evidences[name] = d
+            name = name.lower().replace('-', '_').replace('.', '_')
+            ONok = False
+            for sF, tF, F in annotatedFrames.itertracks(label=True):
+                if sON & sF:
+                    ONok=True
+                    break
+            if ONok:
+                for sshot, tshot, shot in shots.itertracks(label=True):
+                    if sON & sshot:
+                        d = (sON & sshot).duration
+                        evidences.setdefault(name, [d, videoID, shot])
+                        if evidences[name] < d: evidences[name] = [d, videoID, shot]
 
-    # select and write evidence
-    fout_evidence = open(args['<output_evidence>'], 'w')
-    for p in evidences:
-        conf, videoID, shot = sorted(evidences[p], reverse=True)[0]
-        fout_evidence.write(p.lower().replace('-', '_').replace('.', '_')+' '+videoID+' '+shot+' image\n')
-    fout_evidence.close()
-
+    print ' write', args['<output_label>']
     fout_label = open(args['<output_label>'], 'w')
+    l_p_in_label = set([])
     for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
 
@@ -47,6 +52,10 @@ if __name__ == "__main__":
         st = MDTMParser().read(args['<st_seg>']+'/'+videoID+'.mdtm')(uri=videoID, modality = 'speaker')
         faces = parser_vtseg(args['<face_seg>']+'/'+videoID+'.seg', videoID)
         ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
+
+        for sON, tON, name in ON.itertracks(label=True):
+            ON[sON, tON] = name.lower().replace('-', '_').replace('.', '_')
+
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
 
         # name speakers
@@ -110,10 +119,15 @@ if __name__ == "__main__":
                                 else: c = 1/sDist.duration
                             if c > conf: conf = c
 
-                fout_label.write(videoID+' '+shot+' '+p.lower().replace('-', '_').replace('.', '_')+' '+str(conf)+'\n')
+                l_p_in_label.add(p)
+                fout_label.write(videoID+' '+shot+' '+p+' '+str(conf)+'\n')
     fout_label.close()
     
-
-
+    # select and write evidence
+    fout_evidence = open(args['<output_evidence>'], 'w')
+    for name in l_p_in_label:
+        conf, videoID, shot = evidences[name]
+        fout_evidence.write(name+' '+videoID+' '+shot+' image\n')
+    fout_evidence.close()
 
 
