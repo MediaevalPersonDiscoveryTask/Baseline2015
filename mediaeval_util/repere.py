@@ -5,7 +5,6 @@ from sklearn.isotonic import IsotonicRegression
 from pyannote.core import Annotation, Segment
 from pyannote.parser import MDTMParser
 from pyannote.algorithms.tagging import ArgMaxDirectTagger
-from pyannote.core import Scores
 from munkres import Munkres
 
 def drange(start, stop, step):
@@ -17,18 +16,21 @@ def drange(start, stop, step):
 def MESegWriter(anno, scores, f, video):
     fout = open(f, 'w')
     for s, t, l in anno.itertracks(label=True):
-        score = scores and str(scores[s, t, l]) or 'na'
-        fout.write(video+' '+str(s.start)+' '+str(s.end)+' na na '+str(t)+' '+l+' '+score+'\n')
+        fout.write(video+' '+str(s.start)+' '+str(s.end)+' na na '+str(t)+' '+l+' '+str(scores[t])+'\n')
     fout.close()
 
 def MESegParser(f, video):
     anno = Annotation(uri=video)
-    scores = Scores()
+    scores = {}
     for line in open(f):
         v, startTime, endTime, startFrame, endFrame, t, l, conf = line[:-1].split(' ')
-        s = Segment(start=float(startTime), end=float(endTime))
-        anno[s, int(t)] = l
-        if conf != 'na': scores[s, int(t), l] = float(conf)
+        if v == video:
+            s = Segment(start=float(startTime), end=float(endTime))
+            anno[s, int(t)] = l
+            scores[int(t)] = conf != 'na' and float(conf) or 'na'    
+    #print anno
+
+
     return anno, scores
 
 def ShotSegParser(f, video):
