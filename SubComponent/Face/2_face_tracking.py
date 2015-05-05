@@ -62,11 +62,12 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     fout_pos = open(args['<faceTracking>'], 'w')
+    videoID = args['<videoID>']
     # read file with the list of shot
     frames_to_process = []
     shot_boundaries = []
-    faces = {}                                                  # face detected
-    for line in open(args['<shotSegmentation>']).read().splitlines():
+    faces = {}
+    for line in open(args['<shotSegmentationPath>']+'/'+videoID+'.shot').read().splitlines():
         videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
         shot_boundaries.append(int(endFrame))
         for frameID in range(int(startFrame), int(endFrame)+1):
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     # read face detection
     faceToFacetrack = {}                                  # name of the face cluster 
     faceID = 1
-    for line in open(args['<faceDetection>']).read().splitlines():
+    for line in open(args['<faceDetectionPath>']+videoID+'.detection').read().splitlines():
         frameID, x, y, w, h, n = map(int, line.split(' '))
         if frameID in faces:
             faces[frameID][faceID] = [x, y, x+w, y+h]
