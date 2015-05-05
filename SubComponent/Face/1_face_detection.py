@@ -44,13 +44,7 @@ if __name__ == '__main__':
         frame = cv.QueryFrame(capture)
         c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))
         if frame and c_frame in frames_to_process:
-            detected = cv.HaarDetectObjects(frame, 
-                                            cascade, 
-                                            storage, 
-                                            float(args['--scaleFactor']), 
-                                            int(args['--minNeighbors']), 
-                                            cv.CV_HAAR_DO_CANNY_PRUNING, 
-                                            minsize)
+            detected = cv.HaarDetectObjects(frame, cascade, storage, float(args['--scaleFactor']), int(args['--minNeighbors']), cv.CV_HAAR_DO_CANNY_PRUNING, minsize)
             for (x,y,w,h),n in detected:  
                 fout.write(str(int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))))
                 fout.write(' '+str(x)+' '+str(y)+' '+str(w)+' '+str(h)+' '+str(n)+'\n')
