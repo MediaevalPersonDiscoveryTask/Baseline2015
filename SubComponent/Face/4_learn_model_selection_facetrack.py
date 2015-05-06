@@ -23,7 +23,7 @@ if __name__ == '__main__':
         ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>'], videoID, 3)
         facetracks = {}
         l_facetrack_used_to_learn_model = set([])
-        for line in open(args['<faceTrackingPosition>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTrackingPosition>']).read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
         # read visual descriptors
         desc = {}
-        for line in open(args['<descFaceSelection>']+'/'+videoID+'.desc'):
+        for line in open(args['<descFaceSelection>']):
             l = line[:-1].split(' ')
             faceID = int(l[1])
             if faceID in l_facetrack_used_to_learn_model:
