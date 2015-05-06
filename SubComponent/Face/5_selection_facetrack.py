@@ -22,12 +22,11 @@ if __name__ == '__main__':
         l = line[:-1].split(' ')
         print clf.predict([map(float, l[1:])])[0]
         if clf.predict([map(float, l[1:])])[0] == 1:
-            print l[1]
-            l_faceID_to_save.append(l[1])
+            l_faceID_to_save.append(l[0])
 
     fout = open(args['<facetrackPosition>'], 'w')
     for line in open(args['<rawfacetrackPosition>']):
-        #print line.split(' ')[1]
+        print line.split(' ')[1]
         if line.split(' ')[1] in l_faceID_to_save:
             print 'ok1'
             fout.write(line)
@@ -35,7 +34,7 @@ if __name__ == '__main__':
 
     fout = open(args['<facetracks>'], 'w')
     for line in open(args['<rawfacetracks>']):
-        #print line.split(' ')[6]
+        print line.split(' ')[6]
         if line.split(' ')[6] in l_faceID_to_save:
             print 'ok2'
             fout.write(line)
