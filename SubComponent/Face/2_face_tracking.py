@@ -2,7 +2,7 @@
 Face tracking based on the face detection and optical flow for miss detection
 
 Usage:
-  face_tracker.py <videoID> <videoFile> <shotSegmentationPath> <faceDetectionPath> <faceTrackingPath> <faceTrackSegmentationPath> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
+  face_tracker.py <videoID> <videoFile> <shotSegmentation> <faceDetectionPath> <faceTrackingPath> <faceTrackSegmentationPath> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
   face_tracker.py -h | --help
 Options:
   --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
@@ -65,12 +65,13 @@ if __name__ == '__main__':
     frames_to_process = []
     shot_boundaries = []
     faces = {}
-    for line in open(args['<shotSegmentationPath>']+'/'+videoID+'.shot').read().splitlines():
-        videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
-        shot_boundaries.append(int(endFrame))
-        for frameID in range(int(startFrame), int(endFrame)+1):
-            frames_to_process.append(frameID)
-            faces[frameID] = {}
+    for line in open(args['<shotSegmentation>']).read().splitlines():
+        v, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
+        if v == videoID:
+            shot_boundaries.append(int(endFrame))
+            for frameID in range(int(startFrame), int(endFrame)+1):
+                frames_to_process.append(frameID)
+                faces[frameID] = {}
     last_frame_to_process = max(frames_to_process)+10
     # defined function to convert frameID to timestamp
     frame2time = IDXHack(args['--idx'])
