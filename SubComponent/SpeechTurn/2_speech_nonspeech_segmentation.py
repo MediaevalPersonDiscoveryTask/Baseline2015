@@ -11,7 +11,7 @@ Options:
 
 from docopt import docopt
 from pyannote.features.audio.yaafe import YaafeCompound, YaafeZCR, YaafeMFCC
-from pyannote.parser import MDTMParser
+from mediaeval_util.repere import MESegWriter
 import pickle
 
 if __name__ == '__main__':
@@ -24,8 +24,9 @@ if __name__ == '__main__':
     # Extract descriptor
     extractor = YaafeCompound([YaafeZCR(), YaafeMFCC(e=False, De=False, DDe=False, D=True, DD = True)])    
     audio_features = extractor(args['<audioFile>'])
+
     # segment audio signal
     seg = segmenter.predict(audio_features, min_duration={'speech':float(args['--min_dur_speech']), 'non_speech':float(args['--min_dur_non_speech'])})
+
     # write segmentation
-    with open(args['<speechNonSpeechSegmentation>'], 'w') as f:
-        MDTMParser().write(seg, f=f, uri=args['<videoID>'], modality='speaker')
+    MESegWriter(seg, {}, args['<speechNonSpeechSegmentation>'], args['<videoID>'], {})

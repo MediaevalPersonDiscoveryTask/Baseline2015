@@ -9,7 +9,8 @@ Options:
 """
 
 from docopt import docopt
-from pyannote.parser import MDTMParser
+from pyannote.core.matrix import LabelMatrix
+from mediaeval_util.repere import MESegParser, MESegWriter
 import numpy as np
 from scipy import spatial, cluster
 
@@ -17,39 +18,32 @@ if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
 
-    label_to_indice = {}
-    indice_to_st = {}
-    seg_st = MDTMParser().read(args['<linearClustering>'])(uri=args['<videoID>'], modality="speaker")
-    for s, t, l in seg_st.itertracks(label=True):
-        label_to_indice[l] = t
-        indice_to_st[t] = l
+
+    st_seg, confs, timeToFrameID = MESegParser(args['<linearClustering>'], args['<videoID>'])
+    track_to_indice = {}
+    for s, t, l in st_seg.itertracks(label=True):
+        track_to_indice[t] = len(track_to_indice)
 
     # read matrix
-    N = len(label_to_indice)
+    N = len(st_seg.labels())
     X = np.zeros((N, N))
-    for line in open(args['<probaMatrix>']).read().splitlines():
-        st1, st2, proba = line.split(' ')
-        dist = 1.0-float(proba)
-        X[label_to_indice[st1]][label_to_indice[st2]] = dist
-        X[label_to_indice[st2]][label_to_indice[st1]] = dist
+
+    m = LabelMatrix.load(args['<probaMatrix>'])
+
+    # compute score between speech turn and save it
+    for s1, t1 in m.get_rows():
+        for s2, t2 in m.get_columns():
+            X[track_to_indice[t1]][track_to_indice[t2]] = 1.0-m[(s1,t1), (s2,t2)]
 
     # compute diarization
     y = spatial.distance.squareform(X, checks=False)
     Z = cluster.hierarchy.average(y)
     clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
 
-    # compute cluster name
-    clusName = {}
-    for i in sorted(indice_to_st):
-        clusID = clusters[i]
-        if clusID not in clusName:
-            clusName[clusID] = indice_to_st[i]
-        else:
-            clusName[clusID] += ";"+indice_to_st[i]
+    for s, t, l in st_seg.itertracks(label=True):
+        st_seg[s, t] = 'c_'+str(clusters[track_to_indice[t]])
 
     # save clustering
-    fout = open(args['<diarization>'], 'w')
-    for s, t, l in seg_st.itertracks(label=True):
-        fout.write(args['<videoID>']+' 1 '+str(s.start)+' '+str(s.duration)+' speaker na na '+str(clusName[clusters[t]])+'\n')
-    fout.close()
+    MESegWriter(st_seg, {}, args['<diarization>'], args['<videoID>'], {})
+
     

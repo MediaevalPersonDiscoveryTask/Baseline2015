@@ -11,7 +11,7 @@ Options:
 
 from docopt import docopt
 from pyannote.core import Annotation
-from pyannote.parser import MDTMParser
+from mediaeval_util.repere import MESegParser, MESegWriter
 from pyannote.features.audio.yaafe import YaafeMFCC
 from pyannote.algorithms.segmentation.bic import BICSegmentation
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     # read segmentation speech nonspeech
-    speech_nonspeech = MDTMParser().read(args['<speechNonSpeechSegmentation>'])(uri=args['<videoID>'], modality="speaker")
+    speech_nonspeech, confs, timeToFrameID = MESegParser(args['<speechNonSpeechSegmentation>'], args['<videoID>'])
 
     # extract descriptor
     extractor = YaafeMFCC(e=True, coefs=12, De=False, DDe=False, D=False, DD=False)
@@ -29,16 +29,16 @@ if __name__ == '__main__':
 
     # segment audio stream
     segmenter = BICSegmentation(penalty_coef=float(args['--penalty_coef']), min_duration=float(args['--min_duration']))
-    speech_turns = segmenter.apply(audio_features, segmentation=speech_nonspeech.label_timeline('speech'))
+    speech_turns = segmenter.apply(audio_features, segmentation=speech_nonspeech.subset(['speech']).get_timeline())
 
     # create a new annotation 
     anno = Annotation(uri=args['<videoID>'], modality='speaker')
+    
     # rename speech turn
-    nb_st = 1
+    nb_st = 0
     for seg1 in speech_turns:
-        anno[seg1] = 'st_'+str(nb_st)
+        anno[seg1, nb_st] = 'st_'+str(nb_st)
         nb_st+=1
 
     # save the segmentation
-    with open(args['<speechTurnSegmentation>'], 'w') as f:
-        MDTMParser().write(anno, f=f, uri=args['<videoID>'], modality='speaker')
+    MESegWriter(anno, {}, args['<speechTurnSegmentation>'], args['<videoID>'], {})

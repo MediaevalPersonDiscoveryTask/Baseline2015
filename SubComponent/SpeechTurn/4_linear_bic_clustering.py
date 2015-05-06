@@ -12,43 +12,39 @@ Options:
 from docopt import docopt
 from pyannote.core import *
 from pyannote.features.audio.yaafe import YaafeMFCC
-from pyannote.parser import MDTMParser
 from pyannote.algorithms.clustering.bic import BICModel
+from mediaeval_util.repere import MESegParser, MESegWriter
 
 if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
+    
     # read speech turn segmentation
-    annotation = MDTMParser().read(args['<speechTurnSegmentation>'])(uri=args['<videoID>'], modality="speaker")
+    st_seg, confs, timeToFrameID = MESegParser(args['<speechTurnSegmentation>'], args['<videoID>'])
+    
     # extract descriptor
     extractor = YaafeMFCC(e=True, coefs=12, De=False, DDe=False, D=False, DD=False)
     audio_features = extractor(args['<audioFile>'])
+    
     # initialize the model
     model = BICModel(covariance_type='diag', penalty_coef=float(args['--penalty_coef']))
     
+    # linear clustering    
     seg_to_merged = True
     while seg_to_merged == True:
         seg_to_merged = False
-
-        l_seg = list(annotation.get_timeline())
-        cluster = {}
-        for seg in l_seg:
-            cluster[seg] = list(annotation.get_labels(seg))[0]
-
+        l_seg = []
+        for s, t, l in st_seg.itertracks(label=True): l_seg.append([s, t, l])
         for i in range(len(l_seg)-1):
-            if l_seg[i].end - l_seg[i+1].start <= float(args['--gap']) and cluster[l_seg[i]] != cluster[l_seg[i+1]] :
-                if model.get_similarity(cluster[l_seg[i]], cluster[l_seg[i+1]], annotation=annotation, feature=audio_features) > 0:
-                    # merge segment
-                    c1 = cluster[l_seg[i]]
-                    c2 = cluster[l_seg[i+1]]
-                    del annotation[l_seg[i]]
-                    del annotation[l_seg[i+1]]
-                    annotation[Segment(start=min(l_seg[i].start, l_seg[i+1].start), end=max(l_seg[i].end, l_seg[i+1].end))] = c1
+            if l_seg[i][0].end - l_seg[i+1][0].start <= float(args['--gap']) :
+                if model.get_similarity(l_seg[i][2], l_seg[i+1][2], annotation=st_seg, feature=audio_features) > 0:
+                    del st_seg[l_seg[i][0], l_seg[i][1]]
+                    del st_seg[l_seg[i+1][0], l_seg[i+1][1]]
+                    st_seg[Segment(start=l_seg[i][0].start, end=l_seg[i+1][0].end), l_seg[i][1]] = l_seg[i][2]
                     seg_to_merged = True
                     break
     
     # save segmentation
-    with open(args['<linearClustering>'], 'w') as f:
-        MDTMParser().write(annotation, f=f)
+    MESegWriter(st_seg, {}, args['<linearClustering>'], args['<videoID>'], {})
 
                           
