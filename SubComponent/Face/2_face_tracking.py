@@ -80,7 +80,7 @@ if __name__ == '__main__':
     # read face detection
     faceToFacetrack = {}                                  # name of the face cluster 
     faceID = 1
-    for line in open(args['<faceDetectionPath>']+videoID+'.detection').read().splitlines():
+    for line in open(args['<faceDetectionPath>']+videoID+'.face').read().splitlines():
         frameID, x, y, w, h, n = map(int, line.split(' '))
         if frameID in faces:
             faces[frameID][faceID] = [x, y, x+w, y+h]
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     frames = {}
     frameToTimestamp = {}                                     # list of frame number in the current shot 
     seg_face = {}
-    fout_pos = open(args['<faceTracking>']+videoID+'.tracking', 'w')
+    fout_pos = open(args['<faceTracking>']+videoID+'.facetrack', 'w')
     while (frameID<last_frame_to_process):
         ret, frame = capture.read()                             # read the video
         frameID = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
