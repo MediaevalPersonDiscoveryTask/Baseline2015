@@ -13,28 +13,32 @@ def drange(start, stop, step):
         yield r
         r += step
 
-def MESegWriter(anno, scores, f, video, timeToFrameID):
+def MESegWriter(anno, confs, f, video, timeToFrameID):
     fout = open(f, 'w')
+    trackID = 0
     for s, t, l in anno.itertracks(label=True):
-        score = scores and str(scores[s, t, l]) or 'na'
+        conf = confs and str(confs[s, t, l]) or 'na'
         startFrame = timeToFrameID and timeToFrameID[s.start] or 'na'
         endFrame = timeToFrameID and timeToFrameID[s.end] or 'na'
-        fout.write(video+' '+str(s.start)+' '+str(s.end)+' '+str(startFrame)+' '+str(endFrame)+' '+str(t)+' '+str(l)+' '+str(score)+'\n')
+        if t == '_':
+            t = trackID
+            trackID+=1
+        fout.write(video+' '+str(s.start)+' '+str(s.end)+' '+str(startFrame)+' '+str(endFrame)+' '+str(t)+' '+str(l)+' '+str(conf)+'\n')
     fout.close()
 
 def MESegParser(f, video):
     anno = Annotation(uri=video)
-    scores = {}
+    confs = {}
     timeToFrameID = {}
     for line in open(f):
         v, startTime, endTime, startFrame, endFrame, t, l, conf = line[:-1].split(' ')
+        
         if v == video:
-            s = Segment(start=float(startTime), end=float(endTime))
-            anno[s, int(t)] = l
+            anno[Segment(start=float(startTime), end=float(endTime)), int(t)] = l
             if startFrame != 'na' : timeToFrameID[float(startTime)] = int(startFrame)
             if endFrame != 'na' : timeToFrameID[float(endTime)] = int(endFrame)
-            scores[int(t)] = conf != 'na' and float(conf) or 'na'  
-    return anno, scores, timeToFrameID
+            confs[int(t)] = conf != 'na' and float(conf) or 'na'  
+    return anno, confs, timeToFrameID
 
 def ShotSegParser(f, video):
     anno = Annotation(uri=video)
