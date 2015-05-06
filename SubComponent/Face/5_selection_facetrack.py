@@ -23,14 +23,14 @@ if __name__ == '__main__':
         if clf.predict([map(float, l[1:])]) == 1:
             l_faceID_to_save.append(l[1])
 
-    fout = open(args['<facetrackPosition>'])
+    fout = open(args['<facetrackPosition>'], 'w')
     for line in open(args['<rawfacetrackPosition>']):
         if line.split(' ')[1] in l_faceID_to_save:
             fout.write(line)
     fout.close()
 
     fout = open(args['<facetracks>'])
-    for line in open(args['<rawfacetracks>']):
+    for line in open(args['<rawfacetracks>'], 'w'):
         if line.split(' ')[6] in l_faceID_to_save:
             fout.write(line)
     fout.close()
