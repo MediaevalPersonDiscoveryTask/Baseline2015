@@ -20,8 +20,7 @@ if __name__ == '__main__':
     l_faceID_to_save = []
     for line in open(args['<descFaceSelection>']):
         l = line[:-1].split(' ')
-        print clf.predict([map(float, l[1:])]) 
-        if clf.predict([map(float, l[1:])]) == 1:
+        if clf.predict([map(float, l[1:])])[0] == 1:
             l_faceID_to_save.append(l[1])
 
     fout = open(args['<facetrackPosition>'], 'w')
