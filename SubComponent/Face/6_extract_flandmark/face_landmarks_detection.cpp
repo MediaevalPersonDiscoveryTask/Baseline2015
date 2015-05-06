@@ -81,20 +81,17 @@ int main( int argc, char** argv )
                 box[2] = fb[3];
                 box[3] = fb[4]; 
 
-                cout << num_frame << endl ;
-
                 fout << num_frame ;
                 for (int j = 0; j < 5; j++) fout << " " << fb[j];
                 if(flandmark_detect(frame_grayscale, box, model, current_landmarks_tmp)) for (int j = 0; j < 2*model->data.options.M; j++) fout << " " << -1.0;
                 else for (int j = 0; j < 2*model->data.options.M; j++) fout << " " << current_landmarks_tmp[j];
-                fout << endl;
-
+                fout << endl ;
                 map_frame_box[num_frame].pop_front();
             }
             cvReleaseImage(&frame_grayscale);            
         }            
     }
-    cvReleaseImage(&frame);
-    flandmark_free(model);
     fout.close();
+
+    flandmark_free(model);
 }
