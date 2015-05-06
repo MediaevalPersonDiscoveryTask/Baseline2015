@@ -2,14 +2,13 @@
 Learn a classifier model to compute the probability that a facetrack is speaking
 
 Usage:
-  learn_model_proba_speaking_face.py <videoList> <idxPath> <faceTracking> <SpeakingFaceDescriptorPath> <facePositionReferencePath> <speakerSegmentationReferencePath> <modelProbaSpeakingFace>
+  learn_model_proba_speaking_face.py <videoList> <faceTrackingPosition> <descFaceSelection> <facePositionReferencePath> <modelFaceSelection>
   learn_model_proba_speaking_face.py -h | --help
 """
 
 from docopt import docopt
 import numpy as np
-from mediaeval_util.repere import IDXHack, read_ref_facetrack_position, align_facetrack_ref, align_st_ref
-from sklearn.calibration import CalibratedClassifierCV
+from mediaeval_util.repere import read_ref_facetrack_position, align_facetrack_ref, align_st_ref
 from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
 import random
@@ -21,63 +20,29 @@ if __name__ == '__main__':
     X, Y = [], []
     for videoID in open(args['<videoList>']).read().splitlines():
         # find the name corresponding to facetracks
-        ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>']+'/'+videoID+'.position', 3)
+        ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>'], videoID, 3)
         facetracks = {}
         l_facetrack_used_to_learn_model = set([])
-        for line in open(args['<faceTracking>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTrackingPosition>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
             if frameID in ref_f:
-                l_facetrack_used_to_learn_model.add(faceID)
+                l_facetrack_used_to_learn_model.add(faceID)            
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
-        # read speaker reference
-        ref_spk = {}
-        for line in open(args['<speakerSegmentationReferencePath>']+'/'+videoID+'.atseg').read().splitlines():
-            v, startTime, endTime, spkName = line.split(' ') 
-            ref_spk[spkName] = [float(startTime), float(endTime)]
-
-        # fct to convert frameID to timestamp 
-        frame2time = IDXHack(args['<idxPath>']+'/'+videoID+'.MPG.idx')
-
         # read visual descriptors
-        visual_desc = {}
-        for line in open(args['<SpeakingFaceDescriptorPath>']+'/'+videoID+'.desc'):
+        desc = {}
+        for line in open(args['<descFaceSelection>']+'/'+videoID+'.desc'):
             l = line[:-1].split(' ')
             faceID = int(l[1])
             if faceID in l_facetrack_used_to_learn_model:
-                timestamp = frame2time(int(l[0]), 0.0)
-                for spk, time in ref_spk.items():
-                    if timestamp >= time[0] and timestamp <= time[1]:
-                        visual_desc.setdefault(spk, {})
-                        visual_desc[spk].setdefault(faceID, []).append(map(float, l[2:]))
+                X.append(map(float, l[1:]))
+                if faceID in facetrack_vs_ref: Y.append(1)
+                else: Y.append(0)
 
-        # compute a descriptor with information of speaker segment
-        for spk in visual_desc:
-            startTime, endTime = ref_spk[spk]
-            spk_duration = (endTime-startTime)*25
-            l = []
-            for faceID in visual_desc[spk]:
-                l.append(float(len(visual_desc[spk][faceID])))
-            best_facetrack_cooc_duration = max(l)
-
-            for faceID in visual_desc[spk]:
-                facetrack_cooc_duration = float(len(visual_desc[spk][faceID]))
-                propdur_best_duration_faceID = facetrack_cooc_duration/best_facetrack_cooc_duration
-                prop_dur_spk_dur = facetrack_cooc_duration/spk_duration
-
-                # find if the face correspond to the speaker
-                SpeakingFace = 0
-                if faceID in facetrack_vs_ref:
-                    if facetrack_vs_ref[faceID] == spk:
-                        SpeakingFace = 1
-
-                for desc in visual_desc[spk][faceID]:
-                    X.append([propdur_best_duration_faceID, prop_dur_spk_dur]+desc)
-                    Y.append(SpeakingFace)
     # train model
-    clf = CalibratedClassifierCV(LogisticRegression(), method='sigmoid')
+    clf = LogisticRegression()
     clf.fit(X, Y)
     # save model     
-    joblib.dump(clf, args['<modelProbaSpeakingFace>']) 
+    joblib.dump(clf, args['<modelFaceSelection>']) 

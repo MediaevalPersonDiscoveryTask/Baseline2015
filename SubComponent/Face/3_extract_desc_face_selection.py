@@ -2,10 +2,10 @@
 Extract descriptor to find speaking face
 
 Usage:
-  extract_desc_speaking_face.py <videoID> <rawfacetrackPosition> <rawfacetracks_seg> <desc_face_selection> [--video_width=<vw>] 
+  extract_desc_speaking_face.py <videoID> <rawfacetrackPosition> <rawfacetracks> <descFaceSelection> [--videoWidth=<vw>] 
   extract_desc_speaking_face.py -h | --help
 Options:
-  --video_width=<of>   width of the video [default: 1024]
+  --videoWidth=<of>   width of the video [default: 1024]
 """
 
 from docopt import docopt
@@ -20,9 +20,9 @@ if __name__ == "__main__":
     # read arguments   
     args = docopt(__doc__)
 
-    video_w_center = float(args['--video_width'])/2
+    video_w_center = float(args['--videoWidth'])/2
 
-    face_seg, confs, timeToFrameID = MESegParser(args['<rawfacetracks_seg>'], args['<videoID>'])
+    face_seg, confs, timeToFrameID = MESegParser(args['<rawfacetracks>'], args['<videoID>'])
 
     pos = {}
     for line in open(args['<rawfacetrackPosition>']):
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         pos.setdefault(faceID, {})
         pos[faceID][int(frameID)] = map(float, [x, y, w, h])
 
-    fout = open(args['<desc_face_selection>'], 'w')
+    fout = open(args['<descFaceSelection>'], 'w')
     for seg, trackID, faceID in face_seg.itertracks(label=True):
         fout.write(faceID+" "+str(confs[trackID])+" "+str(len(pos[faceID]))+" "+str(float(confs[trackID])/len(pos[faceID])))
         l_size, l_central, l_move = [], [], []
