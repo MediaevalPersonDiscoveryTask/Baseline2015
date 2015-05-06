@@ -31,7 +31,8 @@ def MESegParser(f, video):
         if v == video:
             s = Segment(start=float(startTime), end=float(endTime))
             anno[s, int(t)] = l
-            timeToFrameID[float(startTime)], timeToFrameID[float(endTime)] = int(startFrame), int(endFrame)
+            if startFrame != 'na' : timeToFrameID[float(startTime)] = int(startFrame)
+            if endFrame != 'na' : timeToFrameID[float(endTime)] = int(endFrame)
             scores[int(t)] = conf != 'na' and float(conf) or 'na'  
     return anno, scores, timeToFrameID
 
