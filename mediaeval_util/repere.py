@@ -94,12 +94,12 @@ def align_st_ref(seg_st_path, ref_path, videoID):
             st_vs_ref[track_to_st[t]] = name
     return st_vs_ref
 
-def read_ref_facetrack_position(f, videoID, empo_margin):
+def read_ref_facetrack_position(f, videoID, tempo_margin):
     ref = {}
     for line in open(f).read().splitlines():
         v, frameAnnotated, trackID, name, position = line.split(' ')  
-        if v==videoID and startFrame != '' and endFrame != '' and frameAnnotated != '':
-            startFrame, endFrame, frameAnnotated = int(startFrame), int(endFrame), int(frameAnnotated)
+        if v==videoID and frameAnnotated != '':
+            frameAnnotated = int(frameAnnotated)
             l_x = []
             l_y = []
             for point in position.split(';'):
@@ -109,7 +109,7 @@ def read_ref_facetrack_position(f, videoID, empo_margin):
             x = (max(l_x) + min(l_x))/2
             y = (max(l_y) + min(l_y))/2
             ref.setdefault(frameAnnotated, {})
-            ref[frameAnnotated][name] = [x, y, max(l_x)-min(l_x), max(startFrame,frameAnnotated-tempo_margin), min(endFrame,frameAnnotated+tempo_margin)]
+            ref[frameAnnotated][name] = [x, y, max(l_x)-min(l_x), frameAnnotated-tempo_margin, frameAnnotated+tempo_margin]
     return ref
 
 def align_facetrack_ref(ref_f, facetracks):
