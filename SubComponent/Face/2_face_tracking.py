@@ -7,7 +7,7 @@ Usage:
 Options:
   --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
   --thrNbPtsOF=<nof>        minimum number of point of interest find by th optical flow [default: 8]
-  --thrCoverage=<tc>        if the coverage of 2 boxes is higher than thrCoverage, we consider they correspond to the same face track [default: 0.2]
+  --thrCoverage=<tc>        if the coverage of 2 boxes is higher than thrCoverage, we consider they correspond to the same face track [default: 0.3]
   --nbFrameTracking=<nft>   number of frame where with try to find the net detection [default: 15]
   --idx=<idx>               mapping between frame number to timestamp
 """
@@ -72,7 +72,7 @@ if __name__ == '__main__':
             for frameID in range(int(startFrame), int(endFrame)+1):
                 frames_to_process.append(frameID)
                 faces[frameID] = {}
-    last_frame_to_process = max(frames_to_process)+10
+    last_frame_to_process = max(frames_to_process)
     # defined function to convert frameID to timestamp
     frame2time = IDXHack(args['--idx'])
     # open the video
@@ -111,11 +111,15 @@ if __name__ == '__main__':
 
     # write face segmentation
     fout_seg = open(args['<faceTrackSegmentationPath>']+'/'+videoID+'.MESeg', 'w')
-    t=0
+    trackID=0
     for faceID in sorted(seg_face): 
+        conf = 0
+        for faceIDdetection in faceToFacetrack:
+            if faceToFacetrack[faceIDdetection] == faceID:
+                conf+=1
         startFrame, endFrame = min(seg_face[faceID]), max(seg_face[faceID])
         startTime, endTime = frame2time(startFrame, 0.0), frame2time(endFrame, 0.0)
-        fout.write(videoID+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+' '+str(t)+' '+str(faceID)+' na\n')
-        t+=1
+        fout_seg.write(videoID+' '+str(startTime)+' '+str(endTime)+' '+str(startFrame)+' '+str(endFrame)+' '+str(trackID)+' '+str(faceID)+' '+str(conf)+'\n')
+        trackID+=1
     fout_seg.close()
 
