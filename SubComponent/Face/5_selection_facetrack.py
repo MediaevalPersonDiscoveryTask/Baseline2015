@@ -25,12 +25,12 @@ if __name__ == '__main__':
 
     fout = open(args['<facetrackPosition>'])
     for line in open(args['<rawfacetrackPosition>']):
-        if line.split(' ')[1] in l_faceID_to_save
+        if line.split(' ')[1] in l_faceID_to_save:
             fout.write(line)
     fout.close()
 
     fout = open(args['<facetracks>'])
     for line in open(args['<rawfacetracks>']):
-        if line.split(' ')[6] in l_faceID_to_save
+        if line.split(' ')[6] in l_faceID_to_save:
             fout.write(line)
     fout.close()
