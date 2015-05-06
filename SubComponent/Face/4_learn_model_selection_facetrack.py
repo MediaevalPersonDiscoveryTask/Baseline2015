@@ -35,7 +35,7 @@ if __name__ == '__main__':
         desc = {}
         for line in open(args['<descFaceSelection>']):
             l = line[:-1].split(' ')
-            faceID = int(l[1])
+            faceID = int(l[0])
             if faceID in l_facetrack_used_to_learn_model:
                 X.append(map(float, l[1:]))
                 if faceID in facetrack_vs_ref: Y.append(1)
