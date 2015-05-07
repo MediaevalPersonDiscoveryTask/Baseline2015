@@ -25,10 +25,11 @@ if __name__ == '__main__':
         #print videoID
 
         frames_to_process = []
-        for line in open(args['<shotSegmentation>']+'/'+videoID+'.shot').read().splitlines():
-            videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
-            for frameID in range(int(startFrame), int(endFrame)+1):
-                frames_to_process.append(frameID)
+        for line in open(args['<shotSegmentation>']).read().splitlines():
+            v, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
+            if v==videoID:
+                for frameID in range(int(startFrame), int(endFrame)+1):
+                    frames_to_process.append(frameID)
                 
         ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position>'], videoID, 0)
         ref_f = copy.deepcopy(ref_f_tmp)
