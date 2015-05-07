@@ -2,14 +2,14 @@
 Evaluation of the speaking face detection
 
 Usage:
-  proba_mat_speechTurn.py <video_list> <matrix_speaking_face> <face_tracking> <reference_head_position> <st_seg> <speaker_ref> <idx_path> <shotSegmentation>
+  proba_mat_speechTurn.py <video_list> <matrix_speaking_face> <facetrack> <facetrackPosition> <reference_head_position> <st_seg> <speaker_ref> <idx_path> <shotSegmentation>
   proba_mat_speechTurn.py -h | --help
 """
 
 from docopt import docopt
 from pyannote.algorithms.tagging import ArgMaxDirectTagger
 from pyannote.parser import MDTMParser
-from mediaeval_util.repere import IDXHack, align_st_ref, drange, read_ref_facetrack_position, align_facetrack_ref
+from mediaeval_util.repere import IDXHack, align_st_ref, read_ref_facetrack_position, align_facetrack_ref
 from sklearn.externals import joblib
 import numpy as np
 import copy
@@ -22,7 +22,6 @@ if __name__ == '__main__':
     correct_speakingFace = 0.0
 
     for videoID in open(args['<video_list>']).read().splitlines():
-        #print videoID
 
         frames_to_process = []
         for line in open(args['<shotSegmentation>']).read().splitlines():
@@ -30,47 +29,57 @@ if __name__ == '__main__':
             if v==videoID:
                 for frameID in range(int(startFrame), int(endFrame)+1):
                     frames_to_process.append(frameID)
-                
+        
         ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position>'], videoID, 0)
         ref_f = copy.deepcopy(ref_f_tmp)
         for frameID in ref_f_tmp:
             if frameID not in frames_to_process:
                 del ref_f[frameID]
+
         facetracks = {}
         l_ft = []
-        for line in open(args['<face_tracking>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<facetrackPosition>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
             if frameID in ref_f:
                 l_ft.append(faceID)
+
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
+        facetrack, confs, timeToFrameID = MESegParser(args['<facetrack>'], args['<videoID>'])
+        faceID_to_trackID_face = {}
+        trackID_face_to_faceID = {}
+        for s, trackID, faceID in facetrack.itertracks(label=True):
+            faceID_to_trackID_face[faceID] = trackID
+            trackID_face_to_faceID[trackID] = faceID
 
-        st_vs_ref = align_st_ref(args['<st_seg>'], args['<speaker_ref>'], videoID)
-        st_seg = []
-        for line in open(args['<st_seg>']+'/'+videoID+'.mdtm'):
-            v, p, start, dur, spk, na, na, st = line[:-1].split(' ')
-            st_seg.append([float(start), float(start)+float(dur), st])
 
-        ref_spk = []
-        for line in open(args['<speaker_ref>']+videoID+'.MESeg').read().splitlines():
-            v, startTime, endTime, startFrame, endFrame, t, l, conf = line.split(' ')
-            if v == videoID:
-                ref_spk.append([float(startTime), float(endTime), spkName])
+        st_to_ref = align_st_ref(args['<st_seg>']+'/'+videoID+'.MESeg', args['<speaker_ref>'], videoID)
 
-        frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
+        st, confs, timeToFrameID = MESegParser(args['<st_seg>'], args['<videoID>'])
+        st_to_trackID_st = {}
+        trackID_st_to_st = {}
+        for s, trackID, st in st.itertracks(label=True):
+            st_to_trackID_st[st] = trackID
+            trackID_st_to_st[trackID] = st
 
         speaking_frame = {}
         for line in open(args['<matrix_speaking_face>']+videoID+'.mat').read().splitlines():
-            st, faceID, proba = line.split(' ')
-            faceID = int(faceID)
-            if faceID in l_ft:
+            trackID_st, trackID_faceID, proba = line.split(' ')
+            if trackID_face_to_faceID[trackID_faceID] in l_ft:
                 proba = float(proba)
-                speaking_frame.setdefault(st, [proba, faceID])
-                if proba > speaking_frame[st][0]:
-                    speaking_frame[st] = [proba, faceID]
+                speaking_frame.setdefault(trackID_st_to_st[trackID_st], [proba, trackID_face_to_faceID[trackID_faceID]])
+                if proba > speaking_frame[trackID_st_to_st[trackID_st]][0]:
+                    speaking_frame[trackID_st_to_st[trackID_st]] = [proba, trackID_face_to_faceID[trackID_faceID]]                
 
+        ref_spk = []
+        for line in open(args['<speaker_ref>']).read().splitlines():
+            v, startTime, endTime, startFrame, endFrame, t, l, conf = line.split(' ')
+            if v == videoID:
+                ref_spk.append([float(startTime), float(endTime), l])
+
+        frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
         for frameID in ref_f:
             timestamp =  frame2time(frameID, 0.0)
 
