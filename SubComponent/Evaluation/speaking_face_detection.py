@@ -66,12 +66,12 @@ if __name__ == '__main__':
 
         speaking_frame = {}
         for line in open(args['<matrix_speaking_face>']+videoID+'.mat').read().splitlines():
-            trackID_st, trackID_faceID, proba = line.split(' ')
-            if trackID_face_to_faceID[trackID_faceID] in l_ft:
+            trackID_st, trackID_face, proba = line.split(' ')
+            if trackID_face_to_faceID[int(trackID_face)] in l_ft:
                 proba = float(proba)
-                speaking_frame.setdefault(trackID_st_to_st[trackID_st], [proba, trackID_face_to_faceID[trackID_faceID]])
-                if proba > speaking_frame[trackID_st_to_st[trackID_st]][0]:
-                    speaking_frame[trackID_st_to_st[trackID_st]] = [proba, trackID_face_to_faceID[trackID_faceID]]                
+                speaking_frame.setdefault(trackID_st_to_st[int(trackID_st)], [proba, trackID_face_to_faceID[int(trackID_face)]])
+                if proba > speaking_frame[trackID_st_to_st[int(trackID_st)]][0]:
+                    speaking_frame[trackID_st_to_st[int(trackID_st)]] = [proba, trackID_face_to_faceID[int(trackID_face)]]                
 
         ref_spk = []
         for line in open(args['<speaker_ref>']).read().splitlines():
