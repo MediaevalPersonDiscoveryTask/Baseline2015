@@ -5,7 +5,7 @@ Usage:
   speech_turn_segmentation.py <videoID> <audioFile> <speechNonSpeechSegmentation> <speechTurnSegmentation> [--penalty_coef=<pc>] [--min_duration=<md>] 
   speech_turn_segmentation.py -h | --help
 Options:
-  --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 1.0]
+  --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 1.2]
   --min_duration=<md>   minimum duration of a speech turn (>0.0) [default: 1.0]
 """
 

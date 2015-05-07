@@ -9,7 +9,6 @@ Options:
 """
 
 from docopt import docopt
-from pyannote.core.matrix import LabelMatrix
 from mediaeval_util.repere import MESegParser, MESegWriter
 import numpy as np
 from scipy import spatial, cluster
@@ -28,12 +27,9 @@ if __name__ == '__main__':
     N = len(st_seg.labels())
     X = np.zeros((N, N))
 
-    m = LabelMatrix.load(args['<probaMatrix>'])
-
-    # compute score between speech turn and save it
-    for s1, t1 in m.get_rows():
-        for s2, t2 in m.get_columns():
-            X[track_to_indice[t1]][track_to_indice[t2]] = 1.0-m[(s1,t1), (s2,t2)]
+    for line in open(args['<probaMatrix>']).read().splitlines():
+        t1, t2, p = line.split(' ')
+        X[track_to_indice[int(t1)]][track_to_indice[int(t2)]] = 1.0-float(p)
 
     # compute diarization
     y = spatial.distance.squareform(X, checks=False)
