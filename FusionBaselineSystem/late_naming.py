@@ -2,18 +2,16 @@
 name speakers by overlaid names and then propagate speakers identity to the best speaking Face in higher a threshold
 
 Usage:
-  late_naming.py <video_list> <spk_dia> <st_seg> <face_seg> <mat_speaking_face> <overlaid_names> <shot_seg> <output_label> <output_evidence> <annotatedFrames> [--thr_propagation=<tp>]
+  late_naming.py <video_list> <spk_dia> <face_seg> <mat_speaking_face> <writtenNames> <shot_seg> <output_label> <output_evidence> [--thr_propagation=<tp>]
   late_naming.py -h | --help
 Options:
   --thr_propagation=<tp>  minimum score to propagate speaker identity to facetrack [default: 0.5]
 """
 
 from docopt import docopt
-from pyannote.parser import MDTMParser, REPEREParser
+from mediaeval_util.repere import MESegParser, ShotSegParser
 from pyannote.algorithms.tagging import HungarianTagger, ConservativeDirectTagger
 from pyannote.core import Annotation, Segment
-from mediaeval_util.repere import parser_vtseg, ShotSegParser, MESegParser
-
 
 if __name__ == "__main__":   
     # read arguments
@@ -21,48 +19,33 @@ if __name__ == "__main__":
 
     evidences = {}
     for videoID in open(args['<video_list>']).read().splitlines():
-        print videoID
-        annotatedFrames, scoresF = MESegParser(args['<annotatedFrames>'], videoID)
-
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
-        ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
-
+        ON = REPEREParser().read(args['<writtenNames>'])(uri=videoID, modality = 'written')
         for sON, tON, name in ON.itertracks(label=True):
             name = name.lower().replace('-', '_').replace('.', '_')
-            ONok = False
-            for sF, tF, F in annotatedFrames.itertracks(label=True):
-                if sON & sF:
-                    ONok=True
-                    break
-            if ONok:
-                for sshot, tshot, shot in shots.itertracks(label=True):
-                    if sON & sshot:
-                        d = (sON & sshot).duration
-                        evidences.setdefault(name, [d, videoID, shot])
-                        if evidences[name] < d: evidences[name] = [d, videoID, shot]
+            for sshot, tshot, shot in shots.itertracks(label=True):
+                if sON & sshot:
+                    d = (sON & sshot).duration
+                    evidences.setdefault(name, [d, videoID, shot])
+                    if evidences[name] < d: evidences[name] = [d, videoID, shot]
 
-    print ' write', args['<output_label>']
     fout_label = open(args['<output_label>'], 'w')
     l_p_in_label = set([])
     for videoID in open(args['<video_list>']).read().splitlines():
-        print videoID
-
         # read segmentation file
-        sd = MDTMParser().read(args['<spk_dia>']+'/'+videoID+'.mdtm')(uri=videoID, modality = 'speaker')
-        st = MDTMParser().read(args['<st_seg>']+'/'+videoID+'.mdtm')(uri=videoID, modality = 'speaker')
-        faces = parser_vtseg(args['<face_seg>']+'/'+videoID+'.seg', videoID)
-        ON = REPEREParser().read(args['<overlaid_names>'])(uri=videoID, modality = 'written')
 
-        for sON, tON, name in ON.itertracks(label=True):
-            ON[sON, tON] = name.lower().replace('-', '_').replace('.', '_')
-
+        sd, confs, timeToFrameID = MESegParser(args['<spk_dia>'], videoID)
+        faces, confs, timeToFrameID = MESegParser(args['<face_seg>'], videoID)
+        ON, confs, timeToFrameID = MESegParser(args['<written>'], videoID)
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
 
         # name speakers
         direct = ConservativeDirectTagger()
         one_to_one = HungarianTagger()
         NamedSpk = direct(ON, one_to_one(ON, sd))
+        NamedSpk.get_labels
         l_to_remove = []
+
         for s, t, name in NamedSpk.itertracks(label=True):
             if 'st_' in name: l_to_remove.append([s, t])
         for s, t in l_to_remove: del NamedSpk[s, t]
@@ -76,14 +59,14 @@ if __name__ == "__main__":
 
         thr_propagation = float(args['--thr_propagation'])
         for line in open(args['<mat_speaking_face>']+'/'+videoID+'.mat').read().splitlines():
-            st, faceID, proba = line.split(' ')
+            TrackID_st, TrackID_Face, proba = line.split(' ')
             proba = float(proba)
-            if proba >= thr_propagation and proba > dic_st_to_speakingFace[st][1]: dic_st_to_speakingFace[st] = [faceID, proba]
+            if proba >= thr_propagation and proba > dic_st_to_speakingFace[TrackID_st][1]: dic_st_to_speakingFace[TrackID_Face] = [TrackID_Face, proba]
 
         faceID_to_name = {}
         for s, t, name in NamedSpk.itertracks(label=True):
             st = dic_trackID_to_st[t]
-            if dic_st_to_speakingFace[st][0] != '': faceID_to_name[dic_st_to_speakingFace[st][0]] = name
+            if dic_st_to_speakingFace[t][0] != '': faceID_to_name[dic_st_to_speakingFace[st][0]] = name
 
         namedFaces = Annotation(uri=videoID)
         for s, t, faceID in faces.itertracks(label=True):
