@@ -21,15 +21,12 @@ if __name__ == "__main__":
     args = docopt(__doc__)
 
     video_w_center = float(args['--videoWidth'])/2
-
     face_seg, confs, timeToFrameID = MESegParser(args['<rawfacetracks>'], args['<videoID>'])
-
     pos = {}
     for line in open(args['<rawfacetrackPosition>']):
         frameID, faceID, x, y, w, h = line[:-1].split(' ')
         pos.setdefault(faceID, {})
         pos[faceID][int(frameID)] = map(float, [x, y, w, h])
-
     fout = open(args['<descFaceSelection>'], 'w')
     for seg, trackID, faceID in face_seg.itertracks(label=True):
         fout.write(faceID+" "+str(confs[trackID])+" "+str(len(pos[faceID]))+" "+str(float(confs[trackID])/len(pos[faceID])))
@@ -37,7 +34,6 @@ if __name__ == "__main__":
         for frameID in pos[faceID]: 
             x, y, w, h = pos[faceID][frameID]
             x_center = x+w/2
-
             l_size.append(w*h)
             l_central.append(abs(x_center-video_w_center))
             if frameID-1 in pos[faceID]:
