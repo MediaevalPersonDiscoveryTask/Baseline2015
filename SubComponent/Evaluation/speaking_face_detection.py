@@ -38,7 +38,7 @@ if __name__ == '__main__':
                 del ref_f[frameID]
         facetracks = {}
         l_ft = []
-        for line in open(args['<face_tracking>']+'/'+videoID+'.MESeg').read().splitlines():
+        for line in open(args['<face_tracking>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
