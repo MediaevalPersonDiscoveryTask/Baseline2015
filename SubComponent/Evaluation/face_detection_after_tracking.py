@@ -2,7 +2,7 @@
 Evaluate the face detection after tracking step (all faces and only speaking faces)
 
 Usage:
-  face_tracking.py <video_list> <face_tracking> <reference_head_position_path> <idx_path> <speaker_ref> <shotSegmentation>
+  face_tracking.py <video_list> <face_tracking> <reference_head_position> <idx_path> <speaker_ref> <shotSegmentation>
   face_tracking.py -h | --help
 """
 
@@ -23,21 +23,23 @@ if __name__ == '__main__':
     for videoID in open(args['<video_list>']).read().splitlines():
 
         frames_to_process = []
-        for line in open(args['<shotSegmentation>']+'/'+videoID+'.shot').read().splitlines():
-            videoId, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
-            for frameID in range(int(startFrame), int(endFrame)+1):
-                frames_to_process.append(frameID)
+        for line in open(args['<shotSegmentation>']).read().splitlines():
+            v, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
+            if v == videoID:
+                for frameID in range(int(startFrame), int(endFrame)+1):
+                    frames_to_process.append(frameID)
                 
-        ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', 0)
+        ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position>'], videoID, 0)
         ref_f = copy.deepcopy(ref_f_tmp)
         for frameID in ref_f_tmp:
             if frameID not in frames_to_process:
                 del ref_f[frameID]
 
         ref_spk = []
-        for line in open(args['<speaker_ref>']+videoID+'.atseg').read().splitlines():
-            v, startTime, endTime, spkName = line.split(' ') 
-            ref_spk.append([float(startTime), float(endTime), spkName])
+        for line in open(args['<speaker_ref>']).read().splitlines():
+            v, startTime, endTime, startFrame, endFrame, t, l, conf = line.split(' ')
+            if v == videoID:
+                ref_spk.append([float(startTime), float(endTime), l])
 
         frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
 

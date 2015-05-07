@@ -8,9 +8,8 @@ Usage:
 
 from docopt import docopt
 from pyannote.algorithms.tagging import ArgMaxDirectTagger
-from pyannote.parser import MDTMParser
+from pyannote.core.matrix import LabelMatrix
 from mediaeval_util.repere import align_st_ref, drange
-from sklearn.externals import joblib
 import numpy as np
 
 if __name__ == '__main__':
@@ -21,16 +20,16 @@ if __name__ == '__main__':
 
     for videoID in open(args['<video_list>']).read().splitlines():
 
-        st_to_ref = align_st_ref(args['<st_seg>'], args['<reference_speaker>'], videoID)
+        st_to_ref = align_st_ref(args['<st_seg>']+'/'+videoID+'.MESeg', args['<reference_speaker>'], videoID)
 
-        for line in open(args['<matrix_path>']+'/'+videoID+'.mat').read().splitlines():
-            st1, st2, proba = line.split(' ')
-            if st1 in st_to_ref and st2 in st_to_ref:
-                proba = float(proba)
-                if st_to_ref[st1] == st_to_ref[st2]:
-                    l_true.append(proba)
+        m = LabelMatrix.load(args['<matrix_path>']+'/'+videoID+'.mat')
+        # compute score between speech turn and save it
+        for s1, t1 in m.get_rows():
+            for s2, t2 in m.get_columns():
+                if t1 in st_to_ref and t2 in st_to_ref and st_to_ref[t1] == st_to_ref[t2]:
+                    l_true.append(m[(s1,t1), (s2,t2)])
                 else:
-                    l_false.append(proba)
+                    l_false.append(m[(s1,t1), (s2,t2)])
 
     print len(l_false), len(l_true)
 
