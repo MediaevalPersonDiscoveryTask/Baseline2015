@@ -9,7 +9,7 @@ Usage:
 from docopt import docopt
 from pyannote.algorithms.tagging import ArgMaxDirectTagger
 from pyannote.parser import MDTMParser
-from mediaeval_util.repere import IDXHack, align_st_ref, read_ref_facetrack_position, align_facetrack_ref
+from mediaeval_util.repere import IDXHack, MESegParser, align_st_ref, read_ref_facetrack_position, align_facetrack_ref
 from sklearn.externals import joblib
 import numpy as np
 import copy
