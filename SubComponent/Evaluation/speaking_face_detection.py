@@ -2,7 +2,7 @@
 Evaluation of the speaking face detection
 
 Usage:
-  proba_mat_speechTurn.py <video_list> <matrix_speaking_face> <face_tracking> <reference_head_position_path> <st_seg> <speaker_ref> <idx_path> <shotSegmentation>
+  proba_mat_speechTurn.py <video_list> <matrix_speaking_face> <face_tracking> <reference_head_position> <st_seg> <speaker_ref> <idx_path> <shotSegmentation>
   proba_mat_speechTurn.py -h | --help
 """
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
             for frameID in range(int(startFrame), int(endFrame)+1):
                 frames_to_process.append(frameID)
                 
-        ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position_path>']+'/'+videoID+'.position', 0)
+        ref_f_tmp = read_ref_facetrack_position(args['<reference_head_position>'], videoID, 0)
         ref_f = copy.deepcopy(ref_f_tmp)
         for frameID in ref_f_tmp:
             if frameID not in frames_to_process:
