@@ -7,7 +7,7 @@ Usage:
 """
 
 from docopt import docopt
-from mediaeval_util.repere import IDXHack
+from mediaeval_util.repere import IDXHack, MESegParser
 from sklearn.externals import joblib
 import numpy as np
 
