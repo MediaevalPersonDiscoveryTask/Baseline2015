@@ -2,7 +2,7 @@
 compute probability that a facetrack is speaking
 
 Usage:
-  proba_speaking_face.py <videoID> <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection>
+  proba_speaking_face.py <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection>
   proba_speaking_face.py -h | --help
 """
 
