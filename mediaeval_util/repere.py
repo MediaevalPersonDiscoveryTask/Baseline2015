@@ -32,8 +32,8 @@ def MESegParser(f, video):
     timeToFrameID = {}
     for line in open(f):
         v, startTime, endTime, startFrame, endFrame, t, l, conf = line[:-1].split(' ')
-        
         if v == video:
+            s = Segment(start=float(startTime), end=float(endTime))
             anno[Segment(start=float(startTime), end=float(endTime)), int(t)] = l
             if startFrame != 'na' : timeToFrameID[float(startTime)] = int(startFrame)
             if endFrame != 'na' : timeToFrameID[float(endTime)] = int(endFrame)
@@ -77,21 +77,17 @@ def cooc(seg1, seg2):
         return 0.0    
     return end-start
 
-def align_st_ref(seg_st_path, ref_path, videoID):
+def align_st_ref(fhyp, fref, videoID):
     st_vs_ref = {}
-    ref = parser_atseg(ref_path+'/'+videoID+'.atseg', videoID)
-    seg_st = MDTMParser().read(seg_st_path+'/'+videoID+'.mdtm')(uri=videoID, modality="speaker")
+    seg_st, confs, timeToFrameID = MESegParser(fhyp, videoID)
+    ref, confs, timeToFrameID = MESegParser(fref, videoID)
 
     direct = ArgMaxDirectTagger()
     named_st = direct(ref, seg_st)
 
-    track_to_st = {}
-    for s, t, l in seg_st.itertracks(label=True):
-        track_to_st[t] = l
-
     for s, t, name in named_st.itertracks(label=True):
         if 'st_' not in name:
-            st_vs_ref[track_to_st[t]] = name
+            st_vs_ref[t] = name
     return st_vs_ref
 
 def read_ref_facetrack_position(f, videoID, tempo_margin):
