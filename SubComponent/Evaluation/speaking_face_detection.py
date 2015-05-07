@@ -53,9 +53,10 @@ if __name__ == '__main__':
             st_seg.append([float(start), float(start)+float(dur), st])
 
         ref_spk = []
-        for line in open(args['<speaker_ref>']+videoID+'.atseg').read().splitlines():
-            v, startTime, endTime, spkName = line.split(' ') 
-            ref_spk.append([float(startTime), float(endTime), spkName])
+        for line in open(args['<speaker_ref>']+videoID+'.MESeg').read().splitlines():
+            v, startTime, endTime, startFrame, endFrame, t, l, conf = line.split(' ')
+            if v == videoID:
+                ref_spk.append([float(startTime), float(endTime), spkName])
 
         frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
 
