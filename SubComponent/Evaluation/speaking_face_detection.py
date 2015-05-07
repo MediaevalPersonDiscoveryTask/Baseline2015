@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
-        facetrack, confs, timeToFrameID = MESegParser(args['<facetrack>'], videoID)
+        facetrack, confs, timeToFrameID = MESegParser(args['<facetrack>']+videoID+'.MESeg', videoID)
         faceID_to_trackID_face = {}
         trackID_face_to_faceID = {}
         for s, trackID, faceID in facetrack.itertracks(label=True):
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
         st_to_ref = align_st_ref(args['<st_seg>']+'/'+videoID+'.MESeg', args['<speaker_ref>'], videoID)
 
-        st, confs, timeToFrameID = MESegParser(args['<st_seg>'], videoID)
+        st, confs, timeToFrameID = MESegParser(args['<st_seg>']+videoID+'.MESeg', videoID)
         st_to_trackID_st = {}
         trackID_st_to_st = {}
         for s, trackID, st in st.itertracks(label=True):
