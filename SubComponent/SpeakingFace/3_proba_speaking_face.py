@@ -30,7 +30,7 @@ if __name__ == '__main__':
     visual_desc = {}
     for line in open(args['<SpeakingFaceDescriptor>']):
         l = line[:-1].split(' ')
-        trackID_face = faceID_to_TrackID[int(l[1])]
+        trackID_face = faceID_to_TrackID[l[1]]
         timestamp = frame2time(int(l[0]), 0.0)        
         for s, trackID_st, st in st_seg.itertracks(label=True):
             if timestamp >= s.start and timestamp <= s.end:
