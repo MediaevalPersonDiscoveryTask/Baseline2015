@@ -21,7 +21,7 @@ if __name__ == '__main__':
     nb_hyp_speakingFace = 0.0
     correct_speakingFace = 0.0
 
-    thr_proba = 0.6
+    thr_proba = 0.7
 
     for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
