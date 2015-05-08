@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     evidences = {}
     for videoID in open(args['<video_list>']).read().splitlines():
-        shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
+        shots = ShotSegParser(args['<shot_seg>'], videoID)
         ON, confs, timeToFrameID = MESegParser(args['<writtenNames>'], videoID)
         for sON, tON, name in ON.itertracks(label=True):
             name = name.lower().replace('-', '_').replace('.', '_')
