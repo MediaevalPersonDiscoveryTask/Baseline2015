@@ -80,7 +80,11 @@ if __name__ == '__main__':
                 ref_spk.append([float(startTime), float(endTime), l])
 
         frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
+
+        print speaking_frame
+
         for frameID in ref_f:
+            print frameID
             timestamp =  frame2time(frameID, 0.0)
 
             l_speaking_face = []
@@ -102,7 +106,8 @@ if __name__ == '__main__':
                             
             #print
 
-
+    print nb_ref_speakingFace
+    print nb_hyp_speakingFace
     print 'precision:', round(correct_speakingFace/nb_hyp_speakingFace,3)*100, '%    ',
     print 'recall:',    round(correct_speakingFace/nb_ref_speakingFace,3)*100, '%    '
 
