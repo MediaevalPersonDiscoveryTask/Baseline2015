@@ -64,6 +64,8 @@ if __name__ == '__main__':
             st_to_trackID_st[st] = trackID
             trackID_st_to_st[trackID] = st
 
+        print l_ft
+
         speaking_frame = {}
         for line in open(args['<matrix_speaking_face>']+videoID+'.mat').read().splitlines():
             trackID_st, trackID_face, proba = line.split(' ')
@@ -85,7 +87,6 @@ if __name__ == '__main__':
         print speaking_frame
 
         for frameID in ref_f:
-            print frameID
             timestamp =  frame2time(frameID, 0.0)
 
             l_speaking_face = []
