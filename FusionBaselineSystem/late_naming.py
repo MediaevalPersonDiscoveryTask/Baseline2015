@@ -67,7 +67,7 @@ if __name__ == "__main__":
         trackID_face_to_name = {}
         for s, t, name in NamedSpk.itertracks(label=True):
             if dic_trackID_st_to_speakingFace[t][0] != '': 
-                trackID_face_to_name[dic_trackID_st_to_speakingFace[st][0]] = name
+                trackID_face_to_name[dic_trackID_st_to_speakingFace[t][0]] = name
 
         namedFaces = Annotation(uri=videoID)
         for s, t, faceID in faces.itertracks(label=True):
