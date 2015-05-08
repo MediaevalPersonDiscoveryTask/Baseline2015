@@ -57,10 +57,10 @@ if __name__ == '__main__':
 
         st_to_ref = align_st_ref(args['<st_seg>']+'/'+videoID+'.MESeg', args['<speaker_ref>'], videoID)
 
-        st, confs, timeToFrameID = MESegParser(args['<st_seg>']+videoID+'.MESeg', videoID)
+        st_seg, confs, timeToFrameID = MESegParser(args['<st_seg>']+videoID+'.MESeg', videoID)
         st_to_trackID_st = {}
         trackID_st_to_st = {}
-        for s, trackID, st in st.itertracks(label=True):
+        for s, trackID, st in st_seg.itertracks(label=True):
             st_to_trackID_st[st] = trackID
             trackID_st_to_st[trackID] = st
 
@@ -91,7 +91,7 @@ if __name__ == '__main__':
                             nb_ref_speakingFace+=1
                             l_speaking_face.append(spkName)
 
-            for s, trackID, st in st.itertracks(label=True):
+            for s, trackID, st in st_seg.itertracks(label=True):
                 if timestamp >= s.start and timestamp <= s.end:
                     if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
                         nb_hyp_speakingFace+=1
