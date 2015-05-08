@@ -21,6 +21,8 @@ if __name__ == '__main__':
     nb_hyp_speakingFace = 0.0
     correct_speakingFace = 0.0
 
+    thr_proba = 0.6
+
     for videoID in open(args['<video_list>']).read().splitlines():
         print videoID
         frames_to_process = []
@@ -95,7 +97,7 @@ if __name__ == '__main__':
 
             for s, trackID, st in st_seg.itertracks(label=True):
                 if timestamp >= s.start and timestamp <= s.end:
-                    if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
+                    if st in speaking_frame and speaking_frame[st][0] >= thr_proba :
                         nb_hyp_speakingFace+=1
                         faceIDSpeaking = int(speaking_frame[st][1])
                         if faceIDSpeaking in facetrack_vs_ref :
