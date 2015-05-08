@@ -33,7 +33,6 @@ if __name__ == "__main__":
     l_p_in_label = set([])
     for videoID in open(args['<video_list>']).read().splitlines():
         # read segmentation file
-
         sd, confs, timeToFrameID = MESegParser(args['<spk_dia>']+'/'+videoID+'.MESeg', videoID)
         faces, confs, timeToFrameID = MESegParser(args['<face_seg>']+'/'+videoID+'.MESeg', videoID)
         ON, confs, timeToFrameID = MESegParser(args['<writtenNames>'], videoID)
@@ -47,31 +46,32 @@ if __name__ == "__main__":
         l_to_remove = []
 
         for s, t, name in NamedSpk.itertracks(label=True):
-            if 'st_' in name: l_to_remove.append([s, t])
-        for s, t in l_to_remove: del NamedSpk[s, t]
+            if 'c_' in name: l_to_remove.append([s, t])
+        for s, t in l_to_remove: 
+            del NamedSpk[s, t]
 
+        
         # propagate speakers identity to best speakingFace
-        dic_trackID_to_st = {}
-        dic_st_to_speakingFace = {}
-        for s, t, st in st.itertracks(label=True):
-            dic_trackID_to_st[t] = st
-            dic_st_to_speakingFace[st] = ['', 0.0]
-
         thr_propagation = float(args['--thr_propagation'])
+
+        dic_trackID_st_to_speakingFace = {}
+        for s, t, st in sd.itertracks(label=True):
+            dic_trackID_st_to_speakingFace[t] = ['', thr_propagation]
+        
         for line in open(args['<mat_speaking_face>']+'/'+videoID+'.mat').read().splitlines():
             TrackID_st, TrackID_Face, proba = line.split(' ')
-            proba = float(proba)
-            if proba >= thr_propagation and proba > dic_st_to_speakingFace[TrackID_st][1]: 
-                dic_st_to_speakingFace[TrackID_st] = [TrackID_Face, proba]
+            if float(proba) > dic_trackID_st_to_speakingFace[int(TrackID_st)][1]: 
+                dic_trackID_st_to_speakingFace[int(TrackID_st)] = [int(TrackID_Face), float(proba)]
 
-        faceID_to_name = {}
+        trackID_face_to_name = {}
         for s, t, name in NamedSpk.itertracks(label=True):
-            st = dic_trackID_to_st[t]
-            if dic_st_to_speakingFace[t][0] != '': faceID_to_name[dic_st_to_speakingFace[st][0]] = name
+            if dic_st_to_speakingFace[t][0] != '': 
+                trackID_face_to_name[dic_st_to_speakingFace[st][0]] = name
 
         namedFaces = Annotation(uri=videoID)
         for s, t, faceID in faces.itertracks(label=True):
-            if faceID in faceID_to_name: namedFaces[s, t] = faceID_to_name[faceID]
+            if t in faceID_to_name: 
+                namedFaces[s, t] = trackID_face_to_name[t]
 
         # write person visible and speaking in a shot:
         for sshot, tshot, shot in shots.itertracks(label=True):
