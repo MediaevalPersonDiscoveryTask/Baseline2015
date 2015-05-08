@@ -20,7 +20,7 @@ if __name__ == "__main__":
     evidences = {}
     for videoID in open(args['<video_list>']).read().splitlines():
         shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
-        ON = REPEREParser().read(args['<writtenNames>'])(uri=videoID, modality = 'written')
+        ON, confs, timeToFrameID = MESegParser(args['<writtenNames>'], videoID)
         for sON, tON, name in ON.itertracks(label=True):
             name = name.lower().replace('-', '_').replace('.', '_')
             for sshot, tshot, shot in shots.itertracks(label=True):
@@ -61,7 +61,8 @@ if __name__ == "__main__":
         for line in open(args['<mat_speaking_face>']+'/'+videoID+'.mat').read().splitlines():
             TrackID_st, TrackID_Face, proba = line.split(' ')
             proba = float(proba)
-            if proba >= thr_propagation and proba > dic_st_to_speakingFace[TrackID_st][1]: dic_st_to_speakingFace[TrackID_Face] = [TrackID_Face, proba]
+            if proba >= thr_propagation and proba > dic_st_to_speakingFace[TrackID_st][1]: 
+                dic_st_to_speakingFace[TrackID_st] = [TrackID_Face, proba]
 
         faceID_to_name = {}
         for s, t, name in NamedSpk.itertracks(label=True):
