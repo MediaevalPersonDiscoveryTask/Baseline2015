@@ -37,7 +37,7 @@ if __name__ == "__main__":
         sd, confs, timeToFrameID = MESegParser(args['<spk_dia>'], videoID)
         faces, confs, timeToFrameID = MESegParser(args['<face_seg>'], videoID)
         ON, confs, timeToFrameID = MESegParser(args['<written>'], videoID)
-        shots = ShotSegParser(args['<shot_seg>']+'/'+videoID+'.shot', videoID)
+        shots = ShotSegParser(args['<shot_seg>'], videoID)
 
         # name speakers
         direct = ConservativeDirectTagger()
