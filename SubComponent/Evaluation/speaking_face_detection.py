@@ -97,15 +97,16 @@ if __name__ == '__main__':
                 if timestamp >= s.start and timestamp <= s.end:
                     if st in speaking_frame and speaking_frame[st][0] >= 0.5 :
                         nb_hyp_speakingFace+=1
-                        faceIDSpeaking = speaking_frame[st][1]
+                        faceIDSpeaking = int(speaking_frame[st][1])
                         if faceIDSpeaking in facetrack_vs_ref :
                             if facetrack_vs_ref[faceIDSpeaking] in l_speaking_face:
                                 correct_speakingFace+=1
                             
             #print
 
-        print nb_ref_speakingFace
-        print nb_hyp_speakingFace
+        print nb_ref_speakingFace,
+        print nb_hyp_speakingFace,
+        print correct_speakingFace,
         print 'precision:', round(correct_speakingFace/nb_hyp_speakingFace,3)*100, '%    ',
         print 'recall:',    round(correct_speakingFace/nb_ref_speakingFace,3)*100, '%    '
 
