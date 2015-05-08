@@ -34,8 +34,8 @@ if __name__ == "__main__":
     for videoID in open(args['<video_list>']).read().splitlines():
         # read segmentation file
 
-        sd, confs, timeToFrameID = MESegParser(args['<spk_dia>'], videoID)
-        faces, confs, timeToFrameID = MESegParser(args['<face_seg>'], videoID)
+        sd, confs, timeToFrameID = MESegParser(args['<spk_dia>']+'/'+videoID+'.MESeg', videoID)
+        faces, confs, timeToFrameID = MESegParser(args['<face_seg>']+'/'+videoID+'.MESeg', videoID)
         ON, confs, timeToFrameID = MESegParser(args['<written>'], videoID)
         shots = ShotSegParser(args['<shot_seg>'], videoID)
 
