@@ -32,6 +32,7 @@ if __name__ == "__main__":
     fout_label = open(args['<output_label>'], 'w')
     l_p_in_label = set([])
     for videoID in open(args['<video_list>']).read().splitlines():
+        print videoID
         # read segmentation file
         sd, confs, timeToFrameID = MESegParser(args['<spk_dia>']+'/'+videoID+'.MESeg', videoID)
         faces, confs, timeToFrameID = MESegParser(args['<face_seg>']+'/'+videoID+'.MESeg', videoID)
@@ -65,8 +66,8 @@ if __name__ == "__main__":
 
         trackID_face_to_name = {}
         for s, t, name in NamedSpk.itertracks(label=True):
-            if dic_st_to_speakingFace[t][0] != '': 
-                trackID_face_to_name[dic_st_to_speakingFace[st][0]] = name
+            if dic_trackID_st_to_speakingFace[t][0] != '': 
+                trackID_face_to_name[dic_trackID_st_to_speakingFace[st][0]] = name
 
         namedFaces = Annotation(uri=videoID)
         for s, t, faceID in faces.itertracks(label=True):
