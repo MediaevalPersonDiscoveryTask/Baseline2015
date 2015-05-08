@@ -22,7 +22,7 @@ if __name__ == '__main__':
     correct_speakingFace = 0.0
 
     for videoID in open(args['<video_list>']).read().splitlines():
-
+        print videoID
         frames_to_process = []
         for line in open(args['<shotSegmentation>']).read().splitlines():
             v, shot, startTime, endTime, startFrame, endFrame = line.split(' ') 
@@ -64,14 +64,10 @@ if __name__ == '__main__':
             st_to_trackID_st[st] = trackID
             trackID_st_to_st[trackID] = st
 
-        print l_ft
-
         speaking_frame = {}
         for line in open(args['<matrix_speaking_face>']+videoID+'.mat').read().splitlines():
             trackID_st, trackID_face, proba = line.split(' ')
-            print trackID_face_to_faceID[int(trackID_face)]
             if int(trackID_face_to_faceID[int(trackID_face)]) in l_ft:
-                print '   ici', proba 
                 proba = float(proba)
                 speaking_frame.setdefault(trackID_st_to_st[int(trackID_st)], [proba, trackID_face_to_faceID[int(trackID_face)]])
                 if proba > speaking_frame[trackID_st_to_st[int(trackID_st)]][0]:
@@ -85,7 +81,6 @@ if __name__ == '__main__':
 
         frame2time = IDXHack(args['<idx_path>']+videoID+'.MPG.idx')
 
-        print speaking_frame
 
         for frameID in ref_f:
             timestamp =  frame2time(frameID, 0.0)
