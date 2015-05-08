@@ -71,6 +71,7 @@ if __name__ == '__main__':
             trackID_st, trackID_face, proba = line.split(' ')
             print trackID_face_to_faceID[int(trackID_face)]
             if trackID_face_to_faceID[int(trackID_face)] in l_ft:
+                print '   ici', proba 
                 proba = float(proba)
                 speaking_frame.setdefault(trackID_st_to_st[int(trackID_st)], [proba, trackID_face_to_faceID[int(trackID_face)]])
                 if proba > speaking_frame[trackID_st_to_st[int(trackID_st)]][0]:
