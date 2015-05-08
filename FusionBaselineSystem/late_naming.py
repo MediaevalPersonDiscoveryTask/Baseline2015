@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
         namedFaces = Annotation(uri=videoID)
         for s, t, faceID in faces.itertracks(label=True):
-            if t in faceID_to_name: 
+            if t in trackID_face_to_name: 
                 namedFaces[s, t] = trackID_face_to_name[t]
 
         # write person visible and speaking in a shot:
