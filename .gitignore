@@ -1,6 +1,4 @@
 
 *.pyc
 
-SubComponent/3_Face/3_extract_flandmark/build/*
-
-SubComponent/Face/3_extract_flandmark/build/face_landmarks_detection
+SubComponent/Face/6_extract_flandmark/build/*
