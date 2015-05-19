@@ -2,12 +2,14 @@
 Compute head versus head distance
 
 Usage:
-  compute_hvh_matrix.py <faceTrackDescriptor> <l2Matrix>
+  compute_hvh_matrix.py <faceTrackDescriptor> <l2Matrix> <faceTrackSegmentation>
   compute_hvh_matrix.py -h | --help
 """
 
 from docopt import docopt
 import numpy as np
+from scipy import spatial
+import pickle
 
 def sqdist(desc1, desc2):
 	dist = 0.0
@@ -20,22 +22,32 @@ if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
 
+    # read face track segmentation
+    l_faceID = []
+    for line in open(args['<faceTrackSegmentation>']).read().splitlines():
+        v, startTime, endTime, startFrame, endFrame, trackID, faceID, conf = line[:-1].split(' ')
+        l_faceID.append(int(faceID))
+    l_faceID = sorted(l_faceID)
+
     # read face track descriptors
     dic = {}
     for line in open(args['<faceTrackDescriptor>']).read().splitlines():
         l = line.split(' ')
-        dic[int(l[0])] = [int(l[1]), float(l[2]), np.array(l[3:], dtype='|S20').astype(np.float)]
+        dic[int(l[0])] = np.array(l[3:], dtype='|S20').astype(np.float)
+
+    # initialize matrix
+    N = len(l_faceID)
+    X = np.zeros((N, N))
+    X[:] = np.nan
 
     # compute and save distance between face tracks
-    fout = open(args['<l2Matrix>'], 'w')
-    for h1 in sorted(dic):
-        for h2 in sorted(dic):
-            if h1 < h2:
-                fout.write(str(h1)+' '+str(h2))
-                fout.write(' '+str(dic[h1][0])+' '+str(dic[h2][0]))             # number of HoG extracted
-                fout.write(' '+str(dic[h1][1])+' '+str(dic[h2][1]))             # mean distance of the central desccriptor to other descriptors
-                fout.write(' '+str(round(sqdist(dic[h1][2], dic[h2][2]), 2)))   # l2 distance between descriptors
-                fout.write('\n')
-    fout.close()
-                    
+    for i in range(N):
+        for j in range(i+1, N):
+            if l_faceID[i] in dic and l_faceID[j] in dic:
+                X[i][j] = sqdist(dic[l_faceID[i]], dic[l_faceID[j]])
+
+    y = spatial.distance.squareform(X, checks=False)
+    y = y.astype(np.float16)
+    pickle.dump(y, open(args['<l2Matrix>'], "wb" ))
+
                 

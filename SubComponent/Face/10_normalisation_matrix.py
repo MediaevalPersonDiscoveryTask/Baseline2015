@@ -8,6 +8,8 @@ Usage:
 
 from docopt import docopt
 from sklearn.externals import joblib
+import pickle
+import numpy as np
 
 if __name__ == '__main__':
     args = docopt(__doc__)
@@ -16,8 +18,12 @@ if __name__ == '__main__':
     clas = joblib.load(args['<modell2ToProba>']) 
 
     # compute score between speech turn and save it
-    fout = open(args['<probaMatrix>'], 'w')
-    for line in open(args['<l2Matrix>']).read().splitlines():
-        ft1, ft2, nbHoGFaceID1, nbHoGFaceID2, distCenterFaceID1, distCenterFaceID2, l2Distance = line.split(' ')
-        fout.write(ft1+' '+ft2+' '+str(clas.predict_proba([[float(l2Distance)]])[0][1])+'\n')
-    fout.close()
+    y = pickle.load(open(args['<l2Matrix>'], "rb" ) )
+
+    for i in range(len(y)):
+        y[i] = clas.predict_proba([[y[i]]])[0][1]
+    y = y.astype(np.float16)
+
+    # save matrix
+    pickle.dump(y, open(args['<probaMatrix>'], "wb" ))
+
