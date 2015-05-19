@@ -21,7 +21,10 @@ if __name__ == '__main__':
     y = pickle.load(open(args['<l2Matrix>'], "rb" ) )
 
     for i in range(len(y)):
-        y[i] = clas.predict_proba([[y[i]]])[0][1]
+        if not np.isnan(y[i]):
+            y[i] = clas.predict_proba([[y[i]]])[0][1]
+        else:
+            y[i] = 0.0
     y = y.astype(np.float16)
 
     # save matrix
