@@ -2,58 +2,52 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  8_diarization.py <videoID> <faceTrackSegmentation> <probaMatrix> <diarization> [--threshold=<t>]
-  8_diarization.py -h | --help
+  11_diarization.py <videoID> <faceTrackSegmentation> <probaMatrix> <diarization> [--threshold=<t>]
+  11_diarization.py -h | --help
 Options:
   --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
 """
 
 from docopt import docopt
-from pyannote.parser import MDTMParser
+from mediaeval_util.repere import MESegParser, MESegWriter
 import numpy as np
+import pickle
 from scipy import spatial, cluster
+
+def f(x):
+    return 1.0-x
 
 if __name__ == '__main__':
     # read arguments
     args = docopt(__doc__)
 
-    faceID_to_indice = {}
-    indice_to_face = {}
-    face_seg = {}
-    i=0
-    for line in open(args['<faceTrackSegmentation>']).read().splitlines():
-        faceID, startTime, endTime, startFrame, endFrame = line.split(' ')        
-        faceID_to_indice[faceID] = i
-        indice_to_face[i] = faceID
-        face_seg[i] = [startTime, endTime]
-        i+=1
+    # read face segmentation
+    l_faceID = []
+    face_seg, confs, timeToFrameID = MESegParser(args['<faceTrackSegmentation>'], args['<videoID>'])
+    for s, t, l in face_seg.itertracks(label=True):
+        l_faceID.append(int(l))
+    l_faceID.sort()
 
     # read matrix
-    N = len(faceID_to_indice)
-    X = np.zeros((N, N))
-    for line in open(args['<probaMatrix>']).read().splitlines():
-        ft1, ft2, proba = line.split(' ')
-        dist = 1.0-float(proba)
-        X[faceID_to_indice[ft1]][faceID_to_indice[ft2]] = dist
-        X[faceID_to_indice[ft2]][faceID_to_indice[ft1]] = dist
+    y = pickle.load(open(args['<probaMatrix>'], "rb" ) )
+    f = np.vectorize(f)  # or use a different name if you want to keep the original f
+    y = f(y)
 
-    # compute diarization
-    y = spatial.distance.squareform(X, checks=False)
+    # compute clustering
     Z = cluster.hierarchy.average(y)
-    clusters = cluster.hierarchy.fcluster(Z, 1.0-float(args['--threshold']), criterion='distance')
+    clusters = cluster.hierarchy.fcluster(Z, f(float(args['--threshold'])), criterion='distance')
 
-    # compute cluster name
-    clusName = {}
-    for i in sorted(indice_to_face):
-        clusID = clusters[i]
-        if clusID not in clusName:
-            clusName[clusID] = indice_to_face[i]
-        else:
-            clusName[clusID] += ";"+indice_to_face[i]
+    # find correspondance between faceID and clusterID
+    faceID_cluster = {}
+    for i in range(len(clusters)):
+        faceID_cluster[l_faceID[i]] = clusters[i]
+    
+    # rename facetrack by clusterID
+    for s, t, l in face_seg.itertracks(label=True):
+        face_seg[s, t] = 'c_'+str(faceID_cluster[int(l)])
 
     # save clustering
-    fout = open(args['<diarization>'], 'w')
-    for i in sorted(face_seg):
-        startTime, endTime = face_seg[i]
-        fout.write(args['<videoID>']+' 1 '+str(startTime)+' '+str(endTime)+' head na na '+str(clusName[clusters[i]])+'\n')
-    fout.close()
+    MESegWriter(face_seg, {}, args['<diarization>'], args['<videoID>'], {})
+    
+
+
