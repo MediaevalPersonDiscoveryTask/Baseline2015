@@ -8,7 +8,7 @@ Options:
   --shotSegmentation=<ss>   shot to process
   --scaleFactor=<sf>        scaleFactor value (>1.0) [default: 1.1]
   --minNeighbors=<mn>       minNeighbors value (>1) [default: 4]
-  --minSize=<min>           min size of a face (>1) [default: 50]
+  --minSize=<min>           min size of a face in proportion of the video height [default: 0.0868]
 """
 
 from docopt import docopt
@@ -19,13 +19,15 @@ if __name__ == '__main__':
     # read args
     args = docopt(__doc__)
     videoID = args['<videoID>']
-    minsize = (int(args['--minSize']), int(args['--minSize']))
+
+    capture = cv.CaptureFromFile(args['<videoFile>'])
+    minSize = int(round(float(args['--minSize']) * cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_HEIGHT),0))
+    minSize = (minSize, minSize)
     # storage for face detected  
     storage = cv.CreateMemStorage()
     # load cascade file
     cascade = cv.Load(args['<haarcascade>'])
     # read video
-    capture = cv.CaptureFromFile(args['<videoFile>'])
     # Read shot segmentation
     frames_to_process = []
     if args['--shotSegmentation']:        
@@ -46,6 +48,6 @@ if __name__ == '__main__':
         frame = cv.QueryFrame(capture)
         c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))
         if frame and c_frame in frames_to_process:
-            detected = cv.HaarDetectObjects(frame, cascade, storage, float(args['--scaleFactor']), int(args['--minNeighbors']), cv.CV_HAAR_DO_CANNY_PRUNING, minsize)
+            detected = cv.HaarDetectObjects(frame, cascade, storage, float(args['--scaleFactor']), int(args['--minNeighbors']), cv.CV_HAAR_DO_CANNY_PRUNING, minSize)
             for (x,y,w,h),n in detected: fout.write(str(int(c_frame))+' '+str(x)+' '+str(y)+' '+str(w)+' '+str(h)+' '+str(n)+'\n')
     fout.close()
