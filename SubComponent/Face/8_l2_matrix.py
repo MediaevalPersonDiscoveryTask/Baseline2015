@@ -2,8 +2,8 @@
 Compute head versus head distance
 
 Usage:
-  compute_hvh_matrix.py <faceTrackDescriptor> <l2Matrix> <faceTrackSegmentation>
-  compute_hvh_matrix.py -h | --help
+  l2_matrix.py <faceTrackDescriptor> <l2Matrix> <faceTrackSegmentation>
+  l2_matrix.py -h | --help
 """
 
 from docopt import docopt
