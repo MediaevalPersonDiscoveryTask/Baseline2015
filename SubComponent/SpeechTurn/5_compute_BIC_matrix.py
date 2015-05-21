@@ -19,7 +19,6 @@ if __name__ == '__main__':
     # read segmentation
     st_seg, confs, timeToFrameID = MESegParser(args['<linearClustering>'], args['<videoID>'])
 
-    print st_seg
     # extract descriptor
     extractor = YaafeMFCC(e=True, coefs=12, De=False, DDe=False, D=False, DD=False)
     audio_features = extractor(args['<audioFile>'])
