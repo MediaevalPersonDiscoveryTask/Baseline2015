@@ -1,9 +1,9 @@
 """
-compute probability that a facetrack is speaking
+Select facetrack
 
 Usage:
-  proba_speaking_face.py <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection> [--thr=<t>]
-  proba_speaking_face.py -h | --help
+  selection_facetrack.py <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection> [--thr=<t>]
+  selection_facetrack.py -h | --help
 Options:
   --thr=<t>     threshold on score [default: 0.4]  
 """
