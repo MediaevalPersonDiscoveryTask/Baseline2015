@@ -41,7 +41,7 @@ if __name__ == '__main__':
     last_frame_to_process = max(frames_to_process)
     # save face detection
     c_frame = 0 
-    fout = open(args['<faceDetection>']+'/'+videoID+'.face', 'w')
+    fout = open(args['<faceDetection>'], 'w')
     while (c_frame<last_frame_to_process):
         frame = cv.QueryFrame(capture)
         c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))
