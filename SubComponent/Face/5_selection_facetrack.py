@@ -2,10 +2,11 @@
 Select facetrack
 
 Usage:
-  selection_facetrack.py <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection> [--thr=<t>]
+  selection_facetrack.py <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection> [--thr=<t>] [--minDuration=<md>]
   selection_facetrack.py -h | --help
 Options:
-  --thr=<t>     threshold on score [default: 0.4]  
+  --thr=<t>           threshold on score [default: 0.4] 
+  --minDuration=<md>  minimum duration of a facetrack in second [default: 0.2] 
 """
 
 from docopt import docopt
@@ -18,11 +19,17 @@ if __name__ == '__main__':
     # load classifier model
     clf = joblib.load(args['<modelFaceSelection>']) 
     thr = float(args['--thr'])
-    desc = {}
+    minDuration = float(args['--minDuration'])
+
+    facetrack_duration = {}
+    for line in open(args['<rawfacetracks>']).read().splitlines():
+        v, startTime, endTime, startFrame, endFrame, trackID, faceID, conf = line.split(' ')
+        facetrack_duration[faceID] = float(endTime)-float(startTime)
+
     l_faceID_to_save = []
     for line in open(args['<descFaceSelection>']):
         l = line[:-1].split(' ')
-        if clf.predict_proba([map(float, l[1:])])[0][1] > thr:
+        if clf.predict_proba([map(float, l[1:])])[0][1] > thr and facetrack_duration[l[0]] >= minDuration:
             l_faceID_to_save.append(l[0])
 
     fout = open(args['<facetrackPosition>'], 'w')
