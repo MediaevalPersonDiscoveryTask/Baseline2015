@@ -43,15 +43,8 @@ if __name__ == "__main__":
         direct = ConservativeDirectTagger()
         one_to_one = HungarianTagger()
         NamedSpk = direct(ON, one_to_one(ON, sd))
-        NamedSpk.get_labels
-        l_to_remove = []
+        NamedSpk = NamedSpk.subset(ON.labels())
 
-        for s, t, name in NamedSpk.itertracks(label=True):
-            if 'c_' in name: l_to_remove.append([s, t])
-        for s, t in l_to_remove: 
-            del NamedSpk[s, t]
-
-        
         # propagate speakers identity to best speakingFace
         thr_propagation = float(args['--thr_propagation'])
 
