@@ -2,7 +2,7 @@
 Extract descriptor to find speaking face
 
 Usage:
-  extract_desc_speaking_face.py <videoID> <rawfacetrackPosition> <rawfacetracks> <descFaceSelection> [--videoWidth=<vw>] 
+  extract_desc_speaking_face.py <videoID> <rawFaceTrackPosition> <rawFaceTrackSegmentation> <descFaceSelection> [--videoWidth=<vw>] 
   extract_desc_speaking_face.py -h | --help
 Options:
   --videoWidth=<of>   width of the video [default: 1024]
@@ -21,9 +21,9 @@ if __name__ == "__main__":
     args = docopt(__doc__)
 
     video_w_center = float(args['--videoWidth'])/2
-    face_seg, confs, timeToFrameID = MESegParser(args['<rawfacetracks>'], args['<videoID>'])
+    face_seg, confs, timeToFrameID = MESegParser(args['<rawFaceTrackSegmentation>'], args['<videoID>'])
     pos = {}
-    for line in open(args['<rawfacetrackPosition>']):
+    for line in open(args['<rawFaceTrackPosition>']):
         frameID, faceID, x, y, w, h = line[:-1].split(' ')
         pos.setdefault(faceID, {})
         pos[faceID][int(frameID)] = map(float, [x, y, w, h])

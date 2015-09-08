@@ -2,7 +2,7 @@
 Learn a classifier model to compute the probability that a facetrack is speaking
 
 Usage:
-  learn_model_proba_speaking_face.py <videoList> <faceTrackingPosition> <descFaceSelection> <facePositionReferencePath> <modelFaceSelection>
+  learn_model_proba_speaking_face.py <videoList> <faceTrackPosition> <descFaceSelection> <facePositionReferencePath> <modelFaceSelection>
   learn_model_proba_speaking_face.py -h | --help
 """
 
@@ -24,7 +24,7 @@ if __name__ == '__main__':
         ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>'], videoID, 3)
         facetracks = {}
         l_facetrack_used_to_learn_model = set([])
-        for line in open(args['<faceTrackingPosition>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTrackPosition>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h

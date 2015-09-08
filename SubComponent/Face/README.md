@@ -6,7 +6,7 @@
  - `videoFile`: video file in avi format
  - `faceDetection`: face detection (.face) [frameID xmin ymin width height number_of_neighbors]
  - `shotSegmentation`: list of shot to process with their segmentation (.shot)
- - `faceTracking`: face tracks position in each frame (.facetrack) [frameID xmin ymin width height]
+ - `faceTrackPosition`: face tracks position in each frame (.facetrack) [frameID xmin ymin width height]
  - `faceTrackSegmentation`: temporal face tracks segmentation (.seg) [faceID StartTime endTime startFrame endFrame]
  - `idx`: Indexes of the video files (.MPG.idx), to convert frame number of the video.avi read with opencv to timestamp [frameID typeFrame positionInTheVideo timestamp]
  - `flandmark`: facial landmark position (.flandmark) [frameID xmin yminn xmax ymax (x y)*8]
@@ -32,7 +32,7 @@ python 1_faceDetection.py `videoFile` `faceDetection` `haarcascade_frontalface_d
 
 ## face tracking
 
-python 2_face_tracking.py `videoFile` `shotSegmentation` `faceDetection` `faceTracking` `facetrackSegmentation` --idx=`idx`
+python 2_face_tracking.py `videoFile` `shotSegmentation` `faceDetection` `faceTrackPosition` `facetrackSegmentation` --idx=`idx`
 
 ## extract facial landmarks
 
@@ -42,7 +42,7 @@ cd build
 cmake ..
 make 
 
-./face_landmarks_detection `videoFile` `faceTracking` `flandmark` `flandmark_model.dat`
+./face_landmarks_detection `videoFile` `faceTrackPosition` `flandmark` `flandmark_model.dat`
 
 ## compute central HoG descriptor projected by LDML for each facetrack
 
@@ -54,7 +54,7 @@ python 5_compute_hvh_matrix.py `faceTrackDescriptor` `l2Matrix`
 
 ## Learn normalisation model
 
-python 6_learn_normalisation_model.py `video_list` `faceTracking`  `l2MatrixPath` `facePositionReferencePath` `modell2ToProba` 
+python 6_learn_normalisation_model.py `video_list` `faceTrackPosition`  `l2MatrixPath` `facePositionReferencePath` `modell2ToProba` 
 
 ## normalize l2 distance into probability
 

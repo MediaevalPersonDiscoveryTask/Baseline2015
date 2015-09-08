@@ -2,7 +2,7 @@
 Select facetrack
 
 Usage:
-  selection_facetrack.py <descFaceSelection> <rawfacetrackPosition> <rawfacetracks> <facetrackPosition> <facetracks> <modelFaceSelection> [--thr=<t>] [--minDuration=<md>]
+  selection_facetrack.py <descFaceSelection> <rawFaceTrackPosition> <rawFaceTrackSegmentation> <faceTrackPosition> <faceTrackSegmentation> <modelFaceSelection> [--thr=<t>] [--minDuration=<md>]
   selection_facetrack.py -h | --help
 Options:
   --thr=<t>           threshold on score [default: 0.4] 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     minDuration = float(args['--minDuration'])
 
     facetrack_duration = {}
-    for line in open(args['<rawfacetracks>']).read().splitlines():
+    for line in open(args['<rawFaceTrackSegmentation>']).read().splitlines():
         v, startTime, endTime, startFrame, endFrame, trackID, faceID, conf = line.split(' ')
         facetrack_duration[faceID] = float(endTime)-float(startTime)
 
@@ -32,14 +32,14 @@ if __name__ == '__main__':
         if clf.predict_proba([map(float, l[1:])])[0][1] > thr and facetrack_duration[l[0]] >= minDuration:
             l_faceID_to_save.append(l[0])
 
-    fout = open(args['<facetrackPosition>'], 'w')
-    for line in open(args['<rawfacetrackPosition>']):
+    fout = open(args['<faceTrackPosition>'], 'w')
+    for line in open(args['<rawFaceTrackPosition>']):
         if line.split(' ')[1] in l_faceID_to_save:
             fout.write(line)
     fout.close()
 
-    fout = open(args['<facetracks>'], 'w')
-    for line in open(args['<rawfacetracks>']):
+    fout = open(args['<faceTrackSegmentation>'], 'w')
+    for line in open(args['<rawFaceTrackSegmentation>']):
         if line.split(' ')[6] in l_faceID_to_save:
             fout.write(line)
     fout.close()

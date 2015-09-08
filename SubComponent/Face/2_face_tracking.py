@@ -2,7 +2,7 @@
 Face tracking based on the face detection and optical flow for miss detection
 
 Usage:
-  face_tracker.py <videoID> <videoFile> <shotSegmentation> <faceDetection> <faceTracking> <faceTrackSegmentation> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
+  face_tracker.py <videoID> <videoFile> <shotSegmentation> <faceDetection> <faceTrackPosition> <faceTrackSegmentation> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
   face_tracker.py -h | --help
 Options:
   --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     frames = {}
     frameToTimestamp = {}                                     # list of frame number in the current shot 
     seg_face = {}
-    fout_pos = open(args['<faceTracking>'], 'w')
+    fout_pos = open(args['<faceTrackPosition>'], 'w')
     while (frameID<last_frame_to_process):
         ret, frame = capture.read()                             # read the video
         frameID = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
