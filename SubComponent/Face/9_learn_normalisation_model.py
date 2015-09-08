@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  9_learn_normalisation_model.py <videoList> <faceTrackPosition> <l2MatrixPath> <facePositionReferencePath> <modell2ToProba>
+  9_learn_normalisation_model.py <videoList> <faceTrackPositionPath> <l2MatrixPath> <facePositionReferencePath> <modell2ToProba>
   9_learn_normalisation_model.py -h | --help
 """
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
         # find alignement between facetrack and reference
         facetracks = {}
         l_faceID = set([])
-        for line in open(args['<faceTrackPosition>']+'/'+videoID+'.facetrack').read().splitlines():
+        for line in open(args['<faceTrackPositionPath>']+'/'+videoID+'.facetrack').read().splitlines():
             frameID, faceID, xmin, ymin, w, h = map(int, line.split(' ')) 
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h

@@ -23,9 +23,13 @@ export PYTHONPATH=$PYTHONPATH:path_to_source_code
 
 ## Learn segmenter model for speech nonspeech segmentation
 
+or used the existing model: "Model/modelSpeechNonSpeech"
+
 python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `speakerSegmentationReferencePath` `segment.uem` `modelSpeechNonSpeech` 
 
 ## Speech nonspeech segmentation
+
+`modelSpeechNonSpeech` can be found in the folder "Model"
 
 python 2_speech_nonspeech_segmentation.py `audioFile` `modelSpeechNonSpeech` `speechNonSpeechSegmentation`
 
@@ -43,9 +47,13 @@ python 5_compute_BIC_matrix.py videoID `audioFile` `linearClustering` `BICMatrix
 
 ## learn normalisation model
 
+or used the existing model: "Model/modelBICToProba"
+
 python 6_learn_normalisation_model.py `videoList` `linearClusteringPath` `BICMatrixPath` `speakerSegmentationReferencePath` `modelBICToProba`
 
 ## compute score normalized between speech turns
+
+`modelBICToProba` can be found in the folder "Model"
 
 python 7_normalisation_matrix.py `videoID` `BICMatrix` `modelBICToProba` `probaMatrix`
 

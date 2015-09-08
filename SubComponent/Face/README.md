@@ -28,38 +28,69 @@ export PYTHONPATH=$PYTHONPATH:path_to_source_code
 
 ## face detection
 
-python 1_faceDetection.py `videoFile` `faceDetection` `haarcascade_frontalface_default.xml` --shot_segmentation=`shotSegmentation`
+python 1_faceDetection.py `videoID` `videoFile` `faceDetection` `haarcascade_frontalface_default.xml` --shot_segmentation=`shotSegmentation`
 
 ## face tracking
 
-python 2_face_tracking.py `videoFile` `shotSegmentation` `faceDetection` `faceTrackPosition` `facetrackSegmentation` --idx=`idx`
+If the timestamps in the `faceTrackSegmentation` output are not good (like 0.0 0.0), you can try to used an idx file generate by the script "mediaeval_util/extract_idx.py"
+
+python 2_face_tracking.py `videoID` `videoFile` `shotSegmentation` `faceDetection` `faceTrackPosition` `faceTrackSegmentation` --idx=`idx`
+
+## extract a descriptor per face track to filter out bad face tracks
+
+Change the video width with the good value
+
+python 3_extract_desc_speaking_face.py `videoID` `rawFaceTrackPosition` `rawFaceTrackSegmentation` `descFaceSelection` --videoWidth=1024
+
+## learn a model to filter out bad face tracks
+
+or used the existing model: "Model/model_face_selection"
+
+python 4_learn_model_proba_speaking_face.py `videoList` `faceTrackPositionPath` `descFaceSelection` `facePositionReferencePath` `modelFaceSelection`
+
+## select face tracks
+
+`modelFaceSelection` can be found in the folder "Model"
+
+python 5_selection_facetrack.py `descFaceSelection` `rawFaceTrackPosition` `rawFaceTrackSegmentation` `faceTrackPosition` `faceTrackSegmentation` `modelFaceSelection` --thr=`t` --minDuration=`md`
 
 ## extract facial landmarks
 
-cd 3_extract_flandmark/
+First compile the binary:
+
+cd 6_extract_flandmark/
 mkdir build
 cd build
 cmake ..
 make 
 
+`flandmark_model.dat` can be found in the folder "Model"
+
+
 ./face_landmarks_detection `videoFile` `faceTrackPosition` `flandmark` `flandmark_model.dat`
 
 ## compute central HoG descriptor projected by LDML for each facetrack
 
-python 4_face_HoG_descriptor.py `videoFile` `flandmark` `features_model.txt` `ldml.txt` `faceTrackDescriptor`
+`features_model.txt` `ldml.txt` can be found in the folder "Model"
+
+python 7_facetrack_descriptor.py `videoFile` `flandmark` `features_model.txt` `ldml.txt` `faceTrackDescriptor`
 
 ## compute l2 distance between facetracks
 
-python 5_compute_hvh_matrix.py `faceTrackDescriptor` `l2Matrix`
+python 8_l2_matrix.py `faceTrackDescriptor` `l2Matrix` `faceTrackSegmentation`
 
 ## Learn normalisation model
 
-python 6_learn_normalisation_model.py `video_list` `faceTrackPosition`  `l2MatrixPath` `facePositionReferencePath` `modell2ToProba` 
+or used the existing model: "Model/modell2ToProba"
+
+python 9_learn_normalisation_model.py `video_list` `faceTrackPositionPath`  `l2MatrixPath` `facePositionReferencePath` `modell2ToProba` 
 
 ## normalize l2 distance into probability
 
-python 7_normalisation_matrix.py `l2Matrix` `modell2ToProba` `probaMatrix`
+`modell2ToProba` can be found in the folder "Model"
+
+python 10_normalisation_matrix.py `l2Matrix` `modell2ToProba` `probaMatrix`
 
 ## compute facetrack clustering
 
-python 8_diarization.py `videoID` `facetrackSegmentation` `probaMatrix` `diarization`
+python 11_diarization.py `videoID` `facetrackSegmentation` `probaMatrix` `diarization`

@@ -7,7 +7,7 @@
  - `videoList`: list au videoID to process (.lst)
  - `idx`: indexes of the video files (.MPG.idx), to convert frame number of the video.avi read with opencv to timestamp [frameID typeFrame positionInTheVideo timestamp]
  - `idxPath`: path to the idx file
- - `faceTracking`: face tracks position in each frame (.facetrack) [frameID xmin ymin width height]
+ - `faceTrackPositionPath`: face tracks position in each frame (.facetrack) [frameID xmin ymin width height]
  - `facePositionReferencePath`: face postion in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
  - `speakerSegmentationReferencePath`: path to manual speaker segmentation (.atseg)
  - `speechTurnSegmentation`: speech turn segmentation (.mdtm)
@@ -24,8 +24,18 @@ python 1_extract_desc_speaking_face.py `videoFile` `flandmark` `SpeakingFaceDesc
 
 ## learn a model to find speaking face
 
-python 2_learn_model_proba_speaking_face.py `videoList` `idxPath` `faceTracking` `SpeakingFaceDescriptorPath` `facePositionReferencePath` `speakerSegmentationReferencePath` `modelProbaSpeakingFace`
+or used the existing model: "Model/modelProbaSpeakingFace"
+
+python 2_learn_model_proba_speaking_face.py `videoList` `idxPath` `faceTrackPositionPath` `SpeakingFaceDescriptorPath` `facePositionReferencePath` `speakerSegmentationReferencePath` `modelProbaSpeakingFace`
 
 ## Compute score between face tracks and speech turns
 
-python 3_proba_speaking_face.py `SpeakingFaceDescriptor` `speechTurnSegmentation` `idx` `modelProbaSpeakingFace` `probaSpeakingFace`
+`modelProbaSpeakingFace` can be found in the folder "Model"
+
+python 3_proba_speaking_face.py `videoID` `faceTrackSegmentation` `SpeakingFaceDescriptor` `speechTurnSegmentation` `idx` `modelProbaSpeakingFace` `probaSpeakingFace`
+
+## complete the speaking face matrix for no co-occurring speech turns/face tracks
+
+python 4_complete_speakingFace_matrix.py `videoID` `speechTurnSegmentation` `faceTrackSegmentation` `probaSpeechTurns` `probaFacetracks` `probaSpeakingFace` `output_matrix`
+
+

@@ -2,7 +2,7 @@
 compute probability that a facetrack is speaking
 
 Usage:
-  proba_speaking_face.py <videoID> <facetrack> <SpeakingFaceDescriptor> <speechTurnSegmentation> <idx> <modelProbaSpeakingFace> <probaSpeakingFace>
+  proba_speaking_face.py <videoID> <faceTrackSegmentation> <SpeakingFaceDescriptor> <speechTurnSegmentation> <idx> <modelProbaSpeakingFace> <probaSpeakingFace>
   proba_speaking_face.py -h | --help
 """
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # read speech turn segmentation
     st_seg, confs, timeToFrameID = MESegParser(args['<speechTurnSegmentation>'], args['<videoID>'])
-    facetrack, confs, timeToFrameID = MESegParser(args['<facetrack>'], args['<videoID>'])
+    facetrack, confs, timeToFrameID = MESegParser(args['<faceTrackSegmentation>'], args['<videoID>'])
     faceID_to_TrackID = {}
     for s, trackID, faceID in facetrack.itertracks(label=True):
         faceID_to_TrackID[faceID] = trackID
