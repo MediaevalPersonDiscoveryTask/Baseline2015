@@ -21,7 +21,7 @@
 
 file format can be found [here](https://github.com/MediaevalPersonDiscoveryTask/metadata/wiki/file-format)
 
- #### Model:
+#### Model:
 
  - `haarcascade_frontalface_default.xml`: haar cascasde used by opencv to find face
  - `flandmark_model.dat`: facial landmark model
