@@ -38,10 +38,11 @@ export PYTHONPATH=$PYTHONPATH:path_to_source_code
 python 1_faceDetection.py `videoID` `videoFile` `faceDetection_out` `haarcascade_frontalface_default.xml` --shot_segmentation=`shotSegmentation`
 
 Options:
-  --shotSegmentation=<ss>   shot to process
-  --scaleFactor=<sf>        scaleFactor value (>1.0) [default: 1.1]
-  --minNeighbors=<mn>       minNeighbors value (>1) [default: 4]
-  --minSize=<min>           min size of a face in proportion of the video height [default: 0.0868]
+
+ - --shotSegmentation=<ss>   shot to process
+ - --scaleFactor=<sf>        scaleFactor value (>1.0) [default: 1.1]
+ - --minNeighbors=<mn>       minNeighbors value (>1) [default: 4]
+ - --minSize=<min>           min size of a face in proportion of the video height [default: 0.0868]
 
 ## face tracking
 
@@ -50,18 +51,20 @@ If the timestamps in the `faceTrackSegmentation` output are not good (like 0.0 0
 python 2_face_tracking.py `videoID` `videoFile` `shotSegmentation` `FaceDetection` `rawFaceTrackPosition_out` `rawFaceTrackSegmentation_out` --idx=`idx`
 
 Options:
-  --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
-  --thrNbPtsOF=<nof>        minimum number of point of interest find by th optical flow [default: 8]
-  --thrCoverage=<tc>        if the coverage of 2 boxes is higher than thrCoverage, we consider they correspond to the same face track [default: 0.3]
-  --nbFrameTracking=<nft>   number of frame where with try to find the net detection [default: 15]
-  --idx=<idx>               mapping between frame number to timestamp
+
+ - --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
+ - --thrNbPtsOF=<nof>        minimum number of point of interest find by th optical flow [default: 8]
+ - --thrCoverage=<tc>        if the coverage of 2 boxes is higher than thrCoverage, we consider they correspond to the same face track [default: 0.3]
+ - --nbFrameTracking=<nft>   number of frame where with try to find the net detection [default: 15]
+ - --idx=<idx>               mapping between frame number to timestamp
 
 ## extract a descriptor per face track to filter out bad face tracks
 
 python 3_extract_desc_speaking_face.py `videoID` `rawFaceTrackPosition` `rawFaceTrackSegmentation` `descFaceSelection_out` --videoWidth=1024
 
 Options:
-  --videoWidth=<of>   width of the video [default: 1024]
+
+ - --videoWidth=<of>   width of the video [default: 1024]
 
 ## learn a model to filter out bad face tracks
 
@@ -76,8 +79,9 @@ python 4_learn_model_proba_speaking_face.py `videoList` `rawFaceTrackPositionPat
 python 5_selection_facetrack.py `descFaceSelection` `rawFaceTrackPosition` `rawFaceTrackSegmentation` `faceTrackPosition_out` `faceTrackSegmentation_out` `modelFaceSelection`
 
 Options:
-  --thr=<t>           threshold on score [default: 0.4] 
-  --minDuration=<md>  minimum duration of a facetrack in second [default: 0.2] 
+
+ - --thr=<t>           threshold on score [default: 0.4] 
+ - --minDuration=<md>  minimum duration of a facetrack in second [default: 0.2] 
 
 ## extract facial landmarks
 
@@ -121,4 +125,5 @@ python 10_normalisation_matrix.py `l2Matrix` `modell2ToProba` `probaMatrix_out`
 python 11_diarization.py `videoID` `facetrackSegmentation` `probaMatrix` `diarization_out`
 
 Options:
-  --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
+
+ - --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
