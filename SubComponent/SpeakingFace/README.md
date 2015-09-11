@@ -8,7 +8,7 @@
  - `idx`: indexes of the video files (.MPG.idx), to convert frame number of the video.avi read with opencv to timestamp [frameID typeFrame positionInTheVideo timestamp]
  - `idxPath`: path to the idx file
  - `faceTrackPositionPath`: face tracks position in each frame (.facetrack) [frameID xmin ymin width height]
- - `facePositionReferencePath`: face postion in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
+ - `facePositionReference`: face position in the reference (.position) [frameStart endFrame annotatedFrame personName role pointsPosition]
  - `speakerSegmentationReferencePath`: path to manual speaker segmentation (.atseg)
  - `speechTurnSegmentation`: speech turn segmentation (.mdtm)
  - `probaSpeakingFace` probability that a face track speaks (.mat) [st faceID probability]
@@ -26,7 +26,7 @@ python 1_extract_desc_speaking_face.py `videoFile` `flandmark` `SpeakingFaceDesc
 
 or used the existing model: "Model/modelProbaSpeakingFace"
 
-python 2_learn_model_proba_speaking_face.py `videoList` `idxPath` `faceTrackPositionPath` `SpeakingFaceDescriptorPath` `facePositionReferencePath` `speakerSegmentationReferencePath` `modelProbaSpeakingFace`
+python 2_learn_model_proba_speaking_face.py `videoList` `idxPath` `faceTrackPositionPath` `SpeakingFaceDescriptorPath` `facePositionReference` `speakerSegmentationReferencePath` `modelProbaSpeakingFace`
 
 ## Compute score between face tracks and speech turns
 
