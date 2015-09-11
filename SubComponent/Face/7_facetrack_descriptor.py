@@ -2,7 +2,7 @@
 Compute HoG descriptor projected by LDML for each facetrack
 
 Usage:
-  facetrack_descriptor <videoFile> <flandmark> <features_model.txt> <ldml.txt> <faceTrackDescriptor> 
+  facetrack_descriptor <videoFile> <flandmark> <features_model.txt> <ldml.txt> <faceTrackDescriptor_out> 
   facetrack_descriptor -h | --help
 """
 
@@ -275,7 +275,7 @@ if __name__ == '__main__':
                     projected_desc = np.dot(np.array(HoG_desc, dtype='|S20').astype(np.float), L.T)
                     desc_facetrack.setdefault(i_face, []).append(projected_desc)
     # save the central projected descriptor for each facetrack
-    fout = open(args['<faceTrackDescriptor>'], 'w')
+    fout = open(args['<faceTrackDescriptor_out>'], 'w')
     for i_face, l_desc in sorted(desc_facetrack.items()):
         min_dist = +np.inf
         best_desc = []

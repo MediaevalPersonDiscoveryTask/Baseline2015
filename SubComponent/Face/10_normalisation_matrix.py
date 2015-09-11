@@ -2,7 +2,7 @@
 Compute speaker versus speaker distance
 
 Usage:
-  normalisation_matrix.py <l2Matrix> <modell2ToProba> <probaMatrix>
+  normalisation_matrix.py <l2Matrix> <modell2ToProba> <probaMatrix_out>
   normalisation_matrix.py -h | --help
 """
 
@@ -28,5 +28,5 @@ if __name__ == '__main__':
     y = y.astype(np.float16)
 
     # save matrix
-    pickle.dump(y, open(args['<probaMatrix>'], "wb" ))
+    pickle.dump(y, open(args['<probaMatrix_out>'], "wb" ))
 

@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  9_learn_normalisation_model.py <videoList> <faceTrackPositionPath> <l2MatrixPath> <facePositionReferencePath> <modell2ToProba>
+  9_learn_normalisation_model.py <videoList> <faceTrackPositionPath> <l2MatrixPath> <facePositionReference> <modell2ToProba_out>
   9_learn_normalisation_model.py -h | --help
 """
 
@@ -32,7 +32,7 @@ if __name__ == '__main__':
             facetracks.setdefault(frameID, {})
             facetracks[frameID][faceID] = xmin, ymin, xmin+w, ymin+h
             l_faceID.add(faceID)
-        ref_f = read_ref_facetrack_position(args['<facePositionReferencePath>'], videoID, 0)
+        ref_f = read_ref_facetrack_position(args['<facePositionReference>'], videoID, 0)
         facetrack_vs_ref = align_facetrack_ref(ref_f, facetracks)
 
         # mapping between indice in the matrix and faceID
@@ -60,4 +60,4 @@ if __name__ == '__main__':
     # train model and save it
     clf = CalibratedClassifierCV(LogisticRegression(), method='sigmoid')
     clf.fit(X, Y) 
-    joblib.dump(clf, args['<modell2ToProba>']) 
+    joblib.dump(clf, args['<modell2ToProba_out>']) 

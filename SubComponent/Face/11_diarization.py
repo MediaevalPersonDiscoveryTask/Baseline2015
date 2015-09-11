@@ -2,7 +2,7 @@
 Learn a normalisation model to compute svs matrix
 
 Usage:
-  11_diarization.py <videoID> <faceTrackSegmentation> <probaMatrix> <diarization> [--threshold=<t>]
+  11_diarization.py <videoID> <faceTrackSegmentation> <probaMatrix> <diarization_out> [--threshold=<t>]
   11_diarization.py -h | --help
 Options:
   --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.27]
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         face_seg[s, t] = 'c_'+str(faceID_cluster[int(l)])
 
     # save clustering
-    MESegWriter(face_seg, {}, args['<diarization>'], args['<videoID>'], {})
+    MESegWriter(face_seg, {}, args['<diarization_out>'], args['<videoID>'], {})
     
 
 

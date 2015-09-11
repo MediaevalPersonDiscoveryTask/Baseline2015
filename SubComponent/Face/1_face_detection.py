@@ -2,7 +2,7 @@
 Face detection based on Viola & Jones method
 
 Usage:
-  face_detection.py <videoID> <videoFile> <faceDetection> <haarcascade> [--shotSegmentation=<ss>] [--scaleFactor=<sf>] [--minNeighbors=<mn>] [--minSize=<min>]
+  face_detection.py <videoID> <videoFile> <faceDetection_out> <haarcascade> [--shotSegmentation=<ss>] [--scaleFactor=<sf>] [--minNeighbors=<mn>] [--minSize=<min>]
   face_detection.py -h | --help
 Options:
   --shotSegmentation=<ss>   shot to process
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     last_frame_to_process = max(frames_to_process)
     # save face detection
     c_frame = 0 
-    fout = open(args['<faceDetection>'], 'w')
+    fout = open(args['<faceDetection_out>'], 'w')
     while (c_frame<last_frame_to_process):
         frame = cv.QueryFrame(capture)
         c_frame = int(cv.GetCaptureProperty(capture, cv.CV_CAP_PROP_POS_FRAMES))

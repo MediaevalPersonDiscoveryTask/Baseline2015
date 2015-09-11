@@ -2,7 +2,7 @@
 Extract descriptor to find speaking face
 
 Usage:
-  extract_desc_speaking_face.py <videoID> <rawFaceTrackPosition> <rawFaceTrackSegmentation> <descFaceSelection> [--videoWidth=<vw>] 
+  extract_desc_speaking_face.py <videoID> <rawFaceTrackPosition> <rawFaceTrackSegmentation> <descFaceSelection_out> [--videoWidth=<vw>] 
   extract_desc_speaking_face.py -h | --help
 Options:
   --videoWidth=<of>   width of the video [default: 1024]
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         frameID, faceID, x, y, w, h = line[:-1].split(' ')
         pos.setdefault(faceID, {})
         pos[faceID][int(frameID)] = map(float, [x, y, w, h])
-    fout = open(args['<descFaceSelection>'], 'w')
+    fout = open(args['<descFaceSelection_out>'], 'w')
     for seg, trackID, faceID in face_seg.itertracks(label=True):
         fout.write(faceID+" "+str(confs[trackID])+" "+str(len(pos[faceID]))+" "+str(float(confs[trackID])/len(pos[faceID])))
         l_size, l_central, l_move = [], [], []

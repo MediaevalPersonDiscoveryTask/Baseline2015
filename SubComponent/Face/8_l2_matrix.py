@@ -2,7 +2,7 @@
 Compute head versus head distance
 
 Usage:
-  l2_matrix.py <faceTrackDescriptor> <l2Matrix> <faceTrackSegmentation>
+  l2_matrix.py <faceTrackDescriptor> <l2Matrix_out> <faceTrackSegmentation>
   l2_matrix.py -h | --help
 """
 
@@ -48,6 +48,6 @@ if __name__ == '__main__':
 
     y = spatial.distance.squareform(X, checks=False)
     y = y.astype(np.float16)
-    pickle.dump(y, open(args['<l2Matrix>'], "wb" ))
+    pickle.dump(y, open(args['<l2Matrix_out>'], "wb" ))
 
                 

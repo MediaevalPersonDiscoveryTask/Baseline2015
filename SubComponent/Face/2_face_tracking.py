@@ -2,7 +2,7 @@
 Face tracking based on the face detection and optical flow for miss detection
 
 Usage:
-  face_tracker.py <videoID> <videoFile> <shotSegmentation> <faceDetection> <faceTrackPosition> <faceTrackSegmentation> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
+  face_tracker.py <videoID> <videoFile> <shotSegmentation> <faceDetection> <rawFaceTrackPosition_out> <rawFaceTrackSegmentation_out> [--thrScoreOF=<of>] [--thrNbPtsOF=<nof>] [--thrCoverage=<tc>] [--nbFrameTracking=<nft>] [--idx=<idx>] 
   face_tracker.py -h | --help
 Options:
   --thrScoreOF=<of>         value of the threshold on the optical flow for the tracking [default: 0.3]
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     frames = {}
     frameToTimestamp = {}                                     # list of frame number in the current shot 
     seg_face = {}
-    fout_pos = open(args['<faceTrackPosition>'], 'w')
+    fout_pos = open(args['<rawFaceTrackPosition_out>'], 'w')
     while (frameID<last_frame_to_process):
         ret, frame = capture.read()                             # read the video
         frameID = int(capture.get(cv.CV_CAP_PROP_POS_FRAMES))
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     capture.release()
 
     # write face segmentation
-    fout_seg = open(args['<faceTrackSegmentation>'], 'w')
+    fout_seg = open(args['<rawFaceTrackSegmentation_out>'], 'w')
     trackID=0
     for faceID in sorted(seg_face): 
         conf = 0
