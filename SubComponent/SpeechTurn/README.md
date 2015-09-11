@@ -34,7 +34,6 @@ python 1_learn_model_speech_nonspeech.py `wavePath` `videoList` `speakerSegmenta
 python 2_speech_nonspeech_segmentation.py `audioFile` `modelSpeechNonSpeech` `speechNonSpeechSegmentation`
 
 Options:
-
  - --min_dur_speech=<mds>       minimum duration of a speech segment (>0) [default: 1.0]
  - --min_dur_non_speech=<mdns>  minimum duration of a nonspeech segment (>0) [default: 0.8]
 
@@ -43,7 +42,6 @@ Options:
 python 3_speech_turn_segmentation.py videoID `audioFile` `speechNonSpeechSegmentation` `speechTurnSegmentation`
 
 Options:
-
  - --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 1.2]
  - --min_duration=<md>   minimum duration of a speech turn (>0.0) [default: 1.0]
 
@@ -52,7 +50,6 @@ Options:
 python 4_linear_bic_clustering.py videoID `audioFile` `speechTurnSegmentation` `linearClustering`
 
 Options:
-
  - --penalty_coef=<pc>   penalty coefficient for BIC (>0.0) [default: 2.4]
  - --gap=<g>             maximum gap between 2 speech turns that can be merged (>0.0) [default: 0.8]  
 
@@ -77,7 +74,6 @@ python 7_normalisation_matrix.py `videoID` `BICMatrix` `modelBICToProba` `probaM
 python 8_diarization.py `videoID` `linearClustering` `probaMatrix` `diarization`
 
 Options:
-
  - --threshold=<t>  stop criterion of the agglomerative clustering [default: 0.28]
 
 
